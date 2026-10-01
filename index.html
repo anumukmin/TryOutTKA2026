@@ -708,7 +708,7 @@
     let questionsData = [];
     
     // URL Web App Google Sheets Resmi Milik Pengawas
-    const DEFAULT_SHEETS_URL = "https://script.google.com/macros/s/AKfycbw6K-J4P3Vfa2Sq3IpgSMqUMg04jhGwH1QTgIwqcjOhE4l9N2pWtRrdNv6Dc6ddK9JGlw/exec";
+    const DEFAULT_SHEETS_URL = "https://script.google.com/macros/s/AKfycbzbuBCuVmsvsrxQ5oGlbwbAGql-9fw9UXEpdXt4JPnqmU-sPa4qD1IhVZWlmBGUJ6yOXw/exec";
     let googleSheetsUrl = localStorage.getItem('tryout_sheets_url') || DEFAULT_SHEETS_URL;
 
     // Dataset Awal Contoh Soal Variasi TKA
@@ -1328,7 +1328,6 @@
             }
             // 3. PG Kompleks Benar/Salah (Matrix)
             else if (q.type === 'pgk_matrix') {
-                // Kunci Format: "B,B,S,S"
                 const keyParts = String(q.correct).split(',');
                 const keys = ['A', 'B', 'C', 'D', 'E'];
                 let isAllCorrect = true;
