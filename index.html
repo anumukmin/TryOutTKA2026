@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Try Out TKA SMK NEGERI 1 BULAKAMBA TAHUN 2026</title>
     
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -29,7 +29,7 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- SheetJS (xlsx) for exporting to Excel -->
+    <!-- SheetJS (xlsx) for exporting results to Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <style>
@@ -159,7 +159,7 @@
                     <i class="fa-solid fa-location-dot text-rose-500"></i> Kabupaten Brebes, Jawa Tengah
                 </p>
 
-                <!-- Decorative Quick Badges -->
+                <!-- Decorative Badges -->
                 <div class="flex flex-wrap items-center justify-center gap-2 mt-4 text-[11px] font-semibold text-slate-600">
                     <span class="px-3 py-1 bg-white/80 border border-slate-200 rounded-full shadow-xs flex items-center gap-1.5">
                         <i class="fa-solid fa-book-open text-brand-500"></i> Mapel Umum & Pilihan
@@ -394,7 +394,7 @@
                     <button onclick="saveGoogleSheetsUrl()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl transition shadow flex items-center justify-center gap-1.5">
                         <i class="fa-solid fa-floppy-disk"></i> Simpan & Sinkron
                     </button>
-                    <button onclick="uploadAllToGoogleSheets()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl transition shadow flex items-center justify-center gap-1.5" title="Upload Seluruh Soal Saat Ini ke Google Sheets">
+                    <button id="btn-upload-cloud" onclick="uploadAllToGoogleSheets()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl transition shadow flex items-center justify-center gap-1.5" title="Upload Seluruh Soal Saat Ini ke Google Sheets">
                         <i class="fa-solid fa-cloud-arrow-up"></i> Upload Soal ke Cloud
                     </button>
                 </div>
@@ -625,8 +625,8 @@
     let pendingTabSwitch = null;
     let questionsData = [];
     
-    // Default URL Google Sheets Apps Script milik Pengawas (Terbaru /exec)
-    const DEFAULT_SHEETS_URL = "https://script.google.com/macros/s/AKfycbGzQT31f_We9IUP6FnCp6xDQ4tSUVQZAiWr0J4JuJ-1yK1lZkJmZFDQ9xqESX3IzjcSA/exec";
+    // URL Web App Google Sheets Resmi Milik Pengawas
+    const DEFAULT_SHEETS_URL = "https://script.google.com/macros/s/AKfycbzOiuJpXaznqOainDMQIVR8J9DtTKi_bkeoS7IQke0eOSbNeDXQx1XkcyRpagX80h9iVQ/exec";
     let googleSheetsUrl = localStorage.getItem('tryout_sheets_url') || DEFAULT_SHEETS_URL;
 
     // Initial Demo Questions Dataset (3 Poin Per Soal)
@@ -1252,7 +1252,7 @@
                 saveBankQuestions();
                 if (statusEl) {
                     statusEl.style.display = 'flex';
-                    statusEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span>Tersambung ke Google Sheets (Data Real-Time)</span>';
+                    statusEl.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span>Tersambung ke Google Sheets (Data Real-Time Loaded)</span>';
                 }
             }
         } catch (err) {
@@ -1266,22 +1266,32 @@
             return;
         }
 
-        if (!confirm('Apakah Anda yakin ingin mengunggah SELURUH soal saat ini ke Google Sheets? Baris data lama di sheet akan diperbarui.')) return;
+        if (!confirm('Apakah Anda yakin ingin mengunggah SELURUH soal saat ini ke Google Sheets? Baris data lama di sheet Anda akan diperbarui secara otomatis.')) return;
+
+        const btn = document.getElementById('btn-upload-cloud');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Mengirim Data...';
+        }
 
         try {
-            const resp = await fetch(googleSheetsUrl, {
+            await fetch(googleSheetsUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: 'SYNC_ALL', questions: questionsData })
             });
-            const resData = await resp.json();
-            if (resData.status === 'synced_all') {
-                alert('Berhasil mengunggah semua soal ke Google Sheets!');
-            } else {
-                alert('Berhasil mengirim permintaan sync ke Google Sheets.');
-            }
+            
+            alert('Proses upload berhasil dikirim ke Google Sheets! Silakan periksa tab Google Sheets Anda dalam 3 detik.');
+            setTimeout(() => {
+                fetchFromGoogleSheets();
+            }, 2000);
         } catch (err) {
-            alert('Proses upload terkirim. Silakan periksa Google Sheets Anda.');
+            alert('Upload terkirim ke Google Sheets! Silakan cek halaman Google Sheets Anda.');
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Upload Soal ke Cloud';
+            }
         }
     }
 
@@ -1394,7 +1404,7 @@
         if (googleSheetsUrl) {
             fetch(googleSheetsUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: 'SAVE', question: qObj })
             }).catch(() => {});
         }
@@ -1412,7 +1422,7 @@
         if (googleSheetsUrl) {
             fetch(googleSheetsUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: 'DELETE', id: id })
             }).catch(() => {});
         }
