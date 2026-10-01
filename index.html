@@ -165,7 +165,7 @@
                         <i class="fa-solid fa-book-open text-brand-500"></i> Mapel Umum & Pilihan TKA
                     </span>
                     <span class="px-3 py-1 bg-white/80 border border-slate-200 rounded-full shadow-xs flex items-center gap-1.5">
-                        <i class="fa-solid fa-layer-group text-purple-500"></i> Soal PG & Kompleks
+                        <i class="fa-solid fa-layer-group text-purple-500"></i> PG & Kompleks
                     </span>
                     <span class="px-3 py-1 bg-white/80 border border-slate-200 rounded-full shadow-xs flex items-center gap-1.5">
                         <i class="fa-solid fa-shield-halved text-emerald-500"></i> CBT Anti-Kecurangan
@@ -399,7 +399,7 @@
                     <h3 class="text-lg font-bold flex items-center gap-2">
                         <i class="fa-solid fa-cloud-arrow-up text-emerald-400"></i> Pengaturan Database Cloud (Google Sheets)
                     </h3>
-                    <p class="text-xs text-emerald-100 mt-1">Sistem terhubung otomatis ke Google Sheets untuk menyimpan bank soal TKA secara terpusat.</p>
+                    <p class="text-xs text-emerald-100 mt-1">Sistem terhubung otomatis ke Google Sheets untuk menyimpan bank soal & hasil ujian secara terpusat.</p>
                 </div>
                 <div class="w-full md:w-auto flex flex-col sm:flex-row gap-2">
                     <input type="url" id="google-sheets-url" placeholder="https://script.google.com/macros/s/.../exec" class="px-3 py-2 rounded-xl bg-white/10 border border-white/20 text-white placeholder-emerald-200 text-xs outline-none focus:ring-2 focus:ring-emerald-400 min-w-[280px]">
@@ -472,7 +472,7 @@
         <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div>
                 <h3 class="font-bold text-slate-800 text-base">Rekap Hasil Ujian Siswa</h3>
-                <p class="text-xs text-slate-500 mt-0.5">Seluruh hasil pengerjaan siswa yang tersimpan di perangkat ini.</p>
+                <p class="text-xs text-slate-500 mt-0.5">Seluruh hasil pengerjaan siswa yang tersimpan di perangkat ini & otomatis terkirim ke Google Sheets.</p>
             </div>
             <div class="flex items-center gap-2">
                 <button onclick="exportToExcel()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition shadow flex items-center gap-2">
@@ -707,9 +707,9 @@
     let questionsData = [];
     
     // URL Web App Google Sheets Resmi Terbaru
-    const DEFAULT_SHEETS_URL = "https://script.google.com/macros/s/AKfycbza2MjcfYkRueO0RYCD-xkbxfMl4OzO2-N_NiDDtYom7L0i5AvpVQkF38DyOuDkM6j9/exec";
+    const DEFAULT_SHEETS_URL = "https://script.google.com/macros/s/AKfycbzMSdrxJLBJJX02-l-1jmdcSRgTc131QBSjDFurIqRBAL90MWY76tf4IQct5T3JfFgaVg/exec";
     
-    // Paksa perbarui URL bawaan jika ada URL lama di cache
+    // Paksa perbarui URL jika ada URL lama di cache
     let googleSheetsUrl = DEFAULT_SHEETS_URL;
     localStorage.setItem('tryout_sheets_url', DEFAULT_SHEETS_URL);
 
@@ -1378,9 +1378,20 @@
             violations: activeExam.violations
         };
 
+        // Simpan Hasil ke Browser
         const existingResults = JSON.parse(localStorage.getItem('tryout_results') || '[]');
         existingResults.unshift(resultRecord);
         localStorage.setItem('tryout_results', JSON.stringify(existingResults));
+
+        // OTOMATIS KIRIM HASIL KE GOOGLE SHEETS (Tab "Hasil_Ujian")
+        if (googleSheetsUrl) {
+            fetch(googleSheetsUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'SAVE_RESULT', result: resultRecord })
+            }).catch(err => console.warn('Gagal kirim hasil ke cloud:', err));
+        }
     }
 
     function enterFullscreen() {
@@ -1501,7 +1512,7 @@
                 body: JSON.stringify({ action: 'SYNC_ALL', questions: questionsData })
             });
             
-            alert('Proses upload berhasil dikirim ke Google Sheets! Silakan periksa tab Google Sheets Anda dalam beberapa detik.');
+            alert('Proses upload berhasil dikirim ke Google Sheets! Silakan periksa tab "Bank_Soal" pada Google Sheets Anda.');
             setTimeout(() => {
                 fetchFromGoogleSheets();
             }, 2500);
