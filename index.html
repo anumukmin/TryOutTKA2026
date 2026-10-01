@@ -1494,16 +1494,17 @@
         try {
             await fetch(googleSheetsUrl, {
                 method: 'POST',
+                mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: 'SYNC_ALL', questions: questionsData })
             });
             
-            alert('Proses upload berhasil dikirim ke Google Sheets! Silakan periksa tab Google Sheets Anda.');
+            alert('Proses upload berhasil dikirim ke Google Sheets! Silakan periksa tab Google Sheets Anda dalam beberapa detik.');
             setTimeout(() => {
                 fetchFromGoogleSheets();
-            }, 2000);
+            }, 2500);
         } catch (err) {
-            alert('Upload terkirim ke Google Sheets! Silakan cek halaman Google Sheets Anda.');
+            alert('Upload terkirim ke Google Sheets! Silakan periksa halaman Google Sheets Anda.');
         } finally {
             if (btn) {
                 btn.disabled = false;
@@ -1676,6 +1677,7 @@
         if (googleSheetsUrl) {
             fetch(googleSheetsUrl, {
                 method: 'POST',
+                mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: 'SAVE', question: qObj })
             }).catch(() => {});
@@ -1694,6 +1696,7 @@
         if (googleSheetsUrl) {
             fetch(googleSheetsUrl, {
                 method: 'POST',
+                mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: 'DELETE', id: id })
             }).catch(() => {});
