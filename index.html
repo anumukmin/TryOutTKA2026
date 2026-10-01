@@ -32,10 +32,6 @@
     <!-- SheetJS (xlsx) for exporting to Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-    <!-- KaTeX for Math formatting support -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body {
@@ -59,26 +55,13 @@
             background: #94a3b8;
         }
 
-        /* Pattern Doodle Pendidikan untuk Halaman Depan */
         .edu-doodle-bg {
             background-color: #f0f9ff;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cg fill='%230284c7' fill-opacity='0.08'%3E%3Cpath d='M25 25l20-9 20 9-20 9z'/%3E%3Cpath d='M32 30v7c0 3 6 5 13 5s13-2 13-5v-7' fill='none' stroke='%230284c7' stroke-opacity='0.12' stroke-width='2'/%3E%3Cpath d='M100 22c-5-3-12-3-17 0v16c5-3 12-3 17 0z' fill='none' stroke='%230284c7' stroke-opacity='0.12' stroke-width='2'/%3E%3Cpath d='M100 22c5-3 12-3 17 0z' fill='none' stroke='%230284c7' stroke-opacity='0.12' stroke-width='2'/%3E%3Cpath d='M20 95l30-30 6 6-30 30-8 2z'/%3E%3Ccircle cx='110' cy='95' r='4'/%3E%3Cellipse cx='110' cy='95' rx='14' ry='5' transform='rotate(35 110 95)' fill='none' stroke='%230284c7' stroke-opacity='0.12' stroke-width='1.8'/%3E%3Cellipse cx='110' cy='95' rx='14' ry='5' transform='rotate(-35 110 95)' fill='none' stroke='%230284c7' stroke-opacity='0.12' stroke-width='1.8'/%3E%3Ctext x='65' y='45' font-size='16' font-family='Arial,sans-serif' font-weight='bold' fill-opacity='0.1'%3E%2B %C3%97 %C3%B7 =%3C/text%3E%3Ccircle cx='70' cy='115' r='7' fill='none' stroke='%230284c7' stroke-opacity='0.12' stroke-width='2'/%3E%3Cpath d='M68 122h4m-3 2h2' stroke='%230284c7' stroke-opacity='0.12' stroke-width='2'/%3E%3C/g%3E%3C/svg%3E");
         }
-
-        /* Animasi Mengapung Soft */
-        @keyframes float-slow {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-8px) rotate(2deg); }
-        }
-        .animate-float {
-            animation: float-slow 4s ease-in-out infinite;
-        }
-        .animate-float-delayed {
-            animation: float-slow 5s ease-in-out 1.5s infinite;
-        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between bg-slate-100">
+<body class="min-h-screen flex flex-col justify-between bg-slate-100" oncontextmenu="return false;">
 
 <script>
     const LOGO_SMKN1_BULAKAMBA_PNG = "https://raw.githubusercontent.com/anumukmin/tryout2026/fa43cda08e3610ca170f63a90d1d8caa37dc6d71/logo_smkn_1_bulakamba-removebg-preview.png";
@@ -198,7 +181,7 @@
 
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1">Program Keahlian <span class="text-red-500">*</span></label>
-                    <select id="student-major" required onchange="updateClassOptions()" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none transition bg-white">
+                    <select id="student-major" required onchange="updateClassOptions()" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none transition bg-white cursor-pointer">
                         <option value="" disabled selected>-- Pilih Program Keahlian --</option>
                         <option value="Teknik Kendaraan Ringan">Teknik Kendaraan Ringan</option>
                         <option value="Teknik Sepeda Motor">Teknik Sepeda Motor</option>
@@ -245,9 +228,9 @@
                         <i class="fa-solid fa-shield-halved text-amber-600"></i> Peraturan Keamanan CBT (Anti-Kecurangan):
                     </p>
                     <ul class="list-disc pl-4 space-y-1 text-slate-700">
-                        <li>Layar akan otomatis masuk ke mode **Fullscreen (Layar Penuh)**.</li>
-                        <li>Dilarang **pindah tab, keluar browser, atau membuka aplikasi lain**.</li>
-                        <li>Toleransi pelanggaran maksimal **3x**. Jika melanggar, ujian akan **otomatis dikumpulkan (Auto-Submit)**.</li>
+                        <li>Layar akan otomatis masuk ke mode <b>Fullscreen (Layar Penuh)</b>.</li>
+                        <li>Dilarang <b>pindah tab, keluar browser, atau membuka aplikasi lain</b>.</li>
+                        <li>Toleransi pelanggaran maksimal <b>3x</b>. Jika melanggar, ujian akan <b>otomatis dikumpulkan (Auto-Submit)</b>.</li>
                     </ul>
                 </div>
 
@@ -276,13 +259,11 @@
 
                 <!-- Timer & Violations Counter -->
                 <div class="flex items-center gap-3">
-                    <!-- Violation Counter Badge -->
                     <div id="violation-badge" class="bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs px-3 py-2 rounded-xl font-semibold flex items-center gap-1.5">
                         <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
                         <span>Pelanggaran: <strong id="violation-count-display">0</strong>/3</span>
                     </div>
 
-                    <!-- Countdown Clock -->
                     <div class="bg-slate-800 border border-slate-700 px-4 py-2 rounded-xl flex items-center gap-3">
                         <i class="fa-regular fa-clock text-amber-400 text-lg animate-pulse"></i>
                         <div>
@@ -295,7 +276,6 @@
 
             <!-- CBT Main Content Grid -->
             <div class="flex-grow grid grid-cols-1 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-slate-200">
-                <!-- Question Column (3 cols) -->
                 <div class="lg:col-span-3 p-6 sm:p-8 flex flex-col justify-between">
                     <div>
                         <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-100">
@@ -308,23 +288,18 @@
                             </button>
                         </div>
 
-                        <!-- Question Image (If available) -->
                         <div id="q-image-container" style="display: none;" class="mb-4 max-w-lg mx-auto bg-slate-50 p-2 rounded-xl border border-slate-200">
                             <img id="q-image" src="" alt="Gambar Soal" class="rounded-lg max-h-64 mx-auto object-contain">
                         </div>
 
-                        <!-- Question Text -->
                         <div id="q-text" class="text-slate-800 font-medium text-base sm:text-lg leading-relaxed mb-6 space-y-2">
                             Loading pertanyaan...
                         </div>
 
-                        <!-- Answer Options -->
                         <div id="q-options" class="space-y-3">
-                            <!-- Options injected by JS -->
                         </div>
                     </div>
 
-                    <!-- CBT Navigation Footer -->
                     <div class="mt-8 pt-4 border-t border-slate-100 flex justify-between items-center gap-2">
                         <button onclick="prevQuestion()" id="btn-prev-q" class="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold hover:bg-slate-100 transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2">
                             <i class="fa-solid fa-arrow-left"></i> Sebelum
@@ -338,7 +313,6 @@
                     </div>
                 </div>
 
-                <!-- Question Grid Map Sidebar (1 col) -->
                 <div class="p-6 bg-slate-50/70 flex flex-col justify-between">
                     <div>
                         <h4 class="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
@@ -347,7 +321,6 @@
                         <p class="text-xs text-slate-500 mb-4">Klik nomor untuk melompat langsung ke soal tersebut.</p>
                         
                         <div id="q-grid-nav" class="grid grid-cols-5 gap-2 max-h-72 overflow-y-auto custom-scrollbar p-1">
-                            <!-- Number buttons generated by JS -->
                         </div>
                     </div>
 
@@ -371,14 +344,12 @@
                 <p id="res-date-info" class="text-xs text-slate-400 mt-0.5">Waktu Selesai: -</p>
             </div>
 
-            <!-- Score Display Box -->
             <div class="bg-gradient-to-br from-brand-900 to-brand-700 text-white rounded-2xl p-6 text-center shadow-lg mb-6">
                 <span class="text-xs font-semibold uppercase tracking-widest text-brand-100">Nilai Akhir Ujian</span>
                 <div class="text-5xl font-black my-2 tracking-tight" id="res-final-score">0</div>
                 <p class="text-xs text-brand-100" id="res-score-detail">Terjawab 0 dari 0 Soal</p>
             </div>
 
-            <!-- Stats Grid -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 text-center text-xs">
                 <div class="bg-emerald-50 border border-emerald-100 p-3 rounded-xl">
                     <span class="text-slate-500 block">Benar</span>
@@ -423,6 +394,9 @@
                     <button onclick="saveGoogleSheetsUrl()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl transition shadow flex items-center justify-center gap-1.5">
                         <i class="fa-solid fa-floppy-disk"></i> Simpan & Sinkron
                     </button>
+                    <button onclick="uploadAllToGoogleSheets()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl transition shadow flex items-center justify-center gap-1.5" title="Upload Seluruh Soal Saat Ini ke Google Sheets">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload Soal ke Cloud
+                    </button>
                 </div>
             </div>
             <div id="sheets-sync-status" class="mt-3 text-xs font-semibold text-emerald-300 flex items-center gap-2">
@@ -430,7 +404,6 @@
             </div>
         </div>
 
-        <!-- Question Filter & Add Button Bar -->
         <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
                 <div>
@@ -461,7 +434,6 @@
             </div>
         </div>
 
-        <!-- Bank Soal Table -->
         <div class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-xs">
@@ -476,7 +448,6 @@
                         </tr>
                     </thead>
                     <tbody id="bank-table-body" class="divide-y divide-slate-100">
-                        <!-- Table rows injected by JS -->
                     </tbody>
                 </table>
             </div>
@@ -516,7 +487,6 @@
                         </tr>
                     </thead>
                     <tbody id="results-table-body" class="divide-y divide-slate-100">
-                        <!-- Rows injected by JS -->
                     </tbody>
                 </table>
             </div>
@@ -655,11 +625,11 @@
     let pendingTabSwitch = null;
     let questionsData = [];
     
-    // Default URL Google Sheets Apps Script
-    const DEFAULT_SHEETS_URL = "https://script.google.com/macros/s/AKfycbz5JPPVNS8AbngBxc9GfgoCj7YOaVm_eulzr4Nyn1w1SvefcxAS-r8cMJiUwn0KiTiyhQ/exec";
+    // Default URL Google Sheets Apps Script milik Pengawas (Terbaru /exec)
+    const DEFAULT_SHEETS_URL = "https://script.google.com/macros/s/AKfycbGzQT31f_We9IUP6FnCp6xDQ4tSUVQZAiWr0J4JuJ-1yK1lZkJmZFDQ9xqESX3IzjcSA/exec";
     let googleSheetsUrl = localStorage.getItem('tryout_sheets_url') || DEFAULT_SHEETS_URL;
 
-    // Initial Demo Questions Dataset
+    // Initial Demo Questions Dataset (3 Poin Per Soal)
     const INITIAL_QUESTIONS = [
         {
             id: 'q1',
@@ -1175,7 +1145,6 @@
         document.getElementById('res-empty-count').textContent = emptyCount;
         document.getElementById('res-violation-count').textContent = activeExam.violations;
 
-        // Save Result to Local History
         const resultRecord = {
             id: 'res_' + Date.now(),
             date: new Date().toISOString(),
@@ -1288,6 +1257,31 @@
             }
         } catch (err) {
             console.warn('Gagal menarik data dari Google Sheets:', err);
+        }
+    }
+
+    async function uploadAllToGoogleSheets() {
+        if (!googleSheetsUrl) {
+            alert('URL Google Sheets belum dikonfigurasi!');
+            return;
+        }
+
+        if (!confirm('Apakah Anda yakin ingin mengunggah SELURUH soal saat ini ke Google Sheets? Baris data lama di sheet akan diperbarui.')) return;
+
+        try {
+            const resp = await fetch(googleSheetsUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'SYNC_ALL', questions: questionsData })
+            });
+            const resData = await resp.json();
+            if (resData.status === 'synced_all') {
+                alert('Berhasil mengunggah semua soal ke Google Sheets!');
+            } else {
+                alert('Berhasil mengirim permintaan sync ke Google Sheets.');
+            }
+        } catch (err) {
+            alert('Proses upload terkirim. Silakan periksa Google Sheets Anda.');
         }
     }
 
