@@ -1,105 +1,675 @@
-function doGet(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var data = sheet.getDataRange().getValues();
-  if (data.length <= 1) {
-    return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
-  }
-  var result = [];
-  for (var i = 1; i < data.length; i++) {
-    var row = data[i];
-    if (!row[0]) continue;
-    result.push({
-      id: String(row[0]),
-      category: String(row[1]),
-      weight: Number(row[2]) || 3,
-      question: String(row[3]),
-      image: row[4] ? String(row[4]) : null,
-      options: {
-        A: String(row[5] || ''),
-        B: String(row[6] || ''),
-        C: String(row[7] || ''),
-        D: String(row[8] || ''),
-        E: String(row[9] || '')
-      },
-      correct: String(row[10] || 'A'),
-      discussion: String(row[11] || '')
-    });
-  }
-  return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
-}
-
-function doPost(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var payload = JSON.parse(e.postData.contents);
-  var action = payload.action;
-
-  if (action === 'SAVE') {
-    var q = payload.question;
-    var data = sheet.getDataRange().getValues();
-    var foundRow = -1;
-    for (var i = 1; i < data.length; i++) {
-      if (String(data[i][0]) === String(q.id)) {
-        foundRow = i + 1;
-        break;
-      }
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    brand: {
+                        50: '#f0f9ff',
+                        100: '#e0f2fe',
+                        500: '#0284c7',
+                        600: '#0369a1',
+                        700: '#075985',
+                        900: '#0c4a6e',
+                    }
+                }
+            }
+        }
     }
-    var rowData = [
-      q.id,
-      q.category,
-      q.weight || 3,
-      q.question,
-      q.image || '',
-      q.options.A || '',
-      q.options.B || '',
-      q.options.C || '',
-      q.options.D || '',
-      q.options.E || '',
-      q.correct,
-      q.discussion || ''
-    ];
+</script>
 
-    if (foundRow > 0) {
-      sheet.getRange(foundRow, 1, 1, rowData.length).setValues([rowData]);
-    } else {
-      sheet.appendRow(rowData);
-    }
-    return ContentService.createTextOutput(JSON.stringify({status: 'success'})).setMimeType(ContentService.MimeType.JSON);
-  }
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  if (action === 'DELETE') {
-    var id = payload.id;
-    var data = sheet.getDataRange().getValues();
-    for (var i = 1; i < data.length; i++) {
-      if (String(data[i][0]) === String(id)) {
-        sheet.deleteRow(i + 1);
-        break;
-      }
-    }
-    return ContentService.createTextOutput(JSON.stringify({status: 'deleted'})).setMimeType(ContentService.MimeType.JSON);
-  }
+<!-- SheetJS (xlsx) for exporting to Excel -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-  if (action === 'SYNC_ALL') {
-    var lastRow = sheet.getLastRow();
-    if (lastRow > 1) {
-      sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).clearContent();
+<!-- KaTeX for Math formatting support -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f8fafc;
+        user-select: none; /* Cegah seleksi teks */
+        -webkit-user-select: none;
     }
-    var questions = payload.questions || [];
-    questions.forEach(function(q) {
-      sheet.appendRow([
-        q.id,
-        q.category,
-        q.weight || 3,
-        q.question,
-        q.image || '',
-        q.options.A || '',
-        q.options.B || '',
-        q.options.C || '',
-        q.options.D || '',
-        q.options.E || '',
-        q.correct,
-        q.discussion || ''
-      ]);
-    });
-    return ContentService.createTextOutput(JSON.stringify({status: 'synced_all'})).setMimeType(ContentService.MimeType.JSON);
-  }
-}
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f5f9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+
+    /* Pattern Doodle Pendidikan untuk Halaman Depan */
+    .edu-doodle-bg {
+        background-color: #f0f9ff;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cg fill='%230284c7' fill-opacity='0.08'%3E%3C!-- Topi Toga / Graduation --%3E%3Cpath d='M25 25l20-9 20 9-20 9z'/%3E%3Cpath d='M32 30v7c0 3 6 5 13 5s13-2 13-5v-7' fill='none' stroke='%230284c7' stroke-opacity='0.12' stroke-width='2'/%3E%3C!-- Buku Terbuka --%3E%3Cpath d='M100 22c-5-3-12-3-17 0v16c5-3 12-3 17 0z' fill='none' stroke='%230284c7' stroke-opacity='0.12' stroke-width='2'/%3E%3Cpath d='M100 22c5-3 12-3 17 0z' fill='none' stroke='%230284c7' stroke-opacity='0.12' stroke-width='2'/%3E%3C!-- Pensil --%3E%3Cpath d='M20 95l30-30 6 6-30 30-8 2z'/%3E%3C!-- Atom / Sains --%3E%3Ccircle cx='110' cy='95' r='4'/%3E%3Cellipse cx='110' cy='95' rx='14' ry='5' transform='rotate(35 110 95)' fill='none' stroke='%230284c7' stroke-opacity='0.12' stroke-width='1.8'/%3E%3Cellipse cx='110' cy='95' rx='14' ry='5' transform='rotate(-35 110 95)' fill='none' stroke='%230284c7' stroke-opacity='0.12' stroke-width='1.8'/%3E%3C!-- Simbol Matematika --%3E%3Ctext x='65' y='45' font-size='16' font-family='Arial,sans-serif' font-weight='bold' fill-opacity='0.1'%3E%2B %C3%97 %C3%B7 =%3C/text%3E%3C!-- Lampu Ide --%3E%3Ccircle cx='70' cy='115' r='7' fill='none' stroke='%230284c7' stroke-opacity='0.12' stroke-width='2'/%3E%3Cpath d='M68 122h4m-3 2h2' stroke='%230284c7' stroke-opacity='0.12' stroke-width='2'/%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    /* Animasi Mengapung Soft */
+    @keyframes float-slow {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-8px) rotate(2deg); }
+    }
+    .animate-float {
+        animation: float-slow 4s ease-in-out infinite;
+    }
+    .animate-float-delayed {
+        animation: float-slow 5s ease-in-out 1.5s infinite;
+    }
+</style>
+
+
+        <!-- Navigation Tabs (Desktop) -->
+        <nav class="hidden md:flex space-x-1 items-center">
+            <button id="nav-tryout" onclick="switchTab('tryout')" class="nav-btn active px-4 py-2 rounded-lg text-sm font-medium transition duration-200 bg-brand-700 text-white flex items-center gap-2">
+                <i class="fa-solid fa-pen-to-square"></i> Mulai Try Out
+            </button>
+            <button id="nav-bank" onclick="switchTab('bank')" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition duration-200 hover:bg-brand-700 text-brand-100 flex items-center gap-2">
+                <i class="fa-solid fa-lock text-xs text-amber-300" id="lock-icon-bank"></i>
+                <i class="fa-solid fa-book-open"></i> Bank Soal & Input
+            </button>
+            <button id="nav-results" onclick="switchTab('results')" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition duration-200 hover:bg-brand-700 text-brand-100 flex items-center gap-2">
+                <i class="fa-solid fa-lock text-xs text-amber-300" id="lock-icon-results"></i>
+                <i class="fa-solid fa-square-poll-vertical"></i> Hasil & Ekspor Excel
+            </button>
+
+            <!-- Status Admin Badge -->
+            <div id="admin-badge" class="hidden ml-2 px-2.5 py-1 bg-amber-500/20 border border-amber-400 text-amber-300 rounded-lg text-xs font-semibold flex items-center gap-1.5">
+                <i class="fa-solid fa-user-shield"></i> Mode Pengawas
+                <button onclick="logoutAdmin()" title="Kunci Akses Pengawas" class="ml-1 text-slate-300 hover:text-white"><i class="fa-solid fa-right-from-bracket"></i></button>
+            </div>
+        </nav>
+
+        <!-- Mobile Menu Button -->
+        <div class="md:hidden flex items-center">
+            <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="text-white hover:text-brand-100 p-2 focus:outline-none">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Navigation Menu -->
+<div id="mobile-menu" class="hidden md:hidden bg-brand-800 border-t border-brand-700 px-4 pt-2 pb-4 space-y-2">
+    <button onclick="switchTab('tryout'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-brand-700 flex items-center gap-2">
+        <i class="fa-solid fa-pen-to-square"></i> Mulai Try Out
+    </button>
+    <button onclick="switchTab('bank'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-brand-100 hover:bg-brand-700 flex items-center gap-2">
+        <i class="fa-solid fa-lock text-xs text-amber-300"></i>
+        <i class="fa-solid fa-book-open"></i> Bank Soal & Input
+    </button>
+    <button onclick="switchTab('results'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-brand-100 hover:bg-brand-700 flex items-center gap-2">
+        <i class="fa-solid fa-lock text-xs text-amber-300"></i>
+        <i class="fa-solid fa-square-poll-vertical"></i> Hasil & Ekspor Excel
+    </button>
+</div>
+
+
+<!-- ================= TAB 1: TRY OUT MODULE ================= -->
+<section id="tab-tryout" class="tab-content relative">
+    
+    <!-- 1A. START EXAM / PARTICIPANT REGISTRATION FORM -->
+    <div id="exam-prep-card" class="max-w-2xl mx-auto bg-white/95 backdrop-blur-md rounded-3xl shadow-xl border border-sky-100 p-6 sm:p-9 relative z-10 overflow-hidden edu-doodle-bg">
+        
+        <!-- Decorative Top Ambient Glow -->
+        <div class="absolute -top-20 -left-20 w-48 h-48 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-20 -right-20 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Floating Doodle Badge Left -->
+        <div class="hidden sm:flex absolute top-6 left-6 w-12 h-12 bg-white border border-brand-100 rounded-2xl shadow-sm items-center justify-center text-brand-600 text-lg animate-float" title="Tes Akademik">
+            <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+
+        <!-- Floating Doodle Badge Right -->
+        <div class="hidden sm:flex absolute top-6 right-6 w-12 h-12 bg-white border border-amber-100 rounded-2xl shadow-sm items-center justify-center text-amber-500 text-lg animate-float-delayed" title="Literasi & Numerasi">
+            <i class="fa-solid fa-lightbulb"></i>
+        </div>
+
+        <div class="text-center mb-6 relative">
+            <div class="inline-flex items-center justify-center p-3 bg-white border-2 border-brand-100 rounded-2xl mb-3 shadow-md transform hover:scale-105 transition duration-300">
+                <img src="https://raw.githubusercontent.com/anumukmin/tryout2026/fa43cda08e3610ca170f63a90d1d8caa37dc6d71/logo_smkn_1_bulakamba-removebg-preview.png" alt="Logo SMKN 1 Bulakamba" class="w-20 h-20 object-contain" onerror="handleLogoError(this)">
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">Try Out TKA TAHUN 2026</h2>
+            <p class="text-brand-600 font-bold text-sm tracking-widest uppercase mt-1">SMK NEGERI 1 BULAKAMBA</p>
+            <p class="text-xs text-slate-500 mt-1 flex items-center justify-center gap-1">
+                <i class="fa-solid fa-location-dot text-rose-500"></i> Kabupaten Brebes, Jawa Tengah
+            </p>
+
+            <!-- Decorative Quick Badges -->
+            <div class="flex flex-wrap items-center justify-center gap-2 mt-4 text-[11px] font-semibold text-slate-600">
+                <span class="px-3 py-1 bg-white/80 border border-slate-200 rounded-full shadow-xs flex items-center gap-1.5">
+                    <i class="fa-solid fa-book-open text-brand-500"></i> Mapel Umum & Pilihan
+                </span>
+                <span class="px-3 py-1 bg-white/80 border border-slate-200 rounded-full shadow-xs flex items-center gap-1.5">
+                    <i class="fa-solid fa-stopwatch text-amber-500"></i> Durasi 60-75 Mnt / Mapel
+                </span>
+                <span class="px-3 py-1 bg-white/80 border border-slate-200 rounded-full shadow-xs flex items-center gap-1.5">
+                    <i class="fa-solid fa-shield-halved text-emerald-500"></i> CBT Anti-Kecurangan
+                </span>
+            </div>
+        </div>
+
+        <form id="start-exam-form" onsubmit="handleStartExam(event)" class="space-y-4 relative bg-white/80 p-5 sm:p-6 rounded-2xl border border-slate-100 shadow-sm backdrop-blur-sm">
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Murid <span class="text-red-500">*</span></label>
+                <input type="text" id="student-name" required pattern="[a-zA-Z\s'.,\-]+" title="Nama murid harus berisi huruf dan simbol" placeholder="Contoh: Budi Santoso, S.Pd." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition bg-white">
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Program Keahlian <span class="text-red-500">*</span></label>
+                <select id="student-major" required onchange="updateClassOptions()" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none transition bg-white">
+                    <option value="" disabled selected>-- Pilih Program Keahlian --</option>
+                    <option value="Teknik Kendaraan Ringan">Teknik Kendaraan Ringan</option>
+                    <option value="Teknik Sepeda Motor">Teknik Sepeda Motor</option>
+                    <option value="Agribisnis Tanaman Pangan dan Hortikultura">Agribisnis Tanaman Pangan dan Hortikultura</option>
+                    <option value="Teknik Instalasi Tenaga Listrik">Teknik Instalasi Tenaga Listrik</option>
+                    <option value="Teknik Audio Video">Teknik Audio Video</option>
+                    <option value="Nautika Kapal Penangkap Ikan">Nautika Kapal Penangkap Ikan</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Kelas <span class="text-red-500">*</span></label>
+                <select id="student-class" required disabled class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none transition bg-white disabled:bg-slate-100 disabled:text-slate-400 cursor-pointer disabled:cursor-not-allowed">
+                    <option value="" disabled selected>-- Pilih Program Keahlian Terlebih Dahulu --</option>
+                </select>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Pilih Mata Pelajaran / Subtes <span class="text-red-500">*</span></label>
+                    <select id="exam-subtest-filter" onchange="updateExamDurationDisplay()" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none transition bg-white">
+                        <optgroup label="Mata Pelajaran Wajib (75 Menit)">
+                            <option value="Bahasa Indonesia" selected>Bahasa Indonesia (30 Soal)</option>
+                            <option value="Matematika">Matematika (25 Soal)</option>
+                            <option value="Bahasa Inggris">Bahasa Inggris (30 Soal)</option>
+                        </optgroup>
+                        <optgroup label="Mata Pelajaran Pilihan (60 Menit)">
+                            <option value="Kewirausahaan">Kewirausahaan (25 Soal)</option>
+                            <option value="Program Keahlian">Program Keahlian Sesuai Jurusan (25 Soal)</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Durasi Pengerjaan</label>
+                    <div class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-100 font-semibold text-slate-700 flex items-center justify-between">
+                        <span class="flex items-center gap-2" id="exam-duration-display"><i class="fa-regular fa-clock text-brand-600"></i> 75 Menit</span>
+                        <span class="text-xs bg-brand-100 text-brand-700 px-2.5 py-0.5 rounded-full font-bold" id="exam-duration-badge">30 Soal Target</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-amber-50/90 border border-amber-200 rounded-xl p-4 text-xs text-amber-900 space-y-2 backdrop-blur-sm">
+                <p class="font-bold text-amber-950 flex items-center gap-1.5">
+                    <i class="fa-solid fa-shield-halved text-amber-600"></i> Peraturan Keamanan CBT (Anti-Kecurangan):
+                </p>
+                <ul class="list-disc pl-4 space-y-1 text-slate-700">
+                    <li>Layar akan otomatis masuk ke mode **Fullscreen (Layar Penuh)**.</li>
+                    <li>Dilarang **pindah tab, keluar browser, atau membuka aplikasi lain**.</li>
+                    <li>Toleransi pelanggaran maksimal **3x**. Jika melanggar, ujian akan **otomatis dikumpulkan (Auto-Submit)**.</li>
+                </ul>
+            </div>
+
+            <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 active:scale-[0.99] text-white font-semibold py-3.5 px-6 rounded-xl shadow-lg hover:shadow-brand-500/25 transition duration-200 flex items-center justify-center gap-2 text-base">
+                <i class="fa-solid fa-play"></i> Mulai Simulasi Ujian
+            </button>
+        </form>
+    </div>
+
+    <!-- 1B. CBT EXAM INTERFACE (HIDDEN BY DEFAULT) -->
+    <div id="cbt-exam-interface" class="hidden flex-col gap-6">
+        <!-- Top Status Bar -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-3 w-full md:w-auto">
+                <img src="https://raw.githubusercontent.com/anumukmin/tryout2026/fa43cda08e3610ca170f63a90d1d8caa37dc6d71/logo_smkn_1_bulakamba-removebg-preview.png" alt="Logo" class="w-8 h-8 object-contain hidden sm:block" onerror="handleLogoError(this)">
+                <span class="bg-brand-100 text-brand-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider" id="cbt-subtest-label">Subtes TKA</span>
+                <div>
+                    <span class="text-sm text-slate-500">Peserta:</span>
+                    <span class="font-semibold text-slate-800 ml-1" id="cbt-student-display">Nama Peserta</span>
+                </div>
+            </div>
+
+            <!-- Warning Indicator Badge -->
+            <div id="cheat-warning-badge" class="bg-rose-50 border border-rose-200 text-rose-700 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-2">
+                <i class="fa-solid fa-triangle-exclamation text-rose-500 animate-pulse"></i>
+                <span>Pelanggaran: <strong id="cheat-count-display" class="text-rose-900 text-sm">0</strong> / 3</span>
+            </div>
+
+            <!-- Countdown Timer -->
+            <div class="flex items-center gap-3 bg-slate-900 text-white px-5 py-2 rounded-xl shadow">
+                <i class="fa-regular fa-clock text-amber-400 text-lg animate-pulse"></i>
+                <div>
+                    <div class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Sisa Waktu</div>
+                    <div class="text-xl font-mono font-bold tracking-wider" id="cbt-timer">00:00:00</div>
+                </div>
+            </div>
+
+            <!-- Finish Exam Button -->
+            <button onclick="promptFinishExam()" class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-check-double"></i> Selesaikan Ujian
+            </button>
+        </div>
+
+        <!-- Exam Grid Layout: Left (Question & Options), Right (Question Matrix) -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Main Question Panel -->
+            <div class="lg:col-span-3 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-between min-h-[480px]">
+                <div>
+                    <!-- Question Header -->
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-4">
+                        <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
+                            <span class="bg-brand-600 text-white w-8 h-8 rounded-lg flex items-center justify-center text-sm" id="cbt-question-number">1</span>
+                            Soal Nomor <span id="cbt-question-curr-num">1</span> dari <span id="cbt-question-total-num">10</span>
+                        </h3>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs bg-amber-100 text-amber-800 font-bold px-2.5 py-1 rounded-md border border-amber-300" id="cbt-question-weight">Bobot: 3 Poin</span>
+                            <span class="text-xs bg-slate-100 text-slate-600 font-medium px-2.5 py-1 rounded-md" id="cbt-question-category">Kategori</span>
+                        </div>
+                    </div>
+
+                    <!-- Question Text -->
+                    <div class="prose max-w-none text-slate-800 text-base leading-relaxed mb-6 font-normal">
+                        <div id="cbt-question-text">Loading soal...</div>
+                        <div id="cbt-question-image-box" class="mt-4 hidden text-center">
+                            <img id="cbt-question-image" src="" alt="Gambar Soal" class="max-h-80 mx-auto rounded-xl shadow-sm border border-slate-200 object-contain">
+                        </div>
+                    </div>
+
+                    <!-- Options List -->
+                    <div class="space-y-3" id="cbt-options-container">
+                        <!-- Dynamic Options A-E -->
+                    </div>
+                </div>
+
+                <!-- Navigation Footer Buttons -->
+                <div class="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-5 mt-6">
+                    <button onclick="prevQuestion()" id="btn-prev" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium text-sm transition flex items-center gap-2 disabled:opacity-50">
+                        <i class="fa-solid fa-arrow-left"></i> Sebelumnya
+                    </button>
+
+                    <button onclick="toggleFlagCurrentQuestion()" id="btn-flag" class="px-4 py-2.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-300 rounded-xl font-medium text-sm transition flex items-center gap-2">
+                        <i class="fa-solid fa-flag"></i> <span id="flag-btn-text">Ragu-Ragu</span>
+                    </button>
+
+                    <button onclick="nextQuestion()" id="btn-next" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-medium text-sm transition flex items-center gap-2">
+                        Selanjutnya <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Question Matrix / Navigation Grid -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col">
+                <h4 class="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-grip text-brand-600"></i> Nomor Soal
+                </h4>
+
+                <!-- Legend -->
+                <div class="grid grid-cols-3 gap-1 mb-4 text-[11px] text-slate-600 border-b border-slate-100 pb-3">
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-3 h-3 rounded-md bg-emerald-500 inline-block"></span> Terjawab
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-3 h-3 rounded-md bg-amber-400 inline-block"></span> Ragu
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-3 h-3 rounded-md bg-slate-200 inline-block"></span> Belum
+                    </div>
+                </div>
+
+                <!-- Number Buttons Container -->
+                <div class="grid grid-cols-5 gap-2 overflow-y-auto max-h-72 custom-scrollbar p-1" id="question-matrix-grid">
+                    <!-- Dynamic Question Matrix -->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ================= TAB 2: BANK SOAL & INPUT MANUAL ================= -->
+<section id="tab-bank" class="tab-content hidden space-y-6">
+    
+    <!-- GOOGLE SHEETS SYNC SETTINGS BOX (HANYA DITAMPILKAN DI MODE PENGAWAS) -->
+    <div id="gas-sync-panel" class="bg-emerald-50/90 border border-emerald-200 rounded-2xl p-5 shadow-sm space-y-3">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-emerald-200/60 pb-2">
+            <h3 class="font-bold text-emerald-900 text-sm flex items-center gap-2">
+                <i class="fa-solid fa-cloud-arrow-up text-emerald-600 text-base"></i> Database Cloud (Google Sheets Integration)
+            </h3>
+            <span class="text-[11px] bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full font-semibold" id="gas-status-badge">Mode Offline / LocalStorage</span>
+        </div>
+        <p class="text-xs text-slate-600">Masukkan URL Web App dari Google Apps Script untuk menghubungkan bank soal langsung ke Google Sheets secara gratis.</p>
+
+        <div class="flex flex-col sm:flex-row gap-2">
+            <input type="url" id="gas-url-input" placeholder="Paste Web App URL (https://script.google.com/macros/s/.../exec)" class="flex-grow px-3.5 py-2 border border-slate-300 rounded-xl text-xs outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+            <button onclick="saveGasUrlAndSync()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-xl text-xs shadow transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-floppy-disk"></i> Simpan URL & Sinkronkan
+            </button>
+            <button onclick="uploadAllToSheets()" id="btn-force-upload" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-3.5 py-2 rounded-xl text-xs shadow transition flex items-center justify-center gap-2 hidden">
+                <i class="fa-solid fa-upload"></i> Unggah Semua Soal ke Sheets
+            </button>
+        </div>
+    </div>
+
+    <!-- Header Actions -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+            <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-database text-brand-600"></i> Kelola Bank Soal & Bobot Nilai TKA
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">Tambah, edit, tentukan bobot per soal, serta pantau total poin tiap mata pelajaran (Target Total: 100).</p>
+        </div>
+        <div class="flex flex-wrap gap-2 w-full md:w-auto">
+            <button onclick="openQuestionModal()" class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl font-medium text-sm shadow transition flex items-center gap-2">
+                <i class="fa-solid fa-plus"></i> Tambah Soal Manual
+            </button>
+            <button onclick="resetDefaultQuestions()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2.5 rounded-xl font-medium text-sm transition flex items-center gap-2">
+                <i class="fa-solid fa-rotate-left"></i> Reset Demo Soal
+            </button>
+        </div>
+    </div>
+
+    <!-- REKAPITULASI TOTAL BOBOT PER MAPEL CONTAINER -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+        <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+            <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                <i class="fa-solid fa-calculator text-brand-600"></i> Ringkasan Total Bobot Nilai per Mata Pelajaran (Target: 100 Poin)
+            </h3>
+            <span class="text-xs text-slate-500">Otomatis Terhitung</span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3" id="subject-weight-summary-grid">
+            <!-- Dynamic Summary Badges -->
+        </div>
+    </div>
+
+    <!-- Filter & Search Bar -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col sm:flex-row items-center gap-4">
+        <div class="relative flex-grow w-full">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400"></i>
+            <input type="text" id="bank-search" oninput="renderQuestionBankTable()" placeholder="Cari teks soal atau pembahasan..." class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+        </div>
+        <select id="bank-filter-subtest" onchange="renderQuestionBankTable()" class="w-full sm:w-72 px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 outline-none bg-white">
+            <option value="ALL">Semua Kategori Bank Soal</option>
+            <optgroup label="Mata Pelajaran Wajib">
+                <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                <option value="Matematika">Matematika</option>
+                <option value="Bahasa Inggris">Bahasa Inggris</option>
+            </optgroup>
+            <optgroup label="Mata Pelajaran Pilihan">
+                <option value="Kewirausahaan">Kewirausahaan</option>
+                <option value="SMK - Teknik Kendaraan Ringan">SMK - Teknik Kendaraan Ringan</option>
+                <option value="SMK - Teknik Sepeda Motor">SMK - Teknik Sepeda Motor</option>
+                <option value="SMK - Agribisnis Tanaman Pangan dan Hortikultura">SMK - Agribisnis Tanaman Pangan dan Hortikultura</option>
+                <option value="SMK - Teknik Instalasi Tenaga Listrik">SMK - Teknik Instalasi Tenaga Listrik</option>
+                <option value="SMK - Teknik Audio Video">SMK - Teknik Audio Video</option>
+                <option value="SMK - Nautika Kapal Penangkap Ikan">SMK - Nautika Kapal Penangkap Ikan</option>
+            </optgroup>
+        </select>
+    </div>
+
+    <!-- Question Bank Table List -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold text-xs uppercase tracking-wider">
+                        <th class="p-4 w-12 text-center">No</th>
+                        <th class="p-4 w-40">Subtes</th>
+                        <th class="p-4">Pertanyaan Soal</th>
+                        <th class="p-4 w-28 text-center">Bobot</th>
+                        <th class="p-4 w-24 text-center">Kunci</th>
+                        <th class="p-4 w-32 text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="bank-table-body" class="divide-y divide-slate-100">
+                    <!-- Dynamic Questions Row -->
+                </tbody>
+            </table>
+        </div>
+        <div id="bank-empty-state" class="hidden p-8 text-center text-slate-400">
+            <i class="fa-regular fa-folder-open text-4xl mb-2"></i>
+            <p class="text-sm">Tidak ada soal yang ditemukan.</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- ================= TAB 3: HASIL & EKSPOR EXCEL ================= -->
+<section id="tab-results" class="tab-content hidden space-y-6">
+    <!-- Header Summary & Export All Button -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+            <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-file-excel text-emerald-600"></i> Rekapitulasi Hasil Try Out
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">Lihat riwayat ujian peserta dan ekspor data nilai ke file Microsoft Excel (.xlsx).</p>
+        </div>
+        <button onclick="exportAllResultsToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm shadow transition flex items-center gap-2">
+            <i class="fa-solid fa-file-export"></i> Ekspor Semua Hasil ke Excel (.xlsx)
+        </button>
+    </div>
+
+    <!-- Results History Table -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold text-xs uppercase tracking-wider">
+                        <th class="p-4">Tanggal & Waktu</th>
+                        <th class="p-4">Nama Murid</th>
+                        <th class="p-4">Kelas</th>
+                        <th class="p-4">Program Keahlian</th>
+                        <th class="p-4">Subtes</th>
+                        <th class="p-4 text-center">Pelanggaran</th>
+                        <th class="p-4 text-center">Benar / Salah</th>
+                        <th class="p-4 text-center">Skor Akhir</th>
+                        <th class="p-4 text-center">Opsi</th>
+                    </tr>
+                </thead>
+                <tbody id="results-table-body" class="divide-y divide-slate-100">
+                    <!-- Dynamic Results Rows -->
+                </tbody>
+            </table>
+        </div>
+        <div id="results-empty-state" class="p-8 text-center text-slate-400">
+            <i class="fa-solid fa-chart-line text-4xl mb-2 text-slate-300"></i>
+            <p class="text-sm">Belum ada riwayat hasil ujian Try Out.</p>
+        </div>
+    </div>
+</section>
+
+
+    <div class="bg-rose-50 border border-rose-200 p-3 rounded-xl text-xs font-semibold text-rose-800">
+        Jumlah Pelanggaran Anda: <span id="cheat-modal-count" class="text-base font-extrabold text-rose-900">1</span> / 3
+    </div>
+
+    <p class="text-xs text-slate-500">Jika Anda mencapai 3 kali pelanggaran, sistem akan **otomatis mengumpulkan ujian** secara paksa.</p>
+
+    <button onclick="dismissCheatWarning()" class="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold text-sm shadow-md transition">
+        Kembali ke Ujian Sekarang
+    </button>
+</div>
+
+
+    <form onsubmit="handleVerifyAdminPin(event)" class="space-y-3">
+        <input type="password" id="admin-pin-input" required placeholder="Masukkan PIN Pengawas" class="w-full text-center tracking-widest text-lg font-bold px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none">
+        <p id="admin-pin-error" class="text-xs text-rose-500 font-semibold hidden"><i class="fa-solid fa-circle-exclamation mr-1"></i> PIN yang Anda masukkan salah!</p>
+
+        <div class="flex space-x-2 pt-2">
+            <button type="button" onclick="closeAdminPinModal()" class="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold">Batal</button>
+            <button type="submit" class="w-1/2 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-semibold shadow">Buka Akses</button>
+        </div>
+    </form>
+</div>
+
+
+    <!-- Modal Form Body -->
+    <form id="question-form" onsubmit="saveQuestion(event)" class="p-6 overflow-y-auto space-y-4 custom-scrollbar flex-grow">
+        <input type="hidden" id="form-question-id">
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Mata Pelajaran / Subtes <span class="text-red-500">*</span></label>
+                <select id="form-category" required class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 outline-none bg-white">
+                    <optgroup label="Mata Pelajaran Wajib">
+                        <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                        <option value="Matematika">Matematika</option>
+                        <option value="Bahasa Inggris">Bahasa Inggris</option>
+                    </optgroup>
+                    <optgroup label="Mata Pelajaran Pilihan & Jurusan">
+                        <option value="Kewirausahaan">Kewirausahaan</option>
+                        <option value="SMK - Teknik Kendaraan Ringan">SMK - Teknik Kendaraan Ringan</option>
+                        <option value="SMK - Teknik Sepeda Motor">SMK - Teknik Sepeda Motor</option>
+                        <option value="SMK - Agribisnis Tanaman Pangan dan Hortikultura">SMK - Agribisnis Tanaman Pangan dan Hortikultura</option>
+                        <option value="SMK - Teknik Instalasi Tenaga Listrik">SMK - Teknik Instalasi Tenaga Listrik</option>
+                        <option value="SMK - Teknik Audio Video">SMK - Teknik Audio Video</option>
+                        <option value="SMK - Nautika Kapal Penangkap Ikan">SMK - Nautika Kapal Penangkap Ikan</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Kunci Jawaban Benar <span class="text-red-500">*</span></label>
+                <select id="form-correct" required class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 outline-none bg-white">
+                    <option value="A">Opsi A</option>
+                    <option value="B">Opsi B</option>
+                    <option value="C">Opsi C</option>
+                    <option value="D">Opsi D</option>
+                    <option value="E">Opsi E</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Bobot Nilai (Poin Soal) <span class="text-red-500">*</span></label>
+                <input type="number" id="form-weight" required min="1" max="100" value="3" placeholder="Misal: 3" class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 outline-none">
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Pertanyaan / Teks Soal <span class="text-red-500">*</span></label>
+            <textarea id="form-question" required rows="3" placeholder="Ketikkan isi pertanyaan soal di sini..." class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 outline-none"></textarea>
+        </div>
+
+        <!-- Input Gambar / Diagram Soal -->
+        <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Gambar / Diagram Soal (Opsional)</label>
+            <div class="space-y-2">
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <input type="file" id="form-image-file" accept="image/*" onchange="handleImageFileUpload(event)" class="text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 cursor-pointer w-full border border-slate-200 rounded-xl p-1">
+                    <span class="text-xs text-slate-400 self-center hidden sm:inline">atau</span>
+                    <input type="url" id="form-image-url" placeholder="Paste URL Gambar (https://...)" oninput="handleImageUrlInput(event)" class="w-full px-3 py-1.5 border border-slate-300 rounded-xl text-xs outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+                <input type="hidden" id="form-image-data">
+                <!-- Preview Container -->
+                <div id="image-preview-container" class="hidden relative inline-block border border-slate-200 rounded-xl p-2 bg-slate-50 mt-1">
+                    <img id="image-preview-img" src="" alt="Preview Gambar" class="max-h-40 rounded-lg object-contain">
+                    <button type="button" onclick="removeFormImage()" class="absolute -top-2 -right-2 bg-rose-500 hover:bg-rose-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-md" title="Hapus Gambar">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Options Inputs (A to E) -->
+        <div class="space-y-2 border-t border-slate-100 pt-3">
+            <label class="block text-xs font-semibold text-slate-700">Pilihan Jawaban (Opsi A - E) <span class="text-red-500">*</span></label>
+            
+            <div class="flex items-center gap-2">
+                <span class="w-7 h-7 bg-slate-100 font-bold text-xs rounded-lg flex items-center justify-center text-slate-700">A</span>
+                <input type="text" id="form-option-a" required placeholder="Teks Pilihan A" class="w-full px-3 py-1.5 border border-slate-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-brand-500">
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-7 h-7 bg-slate-100 font-bold text-xs rounded-lg flex items-center justify-center text-slate-700">B</span>
+                <input type="text" id="form-option-b" required placeholder="Teks Pilihan B" class="w-full px-3 py-1.5 border border-slate-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-brand-500">
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-7 h-7 bg-slate-100 font-bold text-xs rounded-lg flex items-center justify-center text-slate-700">C</span>
+                <input type="text" id="form-option-c" required placeholder="Teks Pilihan C" class="w-full px-3 py-1.5 border border-slate-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-brand-500">
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-7 h-7 bg-slate-100 font-bold text-xs rounded-lg flex items-center justify-center text-slate-700">D</span>
+                <input type="text" id="form-option-d" required placeholder="Teks Pilihan D" class="w-full px-3 py-1.5 border border-slate-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-brand-500">
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-7 h-7 bg-slate-100 font-bold text-xs rounded-lg flex items-center justify-center text-slate-700">E</span>
+                <input type="text" id="form-option-e" required placeholder="Teks Pilihan E" class="w-full px-3 py-1.5 border border-slate-300 rounded-xl text-sm outline-none focus:ring-2 focus:ring-brand-500">
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Pembahasan Soal</label>
+            <textarea id="form-discussion" rows="2" placeholder="Penjelasan/cara cepat pengerjaan..." class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 outline-none"></textarea>
+        </div>
+
+        <!-- Footer Buttons -->
+        <div class="flex justify-end space-x-3 border-t border-slate-100 pt-4">
+            <button type="button" onclick="closeQuestionModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium text-sm">Batal</button>
+            <button type="submit" class="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-semibold text-sm shadow">Simpan Soal</button>
+        </div>
+    </form>
+</div>
+
+
+    <!-- Content -->
+    <div class="p-6 overflow-y-auto space-y-6 custom-scrollbar flex-grow">
+        <!-- Score Cards Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+            <div class="bg-brand-50 border border-brand-100 p-4 rounded-xl">
+                <div class="text-xs text-brand-700 font-semibold uppercase">Skor Ujian (0-100)</div>
+                <div class="text-3xl font-extrabold text-brand-900 mt-1" id="res-score-value">0</div>
+                <div class="text-[11px] text-brand-600 mt-1" id="res-accuracy-value">Akurasi: 0%</div>
+            </div>
+            <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-xl">
+                <div class="text-xs text-emerald-700 font-semibold uppercase">Jawaban Benar</div>
+                <div class="text-3xl font-extrabold text-emerald-800 mt-1" id="res-correct-count">0</div>
+                <div class="text-[11px] text-emerald-600 mt-1" id="res-earned-points">0 Poin Diperoleh</div>
+            </div>
+            <div class="bg-rose-50 border border-rose-100 p-4 rounded-xl">
+                <div class="text-xs text-rose-700 font-semibold uppercase">Jawaban Salah</div>
+                <div class="text-3xl font-extrabold text-rose-800 mt-1" id="res-wrong-count">0</div>
+                <div class="text-[11px] text-rose-600 mt-1">Soal</div>
+            </div>
+            <div class="bg-slate-100 border border-slate-200 p-4 rounded-xl">
+                <div class="text-xs text-slate-600 font-semibold uppercase">Tidak Dijawab</div>
+                <div class="text-3xl font-extrabold text-slate-800 mt-1" id="res-empty-count">0</div>
+                <div class="text-[11px] text-slate-500 mt-1">Soal</div>
+            </div>
+        </div>
+
+        <!-- Export Single Result to Excel Button -->
+        <div class="flex items-center justify-between bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <div class="text-sm">
+                <span class="font-semibold text-slate-800 block">Unduh Laporan Nilai Excel</span>
+                <span class="text-xs text-slate-500">File memuat identitas, rincian bobot skor, dan jawaban tiap nomor.</span>
+            </div>
+            <button id="btn-export-single-excel" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-4 py-2 rounded-xl shadow transition flex items-center gap-2">
+                <i class="fa-solid fa-file-excel"></i> Unduh Excel (.xlsx)
+            </button>
+        </div>
+
+        <!-- Detailed Discussion List -->
+        <div>
+            <h4 class="font-bold text-slate-800 text-base mb-3 border-b border-slate-200 pb-2">Pembahasan Jawaban Detail</h4>
+            <div class="space-y-4" id="res-discussion-list">
+                <!-- Dynamic Detailed Discussion -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end">
+        <button onclick="closeResultModal()" class="px-5 py-2 bg-slate-800 text-white rounded-xl font-semibold text-sm">Tutup</button>
+    </div>
+</div>
