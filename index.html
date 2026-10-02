@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Try Out TKA SMK NEGERI 1 BULAKAMBA TAHUN 2026</title>
+    <title>SIMULASI TRY OUT TKA 2026 - SMK NEGERI 1 BULAKAMBA</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -18,7 +18,8 @@
                             500: '#0284c7',
                             600: '#0369a1',
                             700: '#075985',
-                            900: '#0c4a6e',
+                            800: '#0c4a6e',
+                            900: '#0f172a'
                         }
                     }
                 }
@@ -96,21 +97,22 @@
             </div>
 
             <!-- Navigation Tabs (Desktop) -->
-            <nav class="hidden md:flex space-x-1 items-center">
-                <button id="nav-tryout" onclick="switchTab('tryout')" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition duration-200 bg-brand-700 text-white flex items-center gap-2">
-                    <i class="fa-solid fa-pen-to-square"></i> Mulai Try Out
+            <nav class="hidden md:flex space-x-2 items-center">
+                <!-- Mode Koordinator Login Button (Satu-satunya tombol awal untuk login) -->
+                <button id="nav-login-btn" onclick="openModal('modal-admin-auth')" class="px-4 py-2 rounded-lg text-sm font-semibold transition duration-200 bg-amber-500 hover:bg-amber-600 text-slate-900 border border-amber-400 flex items-center gap-2 shadow">
+                    <i class="fa-solid fa-user-lock"></i> Mode Koordinator
                 </button>
-                <button id="nav-bank" onclick="switchTab('bank')" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition duration-200 hover:bg-brand-700 text-brand-100 flex items-center gap-2">
-                    <i class="fa-solid fa-lock text-xs text-amber-300" id="lock-icon-bank"></i>
+
+                <!-- Navigation Tabs Khusus Koordinator (Muncul setelah PIN dimasukkan) -->
+                <button id="nav-bank" onclick="switchTab('bank')" style="display: none;" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition duration-200 hover:bg-brand-700 text-brand-100 flex items-center gap-2">
                     <i class="fa-solid fa-book-open"></i> Bank Soal & Input
                 </button>
-                <button id="nav-results" onclick="switchTab('results')" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition duration-200 hover:bg-brand-700 text-brand-100 flex items-center gap-2">
-                    <i class="fa-solid fa-lock text-xs text-amber-300" id="lock-icon-results"></i>
+                <button id="nav-results" onclick="switchTab('results')" style="display: none;" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition duration-200 hover:bg-brand-700 text-brand-100 flex items-center gap-2">
                     <i class="fa-solid fa-square-poll-vertical"></i> Hasil & Ekspor Excel
                 </button>
 
                 <!-- Status Admin Badge -->
-                <div id="admin-badge" style="display: none;" class="ml-2 px-2.5 py-1 bg-amber-500/20 border border-amber-400 text-amber-300 rounded-lg text-xs font-semibold items-center gap-1.5">
+                <div id="admin-badge" style="display: none;" class="ml-2 px-3 py-1.5 bg-amber-500/20 border border-amber-400 text-amber-300 rounded-lg text-xs font-semibold items-center gap-2">
                     <i class="fa-solid fa-user-shield"></i> Mode Koordinator
                     <button onclick="logoutAdmin()" title="Kunci Akses Koordinator" class="ml-1 text-slate-300 hover:text-white"><i class="fa-solid fa-right-from-bracket"></i></button>
                 </div>
@@ -127,15 +129,13 @@
 
     <!-- Mobile Navigation Menu -->
     <div id="mobile-menu" style="display: none;" class="md:hidden bg-brand-800 border-t border-brand-700 px-4 pt-2 pb-4 space-y-2">
-        <button onclick="switchTab('tryout'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-brand-700 flex items-center gap-2">
-            <i class="fa-solid fa-pen-to-square"></i> Mulai Try Out
+        <button id="mobile-login-btn" onclick="openModal('modal-admin-auth'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-md text-amber-300 bg-amber-500/20 font-medium flex items-center gap-2">
+            <i class="fa-solid fa-user-lock"></i> Mode Koordinator
         </button>
-        <button onclick="switchTab('bank'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-brand-100 hover:bg-brand-700 flex items-center gap-2">
-            <i class="fa-solid fa-lock text-xs text-amber-300"></i>
+        <button id="mobile-nav-bank" onclick="switchTab('bank'); toggleMobileMenu();" style="display: none;" class="w-full text-left px-3 py-2 rounded-md text-white hover:bg-brand-700 flex items-center gap-2">
             <i class="fa-solid fa-book-open"></i> Bank Soal & Input
         </button>
-        <button onclick="switchTab('results'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-brand-100 hover:bg-brand-700 flex items-center gap-2">
-            <i class="fa-solid fa-lock text-xs text-amber-300"></i>
+        <button id="mobile-nav-results" onclick="switchTab('results'); toggleMobileMenu();" style="display: none;" class="w-full text-left px-3 py-2 rounded-md text-white hover:bg-brand-700 flex items-center gap-2">
             <i class="fa-solid fa-square-poll-vertical"></i> Hasil & Ekspor Excel
         </button>
     </div>
@@ -153,7 +153,7 @@
                 <div class="inline-flex items-center justify-center p-3 bg-white border-2 border-brand-100 rounded-2xl mb-3 shadow-md transform hover:scale-105 transition duration-300">
                     <img src="https://raw.githubusercontent.com/anumukmin/tryout2026/fa43cda08e3610ca170f63a90d1d8caa37dc6d71/logo_smkn_1_bulakamba-removebg-preview.png" alt="Logo SMKN 1 Bulakamba" class="w-20 h-20 object-contain" onerror="handleLogoError(this)">
                 </div>
-                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">Try Out TKA TAHUN 2026</h2>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">SIMULASI TRY OUT TKA 2026</h2>
                 <p class="text-brand-600 font-bold text-sm tracking-widest uppercase mt-1">SMK NEGERI 1 BULAKAMBA</p>
                 <p class="text-xs text-slate-500 mt-1 flex items-center justify-center gap-1">
                     <i class="fa-solid fa-location-dot text-rose-500"></i> Kabupaten Brebes, Jawa Tengah
@@ -392,7 +392,7 @@
     <!-- ================= TAB 2: BANK SOAL & INPUT MANUAL ================= -->
     <section id="tab-bank" class="tab-content hidden space-y-6">
         
-        <!-- Google Sheets Sync Configuration Panel -->
+        <!-- Google Sheets Sync Configuration Panel (Satu Tombol Oranye) -->
         <div class="bg-gradient-to-r from-emerald-900 to-teal-900 text-white rounded-2xl p-5 shadow-lg border border-emerald-700">
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                 <div>
@@ -475,9 +475,6 @@
                 <button onclick="exportToExcel()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition shadow flex items-center gap-2">
                     <i class="fa-solid fa-file-excel"></i> Ekspor ke Excel (.xlsx)
                 </button>
-                <button onclick="clearAllResults()" class="px-3 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold text-xs rounded-xl transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-trash"></i> Hapus Rekap
-                </button>
             </div>
         </div>
 
@@ -494,6 +491,7 @@
                             <th class="p-3.5">Subtes</th>
                             <th class="p-3.5 text-center">Nilai</th>
                             <th class="p-3.5 text-center">Pelanggaran</th>
+                            <th class="p-3.5 text-center w-16">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="results-table-body" class="divide-y divide-slate-100">
@@ -705,9 +703,9 @@
     let pinAttempts = 0; // Hitungan percobaan PIN Koordinator
     
     // URL Web App Google Sheets Resmi Terbaru
-    const DEFAULT_SHEETS_URL = "https://script.google.com/macros/s/AKfycbwJIeeiDusmO2-jaCccvNNKNDi-nhD8SxNxN9dZKGdAvZRxFnXaCC3Jou9DCYNuqvXS_w/exec";
+    const DEFAULT_SHEETS_URL = "https://script.google.com/macros/s/AKfycbxFfGUUP84AyYQm6JVrU_anmRBSO67s5QMb0k3zotlrRdyNLugX5gG0bYW0s_sOjY10kQ/exec";
     
-    // Paksa perbarui URL jika ada URL lama di cache
+    // Paksa perbarui URL di storage
     let googleSheetsUrl = DEFAULT_SHEETS_URL;
     localStorage.setItem('tryout_sheets_url', DEFAULT_SHEETS_URL);
 
@@ -784,6 +782,37 @@
         if (menu) menu.style.display = (menu.style.display === 'none' || !menu.style.display) ? 'block' : 'none';
     }
 
+    function updateNavUI() {
+        const loginBtn = document.getElementById('nav-login-btn');
+        const bankBtn = document.getElementById('nav-bank');
+        const resultsBtn = document.getElementById('nav-results');
+        const adminBadge = document.getElementById('admin-badge');
+        
+        const mobLoginBtn = document.getElementById('mobile-login-btn');
+        const mobBankBtn = document.getElementById('mobile-nav-bank');
+        const mobResultsBtn = document.getElementById('mobile-nav-results');
+
+        if (isAdmin) {
+            if (loginBtn) loginBtn.style.display = 'none';
+            if (bankBtn) bankBtn.style.display = 'inline-flex';
+            if (resultsBtn) resultsBtn.style.display = 'inline-flex';
+            if (adminBadge) adminBadge.style.display = 'inline-flex';
+
+            if (mobLoginBtn) mobLoginBtn.style.display = 'none';
+            if (mobBankBtn) mobBankBtn.style.display = 'block';
+            if (mobResultsBtn) mobResultsBtn.style.display = 'block';
+        } else {
+            if (loginBtn) loginBtn.style.display = 'inline-flex';
+            if (bankBtn) bankBtn.style.display = 'none';
+            if (resultsBtn) resultsBtn.style.display = 'none';
+            if (adminBadge) adminBadge.style.display = 'none';
+
+            if (mobLoginBtn) mobLoginBtn.style.display = 'block';
+            if (mobBankBtn) mobBankBtn.style.display = 'none';
+            if (mobResultsBtn) mobResultsBtn.style.display = 'none';
+        }
+    }
+
     function switchTab(tabId) {
         if ((tabId === 'bank' || tabId === 'results') && !isAdmin) {
             pendingTabSwitch = tabId;
@@ -833,17 +862,13 @@
             pinInput.value = '';
             if (err) err.classList.add('hidden');
 
-            const badge = document.getElementById('admin-badge');
-            if (badge) badge.style.display = 'inline-flex';
-
-            const lockBank = document.getElementById('lock-icon-bank');
-            if (lockBank) lockBank.classList.add('hidden');
-            const lockRes = document.getElementById('lock-icon-results');
-            if (lockRes) lockRes.classList.add('hidden');
+            updateNavUI();
 
             if (pendingTabSwitch) {
                 switchTab(pendingTabSwitch);
                 pendingTabSwitch = null;
+            } else {
+                switchTab('bank');
             }
         } else {
             pinAttempts++;
@@ -868,14 +893,7 @@
 
     function logoutAdmin() {
         isAdmin = false;
-        const badge = document.getElementById('admin-badge');
-        if (badge) badge.style.display = 'none';
-
-        const lockBank = document.getElementById('lock-icon-bank');
-        if (lockBank) lockBank.classList.remove('hidden');
-        const lockRes = document.getElementById('lock-icon-results');
-        if (lockRes) lockRes.classList.remove('hidden');
-
+        updateNavUI();
         switchTab('tryout');
     }
 
@@ -1555,12 +1573,6 @@
 
         if (!isAutoCall && !confirm('Apakah Anda yakin ingin mengunggah SELURUH soal saat ini ke Google Sheets? Baris data di sheet Anda akan diperbarui secara otomatis.')) return;
 
-        const btn = document.getElementById('btn-upload-cloud');
-        if (btn) {
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Mengirim Data...';
-        }
-
         try {
             await fetch(googleSheetsUrl, {
                 method: 'POST',
@@ -1569,17 +1581,12 @@
                 body: JSON.stringify({ action: 'SYNC_ALL', questions: questionsData })
             });
             
-            if (!isAutoCall) alert('Proses upload berhasil dikirim ke Google Sheets! Silakan periksa tab "Bank_Soal" pada Google Sheets Anda.');
+            if (!isAutoCall) alert('Proses upload berhasil dikirim ke Google Sheets!');
             setTimeout(() => {
                 fetchFromGoogleSheets();
             }, 2000);
         } catch (err) {
             if (!isAutoCall) alert('Upload terkirim ke Google Sheets! Silakan periksa halaman Google Sheets Anda.');
-        } finally {
-            if (btn) {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> Upload Cloud';
-            }
         }
     }
 
@@ -1787,7 +1794,7 @@
         tbody.innerHTML = '';
 
         if (results.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-400">Belum ada data rekap ujian.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-400">Belum ada data rekap ujian.</td></tr>`;
             return;
         }
 
@@ -1807,10 +1814,33 @@
                 <td class="p-3.5 text-slate-600">${res.subtest}</td>
                 <td class="p-3.5 text-center"><strong class="text-brand-700 text-sm">${res.score}</strong></td>
                 <td class="p-3.5 text-center"><span class="${res.violations > 0 ? 'text-rose-600 font-bold' : 'text-slate-400'}">${res.violations}</span></td>
+                <td class="p-3.5 text-center">
+                    <button onclick="deleteSingleResult('${res.studentName}', '${res.subtest}')" title="Hapus Hasil Siswa Ini" class="px-2.5 py-1.5 bg-rose-100 hover:bg-rose-200 text-rose-800 rounded-lg font-semibold text-xs transition">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </td>
             `;
 
             tbody.appendChild(tr);
         });
+    }
+
+    function deleteSingleResult(studentName, subtest) {
+        if (!confirm(`Apakah Anda yakin ingin menghapus data rekap ujian dari "${studentName}" (${subtest})?`)) return;
+
+        let results = JSON.parse(localStorage.getItem('tryout_results') || '[]');
+        results = results.filter(r => !(r.studentName === studentName && r.subtest === subtest));
+        localStorage.setItem('tryout_results', JSON.stringify(results));
+        renderResultsTable();
+
+        if (googleSheetsUrl) {
+            fetch(googleSheetsUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'DELETE_RESULT', studentName: studentName, subtest: subtest })
+            }).catch(err => console.warn('Gagal menghapus rekap di Google Sheets:', err));
+        }
     }
 
     function exportToExcel() {
@@ -1841,16 +1871,11 @@
         XLSX.writeFile(workbook, `Hasil_TryOut_TKA_SMKN1_Bulakamba_${Date.now()}.xlsx`);
     }
 
-    function clearAllResults() {
-        if (!confirm('Apakah Anda yakin ingin menghapus SELURUH rekap hasil ujian? Tindakan ini tidak dapat dibatalkan.')) return;
-        localStorage.removeItem('tryout_results');
-        renderResultsTable();
-    }
-
     window.onload = function() {
         loadBankQuestions();
         updateClassOptions();
         updateExamDurationDisplay();
+        updateNavUI();
 
         const inputEl = document.getElementById('google-sheets-url');
         if (inputEl) inputEl.value = googleSheetsUrl;
