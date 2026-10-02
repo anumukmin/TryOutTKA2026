@@ -702,10 +702,10 @@
     let questionsData = [];
     let pinAttempts = 0; // Hitungan percobaan PIN Koordinator
     
-    // URL Web App Google Sheets Resmi Terbaru
-    const DEFAULT_SHEETS_URL = "https://script.google.com/macros/s/AKfycbxFfGUUP84AyYQm6JVrU_anmRBSO67s5QMb0k3zotlrRdyNLugX5gG0bYW0s_sOjY10kQ/exec";
+    // URL Web App Google Sheets Resmi Terbaru (Dengan Fitur Tab Perankingan Otomatis)
+    const DEFAULT_SHEETS_URL = "https://script.google.com/macros/s/AKfycbxEeT5t97ddDHrdQIc2DUf2dqJfijFjjtzmAV4Gk0hdFoX5wY4EiE757OdDdvPJiS6TsQ/exec";
     
-    // Paksa perbarui URL di storage
+    // Paksa perbarui URL jika ada URL lama di cache
     let googleSheetsUrl = DEFAULT_SHEETS_URL;
     localStorage.setItem('tryout_sheets_url', DEFAULT_SHEETS_URL);
 
