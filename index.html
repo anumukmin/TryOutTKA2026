@@ -91,14 +91,14 @@
                     <img src="https://raw.githubusercontent.com/anumukmin/tryout2026/fa43cda08e3610ca170f63a90d1d8caa37dc6d71/logo_smkn_1_bulakamba-removebg-preview.png" alt="Logo SMKN 1 Bulakamba" class="w-9 h-9 object-contain" onerror="handleLogoError(this)">
                 </div>
                 <div>
-                    <h1 class="font-bold text-lg leading-tight">Try Out TKA 2026</h1>
+                    <h1 class="font-bold text-lg leading-tight">TRY OUT TKA 2026</h1>
                     <p class="text-xs text-brand-100 font-medium">SMK NEGERI 1 BULAKAMBA</p>
                 </div>
             </div>
 
             <!-- Navigation Tabs (Desktop) -->
             <nav class="hidden md:flex space-x-2 items-center">
-                <!-- Mode Koordinator Login Button (Satu-satunya tombol awal untuk login) -->
+                <!-- Mode Koordinator Login Button (Pintu utama login Koordinator) -->
                 <button id="nav-login-btn" onclick="openModal('modal-admin-auth')" class="px-4 py-2 rounded-lg text-sm font-semibold transition duration-200 bg-amber-500 hover:bg-amber-600 text-slate-900 border border-amber-400 flex items-center gap-2 shadow">
                     <i class="fa-solid fa-user-lock"></i> Mode Koordinator
                 </button>
@@ -146,8 +146,8 @@
     <!-- ================= TAB 1: TRY OUT MODULE ================= -->
     <section id="tab-tryout" class="tab-content relative">
         
-        <!-- 1A. START EXAM / PARTICIPANT REGISTRATION FORM -->
-        <div id="exam-prep-card" class="max-w-2xl mx-auto bg-white/95 backdrop-blur-md rounded-3xl shadow-xl border border-sky-100 p-6 sm:p-9 relative z-10 overflow-hidden edu-doodle-bg">
+        <!-- 1A. FORM LOGIN PESERTA CBT (USERNAME & PASSWORD 6-DIGIT) -->
+        <div id="student-login-card" class="max-w-xl mx-auto bg-white/95 backdrop-blur-md rounded-3xl shadow-xl border border-sky-100 p-6 sm:p-9 relative z-10 overflow-hidden edu-doodle-bg">
             
             <div class="text-center mb-6 relative">
                 <div class="inline-flex items-center justify-center p-3 bg-white border-2 border-brand-100 rounded-2xl mb-3 shadow-md transform hover:scale-105 transition duration-300">
@@ -159,50 +159,86 @@
                     <i class="fa-solid fa-location-dot text-rose-500"></i> Kabupaten Brebes, Jawa Tengah
                 </p>
 
-                <!-- Decorative Badges -->
-                <div class="flex flex-wrap items-center justify-center gap-2 mt-4 text-[11px] font-semibold text-slate-600">
-                    <span class="px-3 py-1 bg-white/80 border border-slate-200 rounded-full shadow-xs flex items-center gap-1.5">
-                        <i class="fa-solid fa-book-open text-brand-500"></i> Mapel Umum & Pilihan TKA
-                    </span>
-                    <span class="px-3 py-1 bg-white/80 border border-slate-200 rounded-full shadow-xs flex items-center gap-1.5">
-                        <i class="fa-solid fa-layer-group text-purple-500"></i> PG & Kompleks
-                    </span>
-                    <span class="px-3 py-1 bg-white/80 border border-slate-200 rounded-full shadow-xs flex items-center gap-1.5">
-                        <i class="fa-solid fa-shield-halved text-emerald-500"></i> CBT Anti-Kecurangan
-                    </span>
+                <div class="inline-block mt-3 px-4 py-1.5 bg-brand-50 border border-brand-200 text-brand-800 rounded-full text-xs font-bold">
+                    <i class="fa-solid fa-right-to-bracket text-brand-600 mr-1"></i> Login Peserta CBT Ujian
                 </div>
             </div>
 
-            <form id="start-exam-form" onsubmit="handleStartExam(event)" class="space-y-4 relative bg-white/80 p-5 sm:p-6 rounded-2xl border border-slate-100 shadow-sm backdrop-blur-sm">
+            <form id="student-login-form" onsubmit="handleStudentLogin(event)" class="space-y-4 relative bg-white/90 p-5 sm:p-6 rounded-2xl border border-slate-100 shadow-sm backdrop-blur-sm">
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Nama Murid <span class="text-red-500">*</span></label>
-                    <input type="text" id="student-name" required pattern="[a-zA-Z\s'.,\-]+" title="Nama murid harus berisi huruf dan simbol resmi" placeholder="Contoh: Budi Santoso" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition bg-white">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Username <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                            <i class="fa-solid fa-user"></i>
+                        </span>
+                        <input type="text" id="login-username" required placeholder="Masukkan Username" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition bg-white text-sm font-semibold text-slate-800">
+                    </div>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Program Keahlian <span class="text-red-500">*</span></label>
-                    <select id="student-major" required onchange="updateClassOptions()" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none transition bg-white cursor-pointer">
-                        <option value="" disabled selected>-- Pilih Program Keahlian --</option>
-                        <option value="Teknik Kendaraan Ringan">Teknik Kendaraan Ringan</option>
-                        <option value="Teknik Sepeda Motor">Teknik Sepeda Motor</option>
-                        <option value="Agribisnis Tanaman Pangan dan Hortikultura">Agribisnis Tanaman Pangan dan Hortikultura</option>
-                        <option value="Teknik Instalasi Tenaga Listrik">Teknik Instalasi Tenaga Listrik</option>
-                        <option value="Teknik Audio Video">Teknik Audio Video</option>
-                        <option value="Nautika Kapal Penangkap Ikan">Nautika Kapal Penangkap Ikan</option>
-                    </select>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Password (6 Digit Angka) <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                            <i class="fa-solid fa-key"></i>
+                        </span>
+                        <input type="password" id="login-password" maxlength="6" pattern="[0-9]{6}" required placeholder="Contoh: 849201" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition bg-white text-sm font-bold tracking-widest text-slate-800">
+                    </div>
+                    <p class="text-[11px] text-slate-500 mt-1">Masukkan 6-digit angka password yang dibagikan oleh panitia/pengawas.</p>
                 </div>
 
+                <div id="login-error-msg" class="hidden bg-rose-50 border border-rose-200 text-rose-700 px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-circle-exclamation text-rose-500"></i>
+                    <span id="login-error-text">Username atau Password salah!</span>
+                </div>
+
+                <button type="submit" id="btn-login-student" class="w-full bg-brand-600 hover:bg-brand-700 active:scale-[0.99] text-white font-bold py-3.5 px-6 rounded-xl shadow-lg hover:shadow-brand-500/25 transition duration-200 flex items-center justify-center gap-2 text-sm">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i> Masuk Try Out
+                </button>
+            </form>
+        </div>
+
+        <!-- 1B. KONFIRMASI PROFIL SISWA & PILIH SUBTES (DITAMPILKAN SETELAH LOGIN SUKSES) -->
+        <div id="student-prep-card" style="display: none;" class="max-w-2xl mx-auto bg-white/95 backdrop-blur-md rounded-3xl shadow-xl border border-sky-100 p-6 sm:p-9 relative z-10 overflow-hidden edu-doodle-bg">
+            <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-900 rounded-2xl p-4 mb-6 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-emerald-500 text-white rounded-xl flex items-center justify-center font-bold text-lg shadow">
+                        <i class="fa-solid fa-user-check"></i>
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-bold text-emerald-700 uppercase tracking-widest block">Status Login</span>
+                        <strong class="text-sm font-bold text-emerald-950">Terverifikasi di Sistem CBT</strong>
+                    </div>
+                </div>
+                <button onclick="logoutStudent()" class="text-xs text-slate-500 hover:text-rose-600 font-semibold px-2.5 py-1 bg-white border rounded-lg transition shadow-xs">
+                    <i class="fa-solid fa-right-from-bracket"></i> Keluar
+                </button>
+            </div>
+
+            <!-- Identitas Murid Otomatis -->
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3 mb-6">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Data Peserta Ujian</h3>
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">Kelas <span class="text-red-500">*</span></label>
-                    <select id="student-class" required disabled class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none transition bg-slate-100 text-slate-400 cursor-not-allowed">
-                        <option value="" disabled selected>-- Pilih Program Keahlian Terlebih Dahulu --</option>
-                    </select>
+                    <span class="text-xs text-slate-500 block">Nama Lengkap Murid:</span>
+                    <strong id="student-display-name" class="text-xl font-black text-slate-800">Nama Siswa</strong>
                 </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-slate-100">
+                    <div>
+                        <span class="text-[11px] text-slate-500 block">Program Keahlian:</span>
+                        <span id="student-display-major" class="inline-block px-2.5 py-1 bg-brand-50 text-brand-800 font-bold text-xs rounded-lg border border-brand-200 mt-0.5">Teknik Kendaraan Ringan</span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] text-slate-500 block">Kelas:</span>
+                        <span id="student-display-class" class="inline-block px-2.5 py-1 bg-purple-50 text-purple-800 font-bold text-xs rounded-lg border border-purple-200 mt-0.5">XII TKR 1</span>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Form Pilih Subtes Ujian -->
+            <form onsubmit="handleStartExam(event)" class="space-y-4">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Pilih Mata Pelajaran / Subtes <span class="text-red-500">*</span></label>
-                        <select id="exam-subtest-filter" onchange="updateExamDurationDisplay()" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none transition bg-white">
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Pilih Mata Pelajaran / Subtes <span class="text-red-500">*</span></label>
+                        <select id="exam-subtest-filter" onchange="updateExamDurationDisplay()" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none transition bg-white text-sm font-semibold">
                             <optgroup label="Mata Pelajaran Wajib (75 Menit)">
                                 <option value="Bahasa Indonesia" selected>Bahasa Indonesia (30 Soal)</option>
                                 <option value="Matematika">Matematika (25 Soal)</option>
@@ -215,8 +251,8 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Durasi Pengerjaan</label>
-                        <div class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-100 font-semibold text-slate-700 flex items-center justify-between">
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Durasi Pengerjaan</label>
+                        <div class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-100 font-semibold text-slate-700 flex items-center justify-between text-sm">
                             <span class="flex items-center gap-2" id="exam-duration-display"><i class="fa-regular fa-clock text-brand-600"></i> 75 Menit</span>
                             <span class="text-xs bg-brand-100 text-brand-700 px-2.5 py-0.5 rounded-full font-bold" id="exam-duration-badge">30 Soal Target</span>
                         </div>
@@ -234,13 +270,13 @@
                     </ul>
                 </div>
 
-                <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 active:scale-[0.99] text-white font-semibold py-3.5 px-6 rounded-xl shadow-lg hover:shadow-brand-500/25 transition duration-200 flex items-center justify-center gap-2 text-base">
-                    <i class="fa-solid fa-play"></i> Mulai Ujian TKA
+                <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 active:scale-[0.99] text-white font-bold py-3.5 px-6 rounded-xl shadow-lg hover:shadow-brand-500/25 transition duration-200 flex items-center justify-center gap-2 text-base">
+                    <i class="fa-solid fa-play"></i> Mulai Ujian TKA Sekarang
                 </button>
             </form>
         </div>
 
-        <!-- 1B. CBT EXAM INTERFACE (HIDDEN BY DEFAULT) -->
+        <!-- 1C. CBT EXAM INTERFACE (HIDDEN BY DEFAULT) -->
         <div id="cbt-screen" style="display: none;" class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden flex flex-col min-h-[600px]">
             <!-- CBT Header Bar -->
             <div class="bg-slate-900 text-white p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-center gap-4 border-b border-slate-800">
@@ -345,7 +381,7 @@
             </div>
         </div>
 
-        <!-- 1C. EXAM RESULT SUMMARY CARD -->
+        <!-- 1D. EXAM RESULT SUMMARY CARD -->
         <div id="cbt-result-card" style="display: none;" class="max-w-3xl mx-auto bg-white rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-9">
             <div class="text-center mb-6">
                 <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl shadow-inner">
@@ -503,18 +539,20 @@
 
 </main>
 
-<!-- ================= FOOTER ================= -->
-<footer class="bg-slate-900 text-slate-400 py-6 mt-12 border-t border-slate-800 text-xs">
-    <div class="max-w-7xl mx-auto px-4 text-center space-y-2">
-        <div class="flex items-center justify-center gap-2 text-slate-300 font-medium flex-wrap">
-            <img src="https://raw.githubusercontent.com/anumukmin/tryout2026/fa43cda08e3610ca170f63a90d1d8caa37dc6d71/logo_smkn_1_bulakamba-removebg-preview.png" alt="Logo SMKN 1 Bulakamba" class="w-5 h-5 object-contain" onerror="handleLogoError(this)">
-            <span>Dikelola & Didesain oleh <strong class="text-amber-400 font-bold">TIM KURIKULUM SMK NEGERI 1 BULAKAMBA</strong></span>
+<footer class="bg-slate-900 text-slate-400 py-6 border-t border-slate-800 mt-12 text-xs">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+        <!-- Kolom 1: Logo & Pengelola -->
+        <div class="flex items-center justify-center md:justify-start gap-3">
+            <img src="https://raw.githubusercontent.com/anumukmin/tryout2026/fa43cda08e3610ca170f63a90d1d8caa37dc6d71/logo_smkn_1_bulakamba-removebg-preview.png" alt="Logo SMKN 1 Bulakamba" class="w-7 h-7 object-contain" onerror="handleLogoError(this)">
+            <span class="text-[11px] text-slate-300">Dikelola & Didesain oleh <strong class="text-amber-400 uppercase tracking-wide">TIM KURIKULUM SMK NEGERI 1 BULAKAMBA</strong></span>
         </div>
-        <p class="text-slate-500 text-[11px]">&copy; 2026 SIMULASI TRY OUT TKA — SMK NEGERI 1 BULAKAMBA. All rights reserved.</p>
+
+        <!-- Kolom 2: Hak Cipta -->
+        <p class="text-[11px] text-slate-500">
+            &copy; 2026 TRY OUT TKA — SMK NEGERI 1 BULAKAMBA. All rights reserved.
+        </p>
     </div>
 </footer>
-
-<!-- ================= MODALS & DIALOGS ================= -->
 
 <!-- Modal Admin PIN Authentication -->
 <div id="modal-admin-auth" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
@@ -628,7 +666,6 @@
                     <span id="form-key-hint" class="text-[11px] text-brand-700 font-medium">Pilih Kunci Jawaban di Bawah</span>
                 </div>
 
-                <!-- Fields Opsi A-E -->
                 <div class="space-y-1.5">
                     <div class="flex items-center gap-2"><span class="font-bold w-4 text-center">A</span><input type="text" id="form-q-opt-A" required placeholder="Teks Opsi A / Pernyataan 1" class="flex-1 px-3 py-1.5 rounded-xl border border-slate-300"></div>
                     <div class="flex items-center gap-2"><span class="font-bold w-4 text-center">B</span><input type="text" id="form-q-opt-B" required placeholder="Teks Opsi B / Pernyataan 2" class="flex-1 px-3 py-1.5 rounded-xl border border-slate-300"></div>
@@ -642,7 +679,6 @@
             <div id="form-correct-container" class="bg-slate-50 p-3 rounded-xl border border-slate-200">
                 <label class="block font-bold text-slate-800 mb-1">Kunci Jawaban Benar <span class="text-red-500">*</span></label>
                 
-                <!-- Format PG Biasa -->
                 <div id="key-input-pg">
                     <select id="form-q-correct-pg" class="w-full px-3 py-2 rounded-xl border border-slate-300 outline-none">
                         <option value="A">Opsi A</option>
@@ -653,7 +689,6 @@
                     </select>
                 </div>
 
-                <!-- Format PG Kompleks Checkbox -->
                 <div id="key-input-checkbox" style="display: none;" class="space-y-1 text-slate-700">
                     <p class="text-[11px] text-slate-500 mb-1">Centang semua pilihan yang benar:</p>
                     <div class="flex flex-wrap gap-3">
@@ -665,7 +700,6 @@
                     </div>
                 </div>
 
-                <!-- Format PG Kompleks Matrix (Benar/Salah) -->
                 <div id="key-input-matrix" style="display: none;" class="space-y-2 text-slate-700">
                     <p class="text-[11px] text-slate-500 mb-1">Pilih status (Benar / Salah) untuk masing-masing pernyataan A - E:</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -690,37 +724,37 @@
                             <select id="key_matrix_E" class="px-2 py-1 rounded border text-xs"><option value="B">Benar (B)</option><option value="S">Salah (S)</option></select>
                         </div>
                     </div>
-<footer class="bg-slate-900 text-slate-400 py-6 border-t border-slate-800 mt-12 text-center text-xs">
-    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-3">
-        <div class="flex items-center justify-center gap-2">
-            <img src="https://raw.githubusercontent.com/anumukmin/tryout2026/fa43cda08e3610ca170f63a90d1d8caa37dc6d71/logo_smkn_1_bulakamba-removebg-preview.png" alt="Logo SMKN 1 Bulakamba" class="w-6 h-6 object-contain" onerror="handleLogoError(this)">
-            <span class="font-bold text-white">TRY OUT TKA 2026</span>
-        </div>
-        <p class="text-[11px] text-slate-400 flex items-center justify-center gap-1.5 flex-wrap">
-            <span>Dikelola & Didesain oleh</span>
-            <span class="font-bold text-amber-300">TIM KURIKULUM SMK NEGERI 1 BULAKAMBA</span>
-        </p>
-        <p class="text-[11px] text-slate-500">
-            &copy; 2026 TRY OUT TKA — SMK NEGERI 1 BULAKAMBA. All rights reserved.
-        </p>
+                </div>
+            </div>
+
+            <div>
+                <label class="block font-semibold text-slate-700 mb-1">Pembahasan Soal</label>
+                <textarea id="form-q-discussion" rows="2" placeholder="Penjelasan/cara cepat pengerjaan..." class="w-full px-3 py-2 rounded-xl border border-slate-300 outline-none"></textarea>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2">
+                <button type="button" onclick="closeModal('modal-question')" class="px-4 py-2 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200">Batal</button>
+                <button type="submit" class="px-5 py-2 bg-brand-600 text-white font-bold rounded-xl hover:bg-brand-700">Simpan Soal TKA</button>
+            </div>
+        </form>
     </div>
-</footer>
+</div>
 
 <script>
     const ADMIN_PIN = "505609";
     let isAdmin = false;
     let pendingTabSwitch = null;
     let questionsData = [];
-    let pinAttempts = 0; // Hitungan percobaan PIN Koordinator
+    let pinAttempts = 0;
+    let loggedInStudent = null; // Storing current logged in student profile
     
-    // URL Web App Google Sheets Resmi Terbaru (Dengan Fitur Tab Perankingan Otomatis)
-    const DEFAULT_SHEETS_URL = "https://script.google.com/macros/s/AKfycbxEeT5t97ddDHrdQIc2DUf2dqJfijFjjtzmAV4Gk0hdFoX5wY4EiE757OdDdvPJiS6TsQ/exec";
+    // URL Web App Google Sheets Resmi Terbaru
+    const DEFAULT_SHEETS_URL = "https://script.google.com/macros/s/AKfycbwx3XoIaGkNPhIUm8pHgTuYVp_-Rbv8iaa1_l_VuqXQedUswsY2FG9mnZZ3244qNnIQRw/exec";
     
-    // Paksa perbarui URL jika ada URL lama di cache
     let googleSheetsUrl = DEFAULT_SHEETS_URL;
     localStorage.setItem('tryout_sheets_url', DEFAULT_SHEETS_URL);
 
-    // Dataset Awal Contoh Soal Variasi TKA
+    // Initial Default Questions
     const INITIAL_QUESTIONS = [
         {
             id: 'q1',
@@ -908,54 +942,73 @@
         switchTab('tryout');
     }
 
-    function updateClassOptions() {
-        const majorSelect = document.getElementById('student-major');
-        const classSelect = document.getElementById('student-class');
-        if (!majorSelect || !classSelect) return;
+    // FUNGSI LOGIN PESERTA (USERNAME & PASSWORD 6-DIGIT)
+    async function handleStudentLogin(e) {
+        if (e) e.preventDefault();
+        const usernameInput = document.getElementById('login-username').value.trim();
+        const passwordInput = document.getElementById('login-password').value.trim();
+        const errContainer = document.getElementById('login-error-msg');
+        const errText = document.getElementById('login-error-text');
+        const btnLogin = document.getElementById('btn-login-student');
 
-        const selectedMajor = majorSelect.value;
-        classSelect.innerHTML = '';
+        if (!usernameInput || !passwordInput) {
+            errText.textContent = 'Harap isi Username dan 6-Digit Password Anda!';
+            errContainer.classList.remove('hidden');
+            return;
+        }
 
-        const classMap = {
-            "Teknik Kendaraan Ringan": ["XII TKR 1", "XII TKR 2", "XII TKR 3", "XII TKR 4"],
-            "Teknik Sepeda Motor": ["XII TSM 1", "XII TSM 2"],
-            "Agribisnis Tanaman Pangan dan Hortikultura": ["XII ATPH 1", "XII ATPH 2"],
-            "Teknik Instalasi Tenaga Listrik": ["XII TITL 1", "XII TITL 2"],
-            "Teknik Audio Video": ["XII TAV 1", "XII TAV 2"],
-            "Nautika Kapal Penangkap Ikan": ["XII NKPI 1", "XII NKPI 2"]
-        };
+        errContainer.classList.add('hidden');
+        btnLogin.disabled = true;
+        btnLogin.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Memverifikasi Peserta...';
 
-        if (selectedMajor && classMap[selectedMajor]) {
-            const defaultOpt = document.createElement('option');
-            defaultOpt.value = "";
-            defaultOpt.disabled = true;
-            defaultOpt.selected = true;
-            defaultOpt.textContent = "-- Pilih Kelas --";
-            classSelect.appendChild(defaultOpt);
+        try {
+            if (!googleSheetsUrl) {
+                throw new Error('Google Sheets URL belum terpasang!');
+            }
 
-            classMap[selectedMajor].forEach(cls => {
-                const opt = document.createElement('option');
-                opt.value = cls;
-                opt.textContent = cls;
-                classSelect.appendChild(opt);
+            const response = await fetch(googleSheetsUrl, {
+                method: 'POST',
+                mode: 'cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    action: 'LOGIN',
+                    username: usernameInput,
+                    password: passwordInput
+                })
             });
 
-            classSelect.disabled = false;
-            classSelect.removeAttribute('disabled');
-            classSelect.classList.remove('bg-slate-100', 'cursor-not-allowed', 'text-slate-400');
-            classSelect.classList.add('bg-white', 'cursor-pointer', 'text-slate-800');
-        } else {
-            const defaultOpt = document.createElement('option');
-            defaultOpt.value = "";
-            defaultOpt.disabled = true;
-            defaultOpt.selected = true;
-            defaultOpt.textContent = "-- Pilih Program Keahlian Terlebih Dahulu --";
-            classSelect.appendChild(defaultOpt);
-            classSelect.disabled = true;
-            classSelect.setAttribute('disabled', 'disabled');
-            classSelect.classList.add('bg-slate-100', 'cursor-not-allowed', 'text-slate-400');
-            classSelect.classList.remove('bg-white', 'cursor-pointer', 'text-slate-800');
+            const resData = await response.json();
+
+            if (resData.status === 'success' && resData.student) {
+                loggedInStudent = resData.student;
+                
+                // Simpan profil siswa yang berhasil login
+                document.getElementById('student-display-name').textContent = loggedInStudent.name;
+                document.getElementById('student-display-major').textContent = loggedInStudent.major;
+                document.getElementById('student-display-class').textContent = loggedInStudent.studentClass;
+
+                // Sembunyikan Form Login & Tampilkan Kartu Pilihan Subtes
+                document.getElementById('student-login-card').style.display = 'none';
+                document.getElementById('student-prep-card').style.display = 'block';
+            } else {
+                errText.textContent = resData.message || 'Username atau Password salah!';
+                errContainer.classList.remove('hidden');
+            }
+        } catch (err) {
+            console.warn('Login offline fallback:', err);
+            errText.textContent = 'Gagal memverifikasi login. Pastikan koneksi internet aktif dan Google Sheets terhubung.';
+            errContainer.classList.remove('hidden');
+        } finally {
+            btnLogin.disabled = false;
+            btnLogin.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Masuk Try Out';
         }
+    }
+
+    function logoutStudent() {
+        loggedInStudent = null;
+        document.getElementById('student-login-form').reset();
+        document.getElementById('student-prep-card').style.display = 'none';
+        document.getElementById('student-login-card').style.display = 'block';
     }
 
     function updateExamDurationDisplay() {
@@ -996,15 +1049,16 @@
     function handleStartExam(e) {
         if (e) e.preventDefault();
         
-        const name = document.getElementById('student-name').value.trim();
-        const major = document.getElementById('student-major').value;
-        const studentClass = document.getElementById('student-class').value;
-        const subtest = document.getElementById('exam-subtest-filter').value;
-
-        if (!name || !major || !studentClass || !subtest) {
-            alert('Harap lengkapi semua isian formulir pendaftaran!');
+        if (!loggedInStudent) {
+            alert('Silakan login terlebih dahulu!');
+            logoutStudent();
             return;
         }
+
+        const name = loggedInStudent.name;
+        const major = loggedInStudent.major;
+        const studentClass = loggedInStudent.studentClass;
+        const subtest = document.getElementById('exam-subtest-filter').value;
 
         let categoryToFetch = subtest;
         if (subtest === 'Program Keahlian') {
@@ -1017,7 +1071,7 @@
         }
 
         if (filteredQuestions.length === 0) {
-            alert(`Belum ada soal terdaftar untuk mata pelajaran / jurusan (${categoryToFetch}). Silakan tambahkan soal terlebih dahulu melalui Bank Soal.`);
+            alert(`Belum ada soal terdaftar untuk mata pelajaran / jurusan (${categoryToFetch}). Silakan hubungi pengawas ujian.`);
             return;
         }
 
@@ -1038,7 +1092,7 @@
         activeExam.remainingSeconds = duration * 60;
         activeExam.violations = 0;
 
-        document.getElementById('exam-prep-card').style.display = 'none';
+        document.getElementById('student-prep-card').style.display = 'none';
         document.getElementById('cbt-screen').style.display = 'flex';
 
         document.getElementById('cbt-student-display').textContent = name;
@@ -1084,7 +1138,6 @@
         document.getElementById('current-q-num').textContent = activeExam.currentIndex + 1;
         document.getElementById('current-q-weight').textContent = q.weight || 3;
 
-        // Badge Jenis Soal TKA
         const badgeEl = document.getElementById('current-q-type-badge');
         if (q.type === 'pgk_checkbox') {
             badgeEl.textContent = 'PG Kompleks (Multi Jawaban)';
@@ -1097,7 +1150,6 @@
             badgeEl.className = 'bg-sky-100 text-sky-800 px-2.5 py-0.5 rounded-lg text-xs font-bold';
         }
 
-        // Stimulus Teks / Wacana
         const stimContainer = document.getElementById('q-stimulus-container');
         const stimText = document.getElementById('q-stimulus-text');
         if (q.stimulus) {
@@ -1107,7 +1159,6 @@
             stimContainer.style.display = 'none';
         }
 
-        // Gambar Soal
         const imgContainer = document.getElementById('q-image-container');
         const imgEl = document.getElementById('q-image');
         if (q.image) {
@@ -1124,7 +1175,6 @@
 
         const currentAns = activeExam.answers[q.id];
 
-        // 1. PG Biasa
         if (!q.type || q.type === 'pg') {
             ['A', 'B', 'C', 'D', 'E'].forEach(optKey => {
                 if (!q.options || !q.options[optKey]) return;
@@ -1153,7 +1203,6 @@
                 optsContainer.appendChild(optBtn);
             });
         } 
-        // 2. PG Kompleks (Checkbox Multi-Jawaban)
         else if (q.type === 'pgk_checkbox') {
             const selectedArray = Array.isArray(currentAns) ? currentAns : (currentAns ? currentAns.split(',') : []);
 
@@ -1191,7 +1240,6 @@
                 optsContainer.appendChild(optBtn);
             });
         }
-        // 3. PG Kompleks (Tabel Pernyataan Benar / Salah)
         else if (q.type === 'pgk_matrix') {
             const matrixAns = (typeof currentAns === 'object' && currentAns !== null) ? currentAns : {};
 
@@ -1358,7 +1406,6 @@
                 return;
             }
 
-            // 1. PG Biasa
             if (!q.type || q.type === 'pg') {
                 if (userAns === q.correct) {
                     correctCount++;
@@ -1367,7 +1414,6 @@
                     wrongCount++;
                 }
             }
-            // 2. PG Kompleks Checkbox
             else if (q.type === 'pgk_checkbox') {
                 const userArr = String(userAns).split(',').sort().join(',');
                 const keyArr = String(q.correct).split(',').sort().join(',');
@@ -1378,7 +1424,6 @@
                     wrongCount++;
                 }
             }
-            // 3. PG Kompleks Benar/Salah (Matrix)
             else if (q.type === 'pgk_matrix') {
                 const keyParts = String(q.correct).split(',');
                 const keys = ['A', 'B', 'C', 'D', 'E'];
@@ -1428,12 +1473,10 @@
             violations: activeExam.violations
         };
 
-        // Simpan Hasil ke Browser
         const existingResults = JSON.parse(localStorage.getItem('tryout_results') || '[]');
         existingResults.unshift(resultRecord);
         localStorage.setItem('tryout_results', JSON.stringify(existingResults));
 
-        // OTOMATIS KIRIM HASIL KE GOOGLE SHEETS (Tab "Hasil_Ujian")
         if (googleSheetsUrl) {
             fetch(googleSheetsUrl, {
                 method: 'POST',
@@ -1507,7 +1550,6 @@
         renderBankTable();
     }
 
-    // Fungsi Terpadu: Simpan URL + Otomatis Cek & Sinkron
     async function connectAndAutoSyncSheets() {
         const urlInput = document.getElementById('google-sheets-url');
         if (!urlInput) return;
@@ -1532,12 +1574,10 @@
             const data = await resp.json();
 
             if (Array.isArray(data) && data.length > 0) {
-                // Jika di Google Sheets sudah ada soal -> Download & Pakai Soal dari Sheets
                 questionsData = data;
                 saveBankQuestions();
                 alert('Berhasil terhubung! Data soal dari Google Sheets berhasil dimuat ke web.');
             } else {
-                // Jika Google Sheets masih kosong -> Otomatis Upload Soal dari Web ke Sheets
                 await uploadAllToGoogleSheets(true);
                 alert('Berhasil terhubung! Google Sheets masih kosong, soal bawaan dari web telah otomatis di-upload ke Google Sheets.');
             }
@@ -1884,7 +1924,6 @@
 
     window.onload = function() {
         loadBankQuestions();
-        updateClassOptions();
         updateExamDurationDisplay();
         updateNavUI();
 
