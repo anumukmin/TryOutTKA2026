@@ -628,9 +628,9 @@
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Bentuk Soal TKA <span class="text-red-500">*</span></label>
                     <select id="form-q-type" onchange="toggleFormQuestionType()" required class="w-full px-3 py-2 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-brand-500 font-bold text-brand-900">
-                        <option value="pg">PG Biasa (1 Jawaban Benar)</option>
-                        <option value="pgk_checkbox">PG Kompleks (Centang > 1 Benar)</option>
-                        <option value="pgk_matrix">PG Kompleks (Tabel Benar / Salah)</option>
+                        <option value="pg">Pilihan Ganda Sederhana (1 Jawaban Benar)</option>
+                        <option value="pgk_checkbox">Pilihan Ganda Kompleks (MCMA - Centang > 1 Benar)</option>
+                        <option value="pgk_matrix">Pilihan Ganda Kompleks Kategori (Tabel Benar/Salah)</option>
                     </select>
                 </div>
 
@@ -701,27 +701,35 @@
                 </div>
 
                 <div id="key-input-matrix" style="display: none;" class="space-y-2 text-slate-700">
-                    <p class="text-[11px] text-slate-500 mb-1">Pilih status (Benar / Salah) untuk masing-masing pernyataan A - E:</p>
+                    <div class="mb-2 pb-2 border-b border-slate-200">
+                        <label class="block font-semibold text-slate-700 mb-1">Format Label Kategori Tabel:</label>
+                        <select id="form-q-matrix-type" onchange="updateMatrixKeyLabels()" class="w-full px-3 py-1.5 rounded-xl border border-slate-300 outline-none font-semibold text-brand-900 bg-white">
+                            <option value="bs" selected>Benar / Salah (B / S)</option>
+                            <option value="sts">Sesuai / Tidak Sesuai (Sesuai / T.Sesuai)</option>
+                        </select>
+                    </div>
+
+                    <p class="text-[11px] text-slate-500 mb-1">Pilih status untuk masing-masing pernyataan A - E:</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <div class="flex items-center justify-between bg-white p-1.5 rounded-lg border">
                             <span class="font-bold">Pernyataan A:</span>
-                            <select id="key_matrix_A" class="px-2 py-1 rounded border text-xs"><option value="B">Benar (B)</option><option value="S">Salah (S)</option></select>
+                            <select id="key_matrix_A" class="matrix-opt-select px-2 py-1 rounded border text-xs"><option value="B">Benar (B)</option><option value="S">Salah (S)</option></select>
                         </div>
                         <div class="flex items-center justify-between bg-white p-1.5 rounded-lg border">
                             <span class="font-bold">Pernyataan B:</span>
-                            <select id="key_matrix_B" class="px-2 py-1 rounded border text-xs"><option value="B">Benar (B)</option><option value="S">Salah (S)</option></select>
+                            <select id="key_matrix_B" class="matrix-opt-select px-2 py-1 rounded border text-xs"><option value="B">Benar (B)</option><option value="S">Salah (S)</option></select>
                         </div>
                         <div class="flex items-center justify-between bg-white p-1.5 rounded-lg border">
                             <span class="font-bold">Pernyataan C:</span>
-                            <select id="key_matrix_C" class="px-2 py-1 rounded border text-xs"><option value="B">Benar (B)</option><option value="S">Salah (S)</option></select>
+                            <select id="key_matrix_C" class="matrix-opt-select px-2 py-1 rounded border text-xs"><option value="B">Benar (B)</option><option value="S">Salah (S)</option></select>
                         </div>
                         <div class="flex items-center justify-between bg-white p-1.5 rounded-lg border">
                             <span class="font-bold">Pernyataan D:</span>
-                            <select id="key_matrix_D" class="px-2 py-1 rounded border text-xs"><option value="B">Benar (B)</option><option value="S">Salah (S)</option></select>
+                            <select id="key_matrix_D" class="matrix-opt-select px-2 py-1 rounded border text-xs"><option value="B">Benar (B)</option><option value="S">Salah (S)</option></select>
                         </div>
                         <div class="flex items-center justify-between bg-white p-1.5 rounded-lg border">
                             <span class="font-bold">Pernyataan E:</span>
-                            <select id="key_matrix_E" class="px-2 py-1 rounded border text-xs"><option value="B">Benar (B)</option><option value="S">Salah (S)</option></select>
+                            <select id="key_matrix_E" class="matrix-opt-select px-2 py-1 rounded border text-xs"><option value="B">Benar (B)</option><option value="S">Salah (S)</option></select>
                         </div>
                     </div>
                 </div>
@@ -1140,13 +1148,13 @@
 
         const badgeEl = document.getElementById('current-q-type-badge');
         if (q.type === 'pgk_checkbox') {
-            badgeEl.textContent = 'PG Kompleks (Multi Jawaban)';
+            badgeEl.textContent = 'Pilihan Ganda Kompleks (MCMA)';
             badgeEl.className = 'bg-purple-100 text-purple-800 px-2.5 py-0.5 rounded-lg text-xs font-bold';
         } else if (q.type === 'pgk_matrix') {
-            badgeEl.textContent = 'PG Kompleks (Benar/Salah)';
+            badgeEl.textContent = 'Pilihan Ganda Kompleks Kategori';
             badgeEl.className = 'bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-lg text-xs font-bold';
         } else {
-            badgeEl.textContent = 'PG Biasa';
+            badgeEl.textContent = 'Pilihan Ganda Sederhana';
             badgeEl.className = 'bg-sky-100 text-sky-800 px-2.5 py-0.5 rounded-lg text-xs font-bold';
         }
 
@@ -1242,6 +1250,11 @@
         }
         else if (q.type === 'pgk_matrix') {
             const matrixAns = (typeof currentAns === 'object' && currentAns !== null) ? currentAns : {};
+            const isSTS = q.matrixType === 'sts';
+            const label1 = isSTS ? 'Sesuai' : 'Benar';
+            const label2 = isSTS ? 'Tidak Sesuai' : 'Salah';
+            const btnText1 = isSTS ? 'Sesuai' : 'B';
+            const btnText2 = isSTS ? 'T.Sesuai' : 'S';
 
             const table = document.createElement('table');
             table.className = 'w-full text-left border-collapse text-xs sm:text-sm bg-white rounded-2xl border border-slate-200 overflow-hidden';
@@ -1249,8 +1262,8 @@
                 <thead>
                     <tr class="bg-slate-100 text-slate-700 font-bold border-b">
                         <th class="p-3">Pernyataan</th>
-                        <th class="p-3 w-20 text-center">Benar</th>
-                        <th class="p-3 w-20 text-center">Salah</th>
+                        <th class="p-3 w-28 text-center">${label1}</th>
+                        <th class="p-3 w-28 text-center">${label2}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100"></tbody>
@@ -1268,10 +1281,10 @@
                 tr.innerHTML = `
                     <td class="p-3 text-slate-800 font-medium">${q.options[optKey]}</td>
                     <td class="p-3 text-center">
-                        <button type="button" onclick="setMatrixChoice('${q.id}', '${optKey}', 'B')" class="w-8 h-8 rounded-xl font-bold text-xs transition ${val === 'B' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">B</button>
+                        <button type="button" onclick="setMatrixChoice('${q.id}', '${optKey}', 'B')" class="px-2.5 py-1.5 rounded-xl font-bold text-xs transition ${val === 'B' ? 'bg-emerald-600 text-white shadow' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">${btnText1}</button>
                     </td>
                     <td class="p-3 text-center">
-                        <button type="button" onclick="setMatrixChoice('${q.id}', '${optKey}', 'S')" class="w-8 h-8 rounded-xl font-bold text-xs transition ${val === 'S' ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">S</button>
+                        <button type="button" onclick="setMatrixChoice('${q.id}', '${optKey}', 'S')" class="px-2.5 py-1.5 rounded-xl font-bold text-xs transition ${val === 'S' ? 'bg-rose-600 text-white shadow' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">${btnText2}</button>
                     </td>
                 `;
 
@@ -1662,9 +1675,9 @@
             const tr = document.createElement('tr');
             tr.className = 'hover:bg-slate-50 transition';
 
-            let typeBadge = '<span class="bg-sky-100 text-sky-800 font-bold px-2 py-0.5 rounded text-[10px]">PG Biasa</span>';
-            if (q.type === 'pgk_checkbox') typeBadge = '<span class="bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded text-[10px]">PGK Centang</span>';
-            if (q.type === 'pgk_matrix') typeBadge = '<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]">Tabel B/S</span>';
+            let typeBadge = '<span class="bg-sky-100 text-sky-800 font-bold px-2 py-0.5 rounded text-[10px]">PG Sederhana</span>';
+            if (q.type === 'pgk_checkbox') typeBadge = '<span class="bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded text-[10px]">PGK (MCMA)</span>';
+            if (q.type === 'pgk_matrix') typeBadge = '<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]">PGK Kategori</span>';
 
             tr.innerHTML = `
                 <td class="p-3.5 text-center font-bold text-slate-500">${idx + 1}</td>
@@ -1684,14 +1697,28 @@
     }
 
     function toggleFormQuestionType() {
-        const typeVal = document.getElementById('form-q-type').value;
+        const type = document.getElementById('form-q-type').value;
         const keyPg = document.getElementById('key-input-pg');
-        const keyCheckbox = document.getElementById('key-input-checkbox');
-        const keyMatrix = document.getElementById('key-input-matrix');
+        const keyCb = document.getElementById('key-input-checkbox');
+        const keyMat = document.getElementById('key-input-matrix');
 
-        if (keyPg) keyPg.style.display = (typeVal === 'pg') ? 'block' : 'none';
-        if (keyCheckbox) keyCheckbox.style.display = (typeVal === 'pgk_checkbox') ? 'block' : 'none';
-        if (keyMatrix) keyMatrix.style.display = (typeVal === 'pgk_matrix') ? 'block' : 'none';
+        if (keyPg) keyPg.style.display = type === 'pg' ? 'block' : 'none';
+        if (keyCb) keyCb.style.display = type === 'pgk_checkbox' ? 'block' : 'none';
+        if (keyMat) keyMat.style.display = type === 'pgk_matrix' ? 'block' : 'none';
+    }
+
+    function updateMatrixKeyLabels() {
+        const matrixType = document.getElementById('form-q-matrix-type').value;
+        const selects = document.querySelectorAll('.matrix-opt-select');
+        
+        selects.forEach(sel => {
+            const currentVal = sel.value || 'B';
+            if (matrixType === 'sts') {
+                sel.innerHTML = `<option value="B" ${currentVal === 'B' ? 'selected' : ''}>Sesuai (S)</option><option value="S" ${currentVal === 'S' ? 'selected' : ''}>Tidak Sesuai (TS)</option>`;
+            } else {
+                sel.innerHTML = `<option value="B" ${currentVal === 'B' ? 'selected' : ''}>Benar (B)</option><option value="S" ${currentVal === 'S' ? 'selected' : ''}>Salah (S)</option>`;
+            }
+        });
     }
 
     function openQuestionModal(qId = null) {
@@ -1727,6 +1754,9 @@
                         cb.checked = keys.includes(cb.value);
                     });
                 } else if (q.type === 'pgk_matrix') {
+                    document.getElementById('form-q-matrix-type').value = q.matrixType || 'bs';
+                    updateMatrixKeyLabels();
+
                     const keys = String(q.correct).split(',');
                     if (keys[0]) document.getElementById('key_matrix_A').value = keys[0];
                     if (keys[1]) document.getElementById('key_matrix_B').value = keys[1];
@@ -1741,16 +1771,6 @@
         }
 
         openModal('modal-question');
-    }
-
-    function handleImageUpload(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-            document.getElementById('form-q-image-url').value = evt.target.result;
-        };
-        reader.readAsDataURL(file);
     }
 
     function saveQuestion(e) {
@@ -1773,6 +1793,8 @@
         };
 
         let correct = '';
+        let matrixType = 'bs';
+
         if (type === 'pg') {
             correct = document.getElementById('form-q-correct-pg').value;
         } else if (type === 'pgk_checkbox') {
@@ -1780,6 +1802,7 @@
             document.querySelectorAll('input[name="key_checkbox"]:checked').forEach(cb => checkedVals.push(cb.value));
             correct = checkedVals.sort().join(',');
         } else if (type === 'pgk_matrix') {
+            matrixType = document.getElementById('form-q-matrix-type').value || 'bs';
             const a = document.getElementById('key_matrix_A').value;
             const b = document.getElementById('key_matrix_B').value;
             const c = document.getElementById('key_matrix_C').value;
@@ -1790,7 +1813,7 @@
 
         const discussion = document.getElementById('form-q-discussion').value.trim();
 
-        const qObj = { id, category, type, weight, stimulus, question, image, options, correct, discussion };
+        const qObj = { id, category, type, matrixType, weight, stimulus, question, image, options, correct, discussion };
 
         const existingIdx = questionsData.findIndex(item => item.id === id);
         if (existingIdx >= 0) {
