@@ -473,8 +473,8 @@
                         <option value="SMK - Nautika Kapal Penangkap Ikan">SMK - Nautika Kapal Penangkap Ikan</option>
                     </select>
                 </div>
-                <!-- Indikator Ringkasan Total Bobot Skor -->
-                <div class="px-3.5 py-2 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl text-xs font-bold flex items-center gap-2 self-end">
+                <!-- Indikator Ringkasan Total Bobot Skor (Ditampilkan hanya untuk mapel spesifik) -->
+                <div id="summary-badge-container" style="display: none;" class="px-3.5 py-2 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl text-xs font-bold flex items-center gap-2 self-end">
                     <i class="fa-solid fa-calculator text-amber-600"></i>
                     <span>Total Soal: <strong id="summary-total-q" class="text-brand-700">0</strong> | Total Bobot Skor: <strong id="summary-total-weight" class="text-amber-700">0 Poin</strong></span>
                 </div>
@@ -1663,13 +1663,21 @@
             filtered = questionsData.filter(q => q.category === filterVal);
         }
 
-        const totalQ = filtered.length;
-        const totalW = filtered.reduce((sum, q) => sum + (Number(q.weight) || 3), 0);
+        const badgeContainer = document.getElementById('summary-badge-container');
+        if (badgeContainer) {
+            if (filterVal === 'ALL') {
+                badgeContainer.style.display = 'none';
+            } else {
+                badgeContainer.style.display = 'inline-flex';
+                const totalQ = filtered.length;
+                const totalW = filtered.reduce((sum, q) => sum + (Number(q.weight) || 3), 0);
 
-        const sumQEl = document.getElementById('summary-total-q');
-        const sumWEl = document.getElementById('summary-total-weight');
-        if (sumQEl) sumQEl.textContent = totalQ;
-        if (sumWEl) sumWEl.textContent = `${totalW} Poin`;
+                const sumQEl = document.getElementById('summary-total-q');
+                const sumWEl = document.getElementById('summary-total-weight');
+                if (sumQEl) sumQEl.textContent = totalQ;
+                if (sumWEl) sumWEl.textContent = `${totalW} Poin`;
+            }
+        }
 
         if (filtered.length === 0) {
             tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">Tidak ada soal terdaftar untuk kategori ini.</td></tr>`;
