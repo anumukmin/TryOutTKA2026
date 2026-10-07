@@ -41,6 +41,10 @@
             user-select: none;
             -webkit-user-select: none;
         }
+        input, textarea, select, #modal-question, #tab-bank {
+            user-select: text !important;
+            -webkit-user-select: text !important;
+        }
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -62,7 +66,7 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between bg-slate-100" oncontextmenu="return false;">
+<body class="min-h-screen flex flex-col justify-between bg-slate-100">
 
 <script>
     const LOGO_SMKN1_BULAKAMBA_PNG = "https://raw.githubusercontent.com/anumukmin/tryout2026/fa43cda08e3610ca170f63a90d1d8caa37dc6d71/logo_smkn_1_bulakamba-removebg-preview.png";
@@ -1209,6 +1213,12 @@
                 triggerViolation('Pindah aplikasi / browser');
             }
         };
+
+        document.addEventListener('contextmenu', function(e) {
+            if (document.getElementById('cbt-screen').style.display === 'flex') {
+                e.preventDefault();
+            }
+        });
     }
 
     function triggerViolation(reason) {
