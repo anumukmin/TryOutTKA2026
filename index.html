@@ -467,6 +467,9 @@
                 <button onclick="openQuestionModal()" class="px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl transition shadow flex items-center gap-2">
                     <i class="fa-solid fa-plus"></i> Tambah Soal TKA Baru
                 </button>
+                <button onclick="removeDuplicateQuestions()" class="px-3.5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition shadow flex items-center gap-1.5" title="Hapus Soal Ganda / Duplikat">
+                    <i class="fa-solid fa-broom"></i> Bersihkan Duplikat
+                </button>
                 <button onclick="resetDemoQuestions()" class="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition flex items-center gap-1.5" title="Reset ke Soal Bawaan">
                     <i class="fa-solid fa-arrows-rotate"></i> Reset Demo
                 </button>
@@ -765,7 +768,48 @@
 <script>
     // --- GLOBAL STATE & CONFIGURATION ---
     const ADMIN_PIN = "505609";
-    let googleSheetsUrl = "https://script.google.com/macros/s/AKfycbxBF7IuF9bWrPRBo0WatwG2wWtIGlwlBqMauCZtC6kpRv0oqjGTlooK3YI-f51IoWwTQQ/exec";
+    let googleSheetsUrl = "https://script.google.com/macros/s/AKfycbybczu2XoeSYJ2TJ2yfR42K2PVMKuPwlh6-mvx1dBzyg6gQpJ_uAhf_Iy60osNAT0vrNw/exec";
+
+    // Default Fallback Questions if local storage is empty
+    const INITIAL_QUESTIONS = [
+        {
+            id: "demo_1",
+            category: "Bahasa Indonesia",
+            type: "pg",
+            weight: 3,
+            stimulus: "Bacalah teks berikut dengan saksama sebelum menjawab pertanyaan.",
+            question: "Manakah yang merupakan ide pokok dari teks stimulus di atas?",
+            image: "",
+            options: {
+                A: "Gagasan utama pada paragraf pertama",
+                B: "Gagasan pendukung paragraf pertama",
+                C: "Kesimpulan umum teks wacana",
+                D: "Pernyataan penjelas paragraf kedua",
+                E: "Saran dan pandangan penulis"
+            },
+            correct: "A",
+            discussion: "Ide pokok terletak di awal kalimat paragraf utama."
+        }
+    ];
+
+    // Image & Logo Error Handlers & Converters
+    function handleLogoError(img) {
+        if (img) img.style.display = 'none';
+    }
+
+    function formatGoogleDriveUrl(url) {
+        if (!url) return '';
+        if (url.startsWith('data:image')) return url;
+        const match = url.match(/(?:drive\.google\.com\/(?:file\/d\/|open\?id=)|lh3\.googleusercontent\.com\/d\/)([a-zA-Z0-9_-]+)/);
+        if (match && match[1]) {
+            return `https://lh3.googleusercontent.com/d/${match[1]}`;
+        }
+        return url;
+    }
+
+    function formatImageUrl(url) {
+        return formatGoogleDriveUrl(url);
+    }
 
     let currentStudent = null;
     let isAdminLoggedIn = false;
@@ -779,76 +823,49 @@
     let violationCount = 0;
     let isExamActive = false;
 
-    // INITIAL DEMO QUESTIONS
-    const INITIAL_QUESTIONS = [
-        {
-            id: 'q_demo_1',
-            category: 'Bahasa Indonesia',
-            type: 'pg',
-            weight: 3,
-            stimulus: 'SMK Negeri 1 Bulakamba Brebes berkomitmen menciptakan lulusan vokasi yang unggul, terampil, dan berdaya saing global melalui pembelajaran berbasis CBT TKA tahun 2026.',
-            question: 'Berdasarkan wacana di atas, apa tujuan utama pembelajaran berbasis CBT TKA di SMKN 1 Bulakamba?',
-            image: null,
-            options: {
-                A: 'Menciptakan lulusan yang terampil dan berdaya saing global',
-                B: 'Menambah jam pelajaran teori siswa',
-                C: 'Menggantikan peran pengawas secara total',
-                D: 'Mengurangi jumlah soal ujian nasional',
-                E: 'Menghapuskan kegiatan praktikum kerja industri'
-            },
-            correct: 'A',
-            discussion: 'Wacana secara tersurat menyebutkan bahwa CBT TKA bertujuan menciptakan lulusan vokasi unggul dan berdaya saing global.'
-        },
-        {
-            id: 'q_demo_2',
-            category: 'Bahasa Indonesia',
-            type: 'pgk_matrix',
-            matrixType: 'bs',
-            weight: 5,
-            stimulus: 'Ciri-ciri teks prosedur kompleks meliputi kriteria ketersediaan langkah yang berurutan, penggunaan kata kerja imperatif, serta konjungsi temporal.',
-            question: 'Tentukan kebenaran dari masing-masing pernyataan berikut berdasarkan ciri-ciri teks prosedur!',
-            image: null,
-            options: {
-                A: 'Menggunakan kata kerja imperatif (perintah).',
-                B: 'Langkah-langkah disusun secara acak tanpa urutan.',
-                C: 'Terdapat konjungsi temporal seperti "kemudian" dan "setelah itu".',
-                D: 'Berisi opini pribadi tanpa fakta langkah kerja.',
-                E: 'Menggunakan kalimat deklaratif penuh tanpa petunjuk.'
-            },
-            correct: 'B,S,B,S,S',
-            discussion: 'Pernyataan A & C Benar, sedangkan B, D, E Salah.'
-        }
-    ];
+    // --- AUTOMATIC QUESTION DEDUPLICATION ENGINE ---
+    function deduplicateQuestions(list) {
+        if (!Array.isArray(list)) return [];
+        const seenKeys = new Set();
+        const result = [];
 
-    // --- HELPER LOGO & IMAGE CONVERTER ---
-    const LOGO_SMKN1_BULAKAMBA_PNG = "https://raw.githubusercontent.com/anumukmin/tryout2026/fa43cda08e3610ca170f63a90d1d8caa37dc6d71/logo_smkn_1_bulakamba-removebg-preview.png";
-    const LOGO_SMKN1_BULAKAMBA_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path d="M100 8 C115 8 120 18 135 13 C150 8 160 18 170 28 C180 38 190 48 185 63 C180 78 190 88 190 98 C190 108 180 118 185 133 C190 148 180 158 170 168 C160 178 150 188 135 183 C120 178 115 188 100 188 C85 188 80 178 65 183 C50 188 40 178 30 168 C20 158 10 148 15 133 C20 118 10 108 10 98 C10 88 20 78 15 63 C10 48 20 38 30 28 C40 18 50 8 65 13 C80 18 85 8 100 8 Z" fill="%2315803d" stroke="%23b91c1c" stroke-width="4"/><path d="M100 16 C112 16 116 24 128 20 C140 16 148 24 156 32 C164 40 172 48 168 60 C164 72 172 80 172 88 C172 96 164 104 168 116 C172 128 164 136 156 144 C148 152 140 160 128 156 C116 152 112 160 100 160 C88 160 84 152 72 156 C60 160 52 152 44 144 C36 136 28 128 32 116 C36 104 28 96 28 88 C28 80 36 72 32 60 C28 48 36 40 44 32 C52 24 60 16 72 20 C84 24 88 16 100 16 Z" fill="%23ffffff"/><path d="M30 48 Q100 23 170 48 L165 60 Q100 36 35 60 Z" fill="%23ffffff" stroke="%23b91c1c" stroke-width="1.5"/><text x="100" y="45" font-family="Arial,sans-serif" font-weight="bold" font-size="8.5" fill="%23b91c1c" text-anchor="middle">SMK NEGERI 1 BULAKAMBA</text><circle cx="100" cy="98" r="36" fill="none" stroke="%2315803d" stroke-width="9" stroke-dasharray="11 5"/><circle cx="100" cy="98" r="31" fill="none" stroke="%2315803d" stroke-width="2.5"/><path d="M100 118 L100 152 M72 132 C72 156 128 156 128 132 M67 128 L76 132 M124 132 L133 128" fill="none" stroke="%230284c7" stroke-width="4.5" stroke-linecap="round"/><path d="M100 146 C86 128 81 114 100 104 C119 114 114 128 100 146 Z" fill="%23dc2626"/><path d="M100 146 C76 133 67 119 86 111 C95 123 100 136 100 146 Z" fill="%23ef4444"/><path d="M100 146 C124 133 133 119 114 111 C105 123 100 136 100 146 Z" fill="%23ef4444"/><polygon points="100,65 81,104 119,104" fill="%23eab308" stroke="%23ca8a04" stroke-width="1.5"/><path d="M101 58 L96 79 L103 79 L98 98" fill="none" stroke="%23dc2626" stroke-width="2.8" stroke-linejoin="round"/><text x="100" y="174" font-family="Arial,sans-serif" font-weight="bold" font-size="11" fill="%23b91c1c" text-anchor="middle" letter-spacing="1.5">BREBES</text></svg>`;
+        list.forEach(q => {
+            if (!q || !q.question) return;
+            const cleanText = String(q.question).trim().toLowerCase();
+            const catText = String(q.category || '').trim().toLowerCase();
+            
+            // Key berdasarkan ID dan kombinasi Kategori + Isi Pertanyaan
+            const idKey = q.id ? String(q.id).trim() : null;
+            const contentKey = `${catText}___${cleanText}`;
 
-    function handleLogoError(imgEl) {
-        if (!imgEl.dataset.triedRelative) {
-            imgEl.dataset.triedRelative = 'true';
-            imgEl.src = 'logo_smkn_1_bulakamba-removebg-preview.png';
-        } else if (!imgEl.dataset.triedRaw) {
-            imgEl.dataset.triedRaw = 'true';
-            imgEl.src = LOGO_SMKN1_BULAKAMBA_PNG;
-        } else {
-            imgEl.onerror = null;
-            imgEl.src = LOGO_SMKN1_BULAKAMBA_SVG;
-        }
+            if ((idKey && seenKeys.has(idKey)) || seenKeys.has(contentKey)) {
+                return; // Abaikan jika duplikat
+            }
+
+            if (idKey) seenKeys.add(idKey);
+            seenKeys.add(contentKey);
+            result.push(q);
+        });
+
+        return result;
     }
 
-    function formatGoogleDriveUrl(url) {
-        if (!url) return '';
-        if (url.startsWith('data:image')) return url;
-        const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
-        if (match && match[1]) {
-            return `https://lh3.googleusercontent.com/d/${match[1]}`;
-        }
-        return url;
-    }
+    function removeDuplicateQuestions() {
+        const initialCount = questionsData.length;
+        questionsData = deduplicateQuestions(questionsData);
+        const removedCount = initialCount - questionsData.length;
+        saveBankQuestions();
 
-    function formatImageUrl(url) {
-        return formatGoogleDriveUrl(url);
+        if (googleSheetsUrl) {
+            fetch(googleSheetsUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'SYNC_ALL', questions: questionsData })
+            }).catch(() => {});
+        }
+
+        alert(`Pembersihan Selesai!\nBerhasil menghapus ${removedCount} soal duplikat. Total soal unik saat ini: ${questionsData.length}`);
     }
 
     // --- BANK SOAL LOCAL & CLOUD STORAGE ---
@@ -856,7 +873,7 @@
         const stored = localStorage.getItem('tryout_bank_questions');
         if (stored) {
             try {
-                questionsData = JSON.parse(stored);
+                questionsData = deduplicateQuestions(JSON.parse(stored));
             } catch(e) {
                 questionsData = [...INITIAL_QUESTIONS];
             }
@@ -876,17 +893,19 @@
     }
 
     function saveBankQuestions() {
+        questionsData = deduplicateQuestions(questionsData);
         localStorage.setItem('tryout_bank_questions', JSON.stringify(questionsData));
         renderBankTable();
     }
 
     function fetchCloudQuestions() {
         if (!googleSheetsUrl) return;
-        fetch(googleSheetsUrl)
+        const cacheBusterUrl = googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
+        fetch(cacheBusterUrl)
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data) && data.length > 0) {
-                    questionsData = data;
+                    questionsData = deduplicateQuestions(data);
                     saveBankQuestions();
                 }
             })
@@ -1834,6 +1853,10 @@
         googleSheetsUrl = urlInput;
         localStorage.setItem('google_sheets_url', googleSheetsUrl);
 
+        // Bersihkan duplikat terlebih dahulu sebelum dikirim
+        questionsData = deduplicateQuestions(questionsData);
+        saveBankQuestions();
+
         fetch(googleSheetsUrl, {
             method: 'POST',
             mode: 'no-cors',
@@ -1841,7 +1864,7 @@
             body: JSON.stringify({ action: 'SYNC_ALL', questions: questionsData })
         })
         .then(() => {
-            alert('Berhasil terhubung & menyinkronkan data ke Google Sheets!');
+            alert('Berhasil terhubung & menyinkronkan data bersih tanpa duplikat ke Google Sheets!');
             fetchCloudQuestions();
         })
         .catch(err => {
