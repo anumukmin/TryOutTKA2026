@@ -1072,13 +1072,52 @@
         e.preventDefault();
         const selectedSubtest = document.getElementById('exam-subtest-filter').value;
 
-        currentExamQuestions = questionsData.filter(q => q.category === selectedSubtest || q.category.includes(selectedSubtest));
-        if (currentExamQuestions.length === 0) {
-            currentExamQuestions = questionsData.filter(q => q.category === 'Bahasa Indonesia');
+        // Pemetaan otomatis Kode Kelas & Nama Jurusan ke Kategori Bank Soal
+        const classStr = (currentStudent.studentClass || '').toUpperCase();
+        const majorStr = (currentStudent.major || '').toUpperCase();
+
+        function matchMajorCategory(qCategory) {
+            const catUpper = (qCategory || '').toUpperCase();
+            
+            // Deteksi TAV / Teknik Audio Video
+            if (classStr.includes('TAV') || majorStr.includes('AUDIO') || majorStr.includes('TAV')) {
+                return catUpper.includes('AUDIO') || catUpper.includes('TAV');
+            }
+            // Deteksi TKR / Teknik Kendaraan Ringan
+            if (classStr.includes('TKR') || majorStr.includes('KENDARAAN') || majorStr.includes('TKR')) {
+                return catUpper.includes('KENDARAAN') || catUpper.includes('TKR');
+            }
+            // Deteksi TSM / Sepeda Motor
+            if (classStr.includes('TSM') || classStr.includes('TBSM') || majorStr.includes('MOTOR') || majorStr.includes('TSM')) {
+                return catUpper.includes('MOTOR') || catUpper.includes('TSM');
+            }
+            // Deteksi TITL / Listrik
+            if (classStr.includes('TITL') || majorStr.includes('LISTRIK') || majorStr.includes('TITL')) {
+                return catUpper.includes('LISTRIK') || catUpper.includes('TITL');
+            }
+            // Deteksi ATPH / Agribisnis / Pertanian
+            if (classStr.includes('ATPH') || majorStr.includes('AGRIBISNIS') || majorStr.includes('HORTI') || majorStr.includes('ATPH')) {
+                return catUpper.includes('AGRIBISNIS') || catUpper.includes('HORTI') || catUpper.includes('ATPH');
+            }
+            // Deteksi NKPI / Nautika / Kapal
+            if (classStr.includes('NKPI') || majorStr.includes('NAUTIKA') || majorStr.includes('KAPAL') || majorStr.includes('NKPI')) {
+                return catUpper.includes('NAUTIKA') || catUpper.includes('KAPAL') || catUpper.includes('NKPI');
+            }
+
+            // Fallback pemencocokan nama jurusan langsung
+            return catUpper.includes(majorStr) || majorStr.includes(catUpper.replace('SMK - ', ''));
+        }
+
+        if (selectedSubtest === 'Program Keahlian' || selectedSubtest.toLowerCase().includes('keahlian')) {
+            // Filter khusus soal jurusan siswa
+            currentExamQuestions = questionsData.filter(q => matchMajorCategory(q.category));
+        } else {
+            // Filter mapel umum (Bahasa Indonesia, Matematika, B. Inggris, Kewirausahaan)
+            currentExamQuestions = questionsData.filter(q => q.category === selectedSubtest || q.category.includes(selectedSubtest));
         }
 
         if (currentExamQuestions.length === 0) {
-            alert('Belum ada soal tersedia untuk subtes ini di bank soal!');
+            alert(`Belum ada soal tersedia di bank soal untuk subtes/jurusan (${selectedSubtest})!`);
             return;
         }
 
