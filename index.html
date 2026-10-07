@@ -1068,9 +1068,18 @@
     }
 
     // --- START CBT EXAM ENGINE ---
-    function handleStartExam(e) {
+    async function handleStartExam(e) {
         e.preventDefault();
         const selectedSubtest = document.getElementById('exam-subtest-filter').value;
+
+        // Ambil data bank soal terbaru dari cloud terlebih dahulu jika ada URL Google Sheets
+        if (googleSheetsUrl) {
+            try {
+                await fetchCloudQuestions();
+            } catch(err) {
+                console.warn("Menggunakan data lokal karena fetch cloud terkendala:", err);
+            }
+        }
 
         // Pemetaan otomatis Kode Kelas & Nama Jurusan ke Kategori Bank Soal
         const classStr = (currentStudent.studentClass || '').toUpperCase();
@@ -1079,27 +1088,27 @@
         function matchMajorCategory(qCategory) {
             const catUpper = (qCategory || '').toUpperCase();
             
-            // Deteksi TAV / Teknik Audio Video
+            // 1. Deteksi TAV / Teknik Audio Video (XII TAV 1, XII TAV 2)
             if (classStr.includes('TAV') || majorStr.includes('AUDIO') || majorStr.includes('TAV')) {
                 return catUpper.includes('AUDIO') || catUpper.includes('TAV');
             }
-            // Deteksi TKR / Teknik Kendaraan Ringan
+            // 2. Deteksi TKR / Teknik Kendaraan Ringan (XII TKR 1, XII TKR 2, dst)
             if (classStr.includes('TKR') || majorStr.includes('KENDARAAN') || majorStr.includes('TKR')) {
                 return catUpper.includes('KENDARAAN') || catUpper.includes('TKR');
             }
-            // Deteksi TSM / Sepeda Motor
+            // 3. Deteksi TSM / TBSM / Sepeda Motor (XII TSM 1, XII TSM 2, dst)
             if (classStr.includes('TSM') || classStr.includes('TBSM') || majorStr.includes('MOTOR') || majorStr.includes('TSM')) {
                 return catUpper.includes('MOTOR') || catUpper.includes('TSM');
             }
-            // Deteksi TITL / Listrik
+            // 4. Deteksi TITL / Instalasi Tenaga Listrik (XII TITL 1, XII TITL 2, dst)
             if (classStr.includes('TITL') || majorStr.includes('LISTRIK') || majorStr.includes('TITL')) {
                 return catUpper.includes('LISTRIK') || catUpper.includes('TITL');
             }
-            // Deteksi ATPH / Agribisnis / Pertanian
+            // 5. Deteksi ATPH / Agribisnis Tanaman (XII ATPH 1, XII ATPH 2, dst)
             if (classStr.includes('ATPH') || majorStr.includes('AGRIBISNIS') || majorStr.includes('HORTI') || majorStr.includes('ATPH')) {
                 return catUpper.includes('AGRIBISNIS') || catUpper.includes('HORTI') || catUpper.includes('ATPH');
             }
-            // Deteksi NKPI / Nautika / Kapal
+            // 6. Deteksi NKPI / Nautika Kapal (XII NKPI 1, XII NKPI 2, dst)
             if (classStr.includes('NKPI') || majorStr.includes('NAUTIKA') || majorStr.includes('KAPAL') || majorStr.includes('NKPI')) {
                 return catUpper.includes('NAUTIKA') || catUpper.includes('KAPAL') || catUpper.includes('NKPI');
             }
