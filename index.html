@@ -1556,7 +1556,18 @@
             let totalWeight = 0;
             filtered.forEach(q => totalWeight += (q.weight || 3));
             document.getElementById('summary-total-q').textContent = filtered.length;
-            document.getElementById('summary-total-weight').textContent = `${totalWeight} Poin`;
+            
+            const weightEl = document.getElementById('summary-total-weight');
+            weightEl.textContent = `${totalWeight} Poin`;
+
+            // Kondisi Warna Total Bobot Skor (Merah jika != 100, Hijau jika === 100)
+            if (totalWeight === 100) {
+                summaryContainer.className = "px-3.5 py-2 bg-emerald-50 border border-emerald-300 text-emerald-900 rounded-xl text-xs font-bold flex items-center gap-2 self-end shadow-xs";
+                weightEl.className = "text-emerald-700 font-extrabold";
+            } else {
+                summaryContainer.className = "px-3.5 py-2 bg-rose-50 border border-rose-300 text-rose-900 rounded-xl text-xs font-bold flex items-center gap-2 self-end shadow-xs";
+                weightEl.className = "text-rose-700 font-extrabold";
+            }
         }
 
         tbody.innerHTML = '';
@@ -1569,14 +1580,22 @@
             const tr = document.createElement('tr');
             tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
 
+            // Menentukan teks dan warna badge khusus untuk setiap Bentuk Soal
             let typeStr = 'PG Sederhana';
-            if (q.type === 'pgk_checkbox') typeStr = 'PG Kompleks (MCMA)';
-            if (q.type === 'pgk_matrix') typeStr = 'PG Kompleks Kategori';
+            let typeBadgeClass = 'bg-sky-100 text-sky-800 border-sky-200';
+            
+            if (q.type === 'pgk_checkbox') {
+                typeStr = 'PG Kompleks (MCMA)';
+                typeBadgeClass = 'bg-purple-100 text-purple-800 border-purple-200';
+            } else if (q.type === 'pgk_matrix') {
+                typeStr = 'PG Kompleks Kategori';
+                typeBadgeClass = 'bg-amber-100 text-amber-800 border-amber-200';
+            }
 
             tr.innerHTML = `
                 <td class="p-3.5 text-center font-bold text-slate-500">${idx + 1}</td>
                 <td class="p-3.5 font-bold text-slate-700">${q.category}</td>
-                <td class="p-3.5 text-center"><span class="px-2 py-1 bg-brand-50 text-brand-800 rounded font-semibold text-[11px]">${typeStr}</span></td>
+                <td class="p-3.5 text-center"><span class="px-2.5 py-1 rounded-lg font-bold text-[11px] border ${typeBadgeClass}">${typeStr}</span></td>
                 <td class="p-3.5 text-center font-bold text-amber-700">⭐ ${q.weight || 3} Poin</td>
                 <td class="p-3.5 font-medium text-slate-800 max-w-xs truncate">${q.question}</td>
                 <td class="p-3.5 text-center font-mono font-bold text-emerald-700">${q.correct}</td>
@@ -1602,20 +1621,20 @@
         if (type === 'pg') pgContainer.style.display = 'block';
         if (type === 'pgk_checkbox') cbContainer.style.display = 'block';
         if (type === 'pgk_matrix') mxContainer.style.display = 'block';
+        const q = currentExamQuestions[currentQIndex];
+        document.getElementById('current-q-num').textContent = currentQIndex + 1;
+        document.getElementById('current-q-weight').textContent = q.weight || 3;
 
-        updatePointBreakdownHint();
-    }
-
-    function updatePointBreakdownHint() {
-        const type = document.getElementById('form-q-type').value;
-        const weight = parseInt(document.getElementById('form-q-weight').value) || 5;
-        const subhint = document.getElementById('form-weight-subhint');
-
-        if (type === 'pgk_matrix') {
-            subhint.innerHTML = `<i class="fa-solid fa-calculator mr-1"></i> Rincian Skor: 5 Pernyataan = ${(weight / 5).toFixed(1)} Poin per baris`;
-            subhint.style.display = 'block';
+        const badge = document.getElementById('current-q-type-badge');
+        if (q.type === 'pg') {
+            badge.textContent = 'Pilihan Ganda Sederhana';
+            badge.className = 'bg-sky-100 text-sky-800 border border-sky-200 px-2.5 py-0.5 rounded-lg text-xs font-bold';
+        } else if (q.type === 'pgk_checkbox') {
+            badge.textContent = 'Pilihan Ganda Kompleks (MCMA)';
+            badge.className = 'bg-purple-100 text-purple-800 border border-purple-200 px-2.5 py-0.5 rounded-lg text-xs font-bold';
         } else {
-            subhint.style.display = 'none';
+            badge.textContent = 'Pilihan Ganda Kompleks Kategori';
+            badge.className = 'bg-amber-100 text-amber-800 border border-amber-200 px-2.5 py-0.5 rounded-lg text-xs font-bold';
         }
     }
 
