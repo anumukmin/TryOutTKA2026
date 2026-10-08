@@ -486,8 +486,8 @@
                 <p class="text-xs text-slate-500 mt-0.5">Seluruh hasil pengerjaan siswa tersimpan & otomatis terkirim ke Google Sheets untuk perankingan.</p>
             </div>
             <div class="flex items-center gap-2">
-                <button onclick="exportToExcel()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition shadow flex items-center gap-2">
-                    <i class="fa-solid fa-file-excel"></i> Ekspor ke Excel (.xlsx)
+                <button onclick="fetchCloudResults()" class="px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl transition shadow flex items-center gap-2">
+                    <i class="fa-solid fa-arrows-rotate"></i> Sinkronkan Hasil Cloud
                 </button>
             </div>
         </div>
@@ -741,7 +741,46 @@
 <script>
     // --- GLOBAL CONFIGURATION ---
     const ADMIN_PIN = "505609";
-    let googleSheetsUrl = "https://script.google.com/macros/s/AKfycbxlGGPLxi3hz9mXM9Ly7uXUFOfDBs5iVi11mtmZxjrXdJC14XrzBtjbdzVQneObZyhyGQ/exec";
+    let googleSheetsUrl = "https://script.google.com/macros/s/AKfycbwM9Kpq_jzSiI8iQg0RPiUZNxG7WIWMnh3AU1C5_mRfvRSKkDsc9fyJtE9_hitt2iXMZg/exec";
+
+    // --- MODAL & UI HELPER FUNCTIONS ---
+    function openModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) modal.style.display = 'flex';
+    }
+
+    function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) modal.style.display = 'none';
+    }
+
+    function toggleMobileMenu() {
+        const menu = document.getElementById('mobile-menu');
+        if (menu) {
+            menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'block' : 'none';
+        }
+    }
+
+    function submitAdminAuth(e) {
+        e.preventDefault();
+        const pinInput = document.getElementById('admin-pin-input');
+        const pinError = document.getElementById('admin-pin-error');
+        const pinValue = pinInput ? pinInput.value.trim() : '';
+
+        if (pinValue === ADMIN_PIN) {
+            isAdminLoggedIn = true;
+            if (pinError) pinError.classList.add('hidden');
+            if (pinInput) pinInput.value = '';
+            closeModal('modal-admin-auth');
+            updateNavUI();
+            switchTab('bank');
+        } else {
+            if (pinError) {
+                pinError.textContent = 'PIN Koordinator salah!';
+                pinError.classList.remove('hidden');
+            }
+        }
+    }
 
     const INITIAL_QUESTIONS = [
         {
@@ -890,39 +929,9 @@
         if (navBtn) navBtn.classList.add('bg-brand-700', 'font-bold');
 
         if (tabName === 'bank') renderBankTable();
-        if (tabName === 'results') renderResultsTable();
-    }
-
-    function toggleMobileMenu() {
-        const menu = document.getElementById('mobile-menu');
-        if (menu) menu.style.display = (menu.style.display === 'none' || !menu.style.display) ? 'block' : 'none';
-    }
-
-    function openModal(modalId) {
-        const modal = document.getElementById(modalId);
-        if (modal) modal.style.display = 'flex';
-    }
-
-    function closeModal(modalId) {
-        const modal = document.getElementById(modalId);
-        if (modal) modal.style.display = 'none';
-    }
-
-    // --- AUTHENTICATION & NAVIGATION ---
-    function submitAdminAuth(e) {
-        e.preventDefault();
-        const pin = document.getElementById('admin-pin-input').value.trim();
-        const errorEl = document.getElementById('admin-pin-error');
-
-        if (pin === ADMIN_PIN) {
-            isAdminLoggedIn = true;
-            errorEl.classList.add('hidden');
-            closeModal('modal-admin-auth');
-            updateNavUI();
-            switchTab('bank');
-        } else {
-            errorEl.textContent = 'PIN Koordinator salah!';
-            errorEl.classList.remove('hidden');
+        if (tabName === 'results') {
+            renderResultsTable();
+            if (googleSheetsUrl) fetchCloudResults();
         }
     }
 
@@ -1799,31 +1808,69 @@
     }
 
     function connectAndAutoSyncSheets() {
-        const urlInput = document.getElementById('google-sheets-url').value.trim();
-        if (!urlInput) {
+        const inputEl = document.getElementById('google-sheets-url');
+        const urlValue = inputEl ? inputEl.value.trim() : '';
+
+        if (!urlValue && !googleSheetsUrl) {
             alert('Masukkan URL Google Apps Script!');
             return;
         }
 
-        googleSheetsUrl = urlInput;
-        localStorage.setItem('google_sheets_url', googleSheetsUrl);
+        if (urlValue) {
+            googleSheetsUrl = urlValue;
+            localStorage.setItem('google_sheets_url', googleSheetsUrl);
+        }
 
         questionsData = deduplicateQuestions(questionsData);
         saveBankQuestions();
 
-        fetch(googleSheetsUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ action: 'SYNC_ALL', questions: questionsData })
-        })
-        .then(() => {
-            alert('Berhasil terhubung & menyinkronkan data bersih tanpa duplikat ke Google Sheets!');
-            fetchCloudQuestions();
-        })
-        .catch(err => {
-            alert('Gagal menyinkronkan: ' + err.message);
-        });
+        const statusEl = document.getElementById('sheets-sync-status');
+        if (statusEl) {
+            statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-amber-300"></i> <span>Menghubungkan ke Google Sheets...</span>`;
+        }
+
+        fetchCloudQuestions();
+        fetchCloudResults();
+
+        if (googleSheetsUrl && questionsData.length > 0) {
+            fetch(googleSheetsUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'SYNC_ALL', questions: questionsData })
+            })
+            .then(() => {
+                if (statusEl) {
+                    statusEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-300"></i> <span>Tersambung ke Google Sheets (Data Real-Time Sync)</span>`;
+                }
+                alert('Berhasil terhubung dan tersinkronisasi dengan Google Sheets!');
+            })
+            .catch(() => {
+                if (statusEl) {
+                    statusEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-300"></i> <span>Tersambung ke Google Sheets</span>`;
+                }
+            });
+        } else {
+            if (statusEl) {
+                statusEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-300"></i> <span>Tersambung ke Google Sheets</span>`;
+            }
+            alert('Berhasil terhubung ke Google Sheets!');
+        }
+    }
+
+    function fetchCloudResults() {
+        if (!googleSheetsUrl) return;
+        const cacheBusterUrl = googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 'action=GET_RESULTS&t=' + Date.now();
+        
+        fetch(cacheBusterUrl)
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    localStorage.setItem('tryout_results', JSON.stringify(data));
+                    renderResultsTable();
+                }
+            })
+            .catch(err => console.log('Info: Menggunakan data rekap lokal', err));
     }
 
     function renderResultsTable() {
@@ -1834,7 +1881,7 @@
         tbody.innerHTML = '';
 
         if (results.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-400">Belum ada data rekap ujian.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-400">Belum ada data rekap ujian. Klik "Sinkronkan Hasil Cloud" jika data sudah ada di Google Sheets.</td></tr>`;
             return;
         }
 
@@ -1842,18 +1889,17 @@
             const tr = document.createElement('tr');
             tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
 
-            const d = new Date(res.date);
-            const dateStr = d.toLocaleDateString('id-ID') + ' ' + d.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
+            const dateDisplay = res.date && res.date.includes('T') ? new Date(res.date).toLocaleString('id-ID') : (res.date || '-');
 
             tr.innerHTML = `
                 <td class="p-3.5 text-center font-bold text-slate-500">${idx + 1}</td>
-                <td class="p-3.5 text-slate-500">${dateStr}</td>
-                <td class="p-3.5 font-bold text-slate-800">${res.studentName}</td>
-                <td class="p-3.5 font-semibold text-brand-700">${res.studentClass}</td>
-                <td class="p-3.5 text-slate-600">${res.studentMajor}</td>
-                <td class="p-3.5 text-slate-600">${res.subtest}</td>
-                <td class="p-3.5 text-center"><strong class="text-brand-700 text-sm">${res.score}</strong></td>
-                <td class="p-3.5 text-center"><span class="${res.violations > 0 ? 'text-rose-600 font-bold' : 'text-slate-400'}">${res.violations}</span></td>
+                <td class="p-3.5 text-slate-500">${dateDisplay}</td>
+                <td class="p-3.5 font-bold text-slate-800">${res.studentName || '-'}</td>
+                <td class="p-3.5 font-semibold text-brand-700">${res.studentClass || '-'}</td>
+                <td class="p-3.5 text-slate-600">${res.studentMajor || '-'}</td>
+                <td class="p-3.5 text-slate-600">${res.subtest || '-'}</td>
+                <td class="p-3.5 text-center"><strong class="text-brand-700 text-sm">${res.score || 0}</strong></td>
+                <td class="p-3.5 text-center"><span class="${(res.violations || 0) > 0 ? 'text-rose-600 font-bold' : 'text-slate-400'}">${res.violations || 0}</span></td>
                 <td class="p-3.5 text-center">
                     <button onclick="deleteSingleResult('${res.studentName}', '${res.subtest}')" title="Hapus Hasil Siswa Ini" class="px-2.5 py-1.5 bg-rose-100 hover:bg-rose-200 text-rose-800 rounded-lg font-semibold text-xs transition">
                         <i class="fa-solid fa-trash"></i>
@@ -1892,7 +1938,7 @@
 
         const excelData = results.map((r, idx) => ({
             'No': idx + 1,
-            'Waktu Ujian': new Date(r.date).toLocaleString('id-ID'),
+            'Waktu Ujian': r.date && r.date.includes('T') ? new Date(r.date).toLocaleString('id-ID') : r.date,
             'Nama Murid': r.studentName,
             'Kelas': r.studentClass,
             'Program Keahlian': r.studentMajor,
@@ -1917,7 +1963,9 @@
         updateNavUI();
 
         const inputEl = document.getElementById('google-sheets-url');
-        if (inputEl) inputEl.value = googleSheetsUrl;
+        if (inputEl) {
+            inputEl.value = googleSheetsUrl || '';
+        }
     };
 </script>
 </body>
