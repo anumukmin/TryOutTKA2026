@@ -39,7 +39,6 @@
             user-select: none;
             -webkit-user-select: none;
         }
-        /* Allow selection for form inputs, modals, textareas, and question bank editor */
         input, textarea, select, #modal-question, #tab-bank, .selectable-text {
             user-select: text !important;
             -webkit-user-select: text !important;
@@ -89,7 +88,7 @@
                     <i class="fa-solid fa-book-open"></i> Bank Soal & Input
                 </button>
                 <button id="nav-results" onclick="switchTab('results')" style="display: none;" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition duration-200 hover:bg-brand-700 text-brand-100 flex items-center gap-2">
-                    <i class="fa-solid fa-square-poll-vertical"></i> Hasil & Ekspor Excel
+                    <i class="fa-solid fa-square-poll-vertical"></i> Hasil Ujian (Cloud)
                 </button>
 
                 <div id="admin-badge" style="display: none;" class="ml-2 px-3 py-1.5 bg-amber-500/20 border border-amber-400 text-amber-300 rounded-lg text-xs font-semibold items-center gap-2">
@@ -114,7 +113,7 @@
             <i class="fa-solid fa-book-open"></i> Bank Soal & Input
         </button>
         <button id="mobile-nav-results" onclick="switchTab('results'); toggleMobileMenu();" style="display: none;" class="w-full text-left px-3 py-2 rounded-md text-white hover:bg-brand-700 flex items-center gap-2">
-            <i class="fa-solid fa-square-poll-vertical"></i> Hasil & Ekspor Excel
+            <i class="fa-solid fa-square-poll-vertical"></i> Hasil Ujian (Cloud)
         </button>
     </div>
 </header>
@@ -440,7 +439,6 @@
                     </select>
                 </div>
 
-                <!-- Indikator Dinamis Total Bobot Skor (Hijau jika = 100, Merah jika != 100) -->
                 <div id="summary-badge-container" style="display: none;" class="px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 self-end">
                     <i class="fa-solid fa-calculator text-amber-600"></i>
                     <span>Total Soal: <strong id="summary-total-q" class="text-brand-700">0</strong> | Total Bobot Skor: <strong id="summary-total-weight">0 Poin</strong></span>
@@ -478,12 +476,12 @@
         </div>
     </section>
 
-    <!-- 3. RESULTS & RECAP SECTION -->
+    <!-- 3. RESULTS & RECAP SECTION WITH 50 PER PAGE PAGINATION -->
     <section id="tab-results" class="tab-content hidden space-y-6">
         <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div>
-                <h3 class="font-bold text-slate-800 text-base">Rekap Hasil Ujian Siswa</h3>
-                <p class="text-xs text-slate-500 mt-0.5">Seluruh hasil pengerjaan siswa tersimpan & otomatis terkirim ke Google Sheets untuk perankingan.</p>
+                <h3 class="font-bold text-slate-800 text-base">Rekap Hasil Ujian Siswa (Google Sheets Cloud)</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Hasil pengerjaan siswa disinkronkan secara otomatis dari sheet <strong class="text-emerald-700">Hasil_Ujian</strong>.</p>
             </div>
             <div class="flex items-center gap-2">
                 <button onclick="fetchCloudResults()" class="px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl transition shadow flex items-center gap-2">
@@ -511,6 +509,24 @@
                     <tbody id="results-table-body" class="divide-y divide-slate-100">
                     </tbody>
                 </table>
+            </div>
+
+            <!-- PAGINATION CONTROLS (50 Anak Per Page) -->
+            <div class="p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs">
+                <div class="text-slate-500 font-medium">
+                    Menampilkan <span id="results-range-start" class="font-bold text-slate-800">0</span> - <span id="results-range-end" class="font-bold text-slate-800">0</span> dari <span id="results-total-count" class="font-bold text-brand-700">0</span> data siswa
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="changeResultsPage(-1)" id="btn-results-prev" class="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed font-semibold transition">
+                        <i class="fa-solid fa-chevron-left mr-1"></i> Prev
+                    </button>
+                    <span id="results-page-indicator" class="px-3 py-1 bg-brand-50 border border-brand-200 text-brand-800 rounded-lg font-bold">
+                        Halaman 1 / 1
+                    </span>
+                    <button onclick="changeResultsPage(1)" id="btn-results-next" class="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed font-semibold transition">
+                        Next <i class="fa-solid fa-chevron-right ml-1"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </section>
@@ -741,7 +757,7 @@
 <script>
     // --- GLOBAL CONFIGURATION ---
     const ADMIN_PIN = "505609";
-    let googleSheetsUrl = "https://script.google.com/macros/s/AKfycbwM9Kpq_jzSiI8iQg0RPiUZNxG7WIWMnh3AU1C5_mRfvRSKkDsc9fyJtE9_hitt2iXMZg/exec";
+    let googleSheetsUrl = "https://script.google.com/macros/s/AKfycbybdyNH1OlGXFaePBGtcWOP0kpdC2zwAnLsWBNWiOyC73s65HSZFDzCy_qZButRqxF2fw/exec";
 
     // --- MODAL & UI HELPER FUNCTIONS ---
     function openModal(modalId) {
@@ -833,6 +849,11 @@
     let violationCount = 0;
     let isExamActive = false;
 
+    // --- PAGINASI REKAP HASIL (50 ANAK PER PAGE) ---
+    let resultsDataList = [];
+    let currentResultsPage = 1;
+    const RESULTS_PER_PAGE = 50;
+
     // --- ACCURATE DEDUPLICATION ENGINE (PER-SUBJECT + TEXT) ---
     function deduplicateQuestions(list) {
         if (!Array.isArray(list)) return [];
@@ -845,33 +866,13 @@
             const catText = String(q.category || '').trim().toLowerCase();
             const contentKey = `${catText}___${cleanText}`;
 
-            if (seenKeys.has(contentKey)) {
-                return; // Only skip if same Subject AND Question text
-            }
+            if (seenKeys.has(contentKey)) return;
 
             seenKeys.add(contentKey);
             result.push(q);
         });
 
         return result;
-    }
-
-    function removeDuplicateQuestions() {
-        const initialCount = questionsData.length;
-        questionsData = deduplicateQuestions(questionsData);
-        const removedCount = initialCount - questionsData.length;
-        saveBankQuestions();
-
-        if (googleSheetsUrl) {
-            fetch(googleSheetsUrl, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: 'SYNC_ALL', questions: questionsData })
-            }).catch(() => {});
-        }
-
-        alert(`Pembersihan Selesai!\nBerhasil menghapus ${removedCount} soal duplikat. Total soal unik saat ini: ${questionsData.length}`);
     }
 
     function loadBankQuestions() {
@@ -930,8 +931,8 @@
 
         if (tabName === 'bank') renderBankTable();
         if (tabName === 'results') {
-            renderResultsTable();
             if (googleSheetsUrl) fetchCloudResults();
+            else renderResultsTable();
         }
     }
 
@@ -1002,7 +1003,7 @@
                     currentStudent = data.student;
                     showStudentPrepCard();
                 } else {
-                    document.getElementById('login-error-text').textContent = data.message || 'Username atau password salah!';
+                    document.getElementById('login-error-text').textContent = data.message || 'Username atau password 6-digit salah!';
                     errorEl.classList.remove('hidden');
                 }
             })
@@ -1371,7 +1372,7 @@
         }
     }
 
-    // --- FINISH EXAM & PARSIAL SCORING ENGINE ---
+    // --- FINISH EXAM & AUTO SAVE TO CLOUD ---
     function finishExam(forced = false) {
         isExamActive = false;
         clearInterval(examTimerInterval);
@@ -1858,6 +1859,7 @@
         }
     }
 
+    // --- REAL-TIME CLOUD RESULTS SYNC & PAGINATION ---
     function fetchCloudResults() {
         if (!googleSheetsUrl) return;
         const cacheBusterUrl = googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 'action=GET_RESULTS&t=' + Date.now();
@@ -1866,33 +1868,50 @@
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data)) {
+                    resultsDataList = data;
                     localStorage.setItem('tryout_results', JSON.stringify(data));
+                    currentResultsPage = 1;
                     renderResultsTable();
                 }
             })
-            .catch(err => console.log('Info: Menggunakan data rekap lokal', err));
+            .catch(err => {
+                console.log('Info: Menggunakan data rekap lokal', err);
+                resultsDataList = JSON.parse(localStorage.getItem('tryout_results') || '[]');
+                renderResultsTable();
+            });
     }
 
     function renderResultsTable() {
         const tbody = document.getElementById('results-table-body');
         if (!tbody) return;
 
-        const results = JSON.parse(localStorage.getItem('tryout_results') || '[]');
-        tbody.innerHTML = '';
-
-        if (results.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-400">Belum ada data rekap ujian. Klik "Sinkronkan Hasil Cloud" jika data sudah ada di Google Sheets.</td></tr>`;
+        if (resultsDataList.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-400">Belum ada data rekap ujian. Klik "Sinkronkan Hasil Cloud" untuk menarik data dari Google Sheets.</td></tr>`;
+            updateResultsPaginationControls(0);
             return;
         }
 
-        results.forEach((res, idx) => {
+        const totalItems = resultsDataList.length;
+        const totalPages = Math.ceil(totalItems / RESULTS_PER_PAGE) || 1;
+
+        if (currentResultsPage > totalPages) currentResultsPage = totalPages;
+        if (currentResultsPage < 1) currentResultsPage = 1;
+
+        const startIndex = (currentResultsPage - 1) * RESULTS_PER_PAGE;
+        const endIndex = Math.min(startIndex + RESULTS_PER_PAGE, totalItems);
+        const pageItems = resultsDataList.slice(startIndex, endIndex);
+
+        tbody.innerHTML = '';
+
+        pageItems.forEach((res, idx) => {
             const tr = document.createElement('tr');
             tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
 
+            const globalNum = startIndex + idx + 1;
             const dateDisplay = res.date && res.date.includes('T') ? new Date(res.date).toLocaleString('id-ID') : (res.date || '-');
 
             tr.innerHTML = `
-                <td class="p-3.5 text-center font-bold text-slate-500">${idx + 1}</td>
+                <td class="p-3.5 text-center font-bold text-slate-500">${globalNum}</td>
                 <td class="p-3.5 text-slate-500">${dateDisplay}</td>
                 <td class="p-3.5 font-bold text-slate-800">${res.studentName || '-'}</td>
                 <td class="p-3.5 font-semibold text-brand-700">${res.studentClass || '-'}</td>
@@ -1909,14 +1928,34 @@
 
             tbody.appendChild(tr);
         });
+
+        updateResultsPaginationControls(totalItems, startIndex + 1, endIndex, totalPages);
+    }
+
+    function updateResultsPaginationControls(totalItems, rangeStart = 0, rangeEnd = 0, totalPages = 1) {
+        document.getElementById('results-total-count').textContent = totalItems;
+        document.getElementById('results-range-start').textContent = totalItems > 0 ? rangeStart : 0;
+        document.getElementById('results-range-end').textContent = totalItems > 0 ? rangeEnd : 0;
+
+        document.getElementById('results-page-indicator').textContent = `Halaman ${currentResultsPage} / ${totalPages}`;
+
+        document.getElementById('btn-results-prev').disabled = (currentResultsPage <= 1);
+        document.getElementById('btn-results-next').disabled = (currentResultsPage >= totalPages || totalItems === 0);
+    }
+
+    function changeResultsPage(direction) {
+        const totalPages = Math.ceil(resultsDataList.length / RESULTS_PER_PAGE) || 1;
+        currentResultsPage += direction;
+        if (currentResultsPage < 1) currentResultsPage = 1;
+        if (currentResultsPage > totalPages) currentResultsPage = totalPages;
+        renderResultsTable();
     }
 
     function deleteSingleResult(studentName, subtest) {
         if (!confirm(`Apakah Anda yakin ingin menghapus data rekap ujian dari "${studentName}" (${subtest})?`)) return;
 
-        let results = JSON.parse(localStorage.getItem('tryout_results') || '[]');
-        results = results.filter(r => !(r.studentName === studentName && r.subtest === subtest));
-        localStorage.setItem('tryout_results', JSON.stringify(results));
+        resultsDataList = resultsDataList.filter(r => !(r.studentName === studentName && r.subtest === subtest));
+        localStorage.setItem('tryout_results', JSON.stringify(resultsDataList));
         renderResultsTable();
 
         if (googleSheetsUrl) {
@@ -1927,34 +1966,6 @@
                 body: JSON.stringify({ action: 'DELETE_RESULT', studentName: studentName, subtest: subtest })
             }).catch(err => console.warn('Gagal menghapus rekap di Google Sheets:', err));
         }
-    }
-
-    function exportToExcel() {
-        const results = JSON.parse(localStorage.getItem('tryout_results') || '[]');
-        if (results.length === 0) {
-            alert('Belum ada data rekap hasil untuk diekspor!');
-            return;
-        }
-
-        const excelData = results.map((r, idx) => ({
-            'No': idx + 1,
-            'Waktu Ujian': r.date && r.date.includes('T') ? new Date(r.date).toLocaleString('id-ID') : r.date,
-            'Nama Murid': r.studentName,
-            'Kelas': r.studentClass,
-            'Program Keahlian': r.studentMajor,
-            'Subtes / Mapel': r.subtest,
-            'Nilai Akhir (Skala 100)': r.score,
-            'Jumlah Sempurna': r.correct,
-            'Jumlah Salah': r.wrong,
-            'Jumlah Kosong': r.empty,
-            'Pelanggaran (Pindah Tab)': r.violations
-        }));
-
-        const worksheet = XLSX.utils.json_to_sheet(excelData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Hasil Try Out TKA 2026");
-
-        XLSX.writeFile(workbook, `Hasil_TryOut_TKA_SMKN1_Bulakamba_${Date.now()}.xlsx`);
     }
 
     window.onload = function() {
