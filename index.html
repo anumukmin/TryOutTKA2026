@@ -674,11 +674,11 @@
                 </div>
 
                 <div class="space-y-1.5">
-                    <div class="flex items-center gap-2"><span class="font-bold w-4 text-center">A</span><input type="text" id="form-q-opt-A" required placeholder="Pernyataan 1 (A)" class="flex-1 px-3 py-1.5 rounded-xl border border-slate-300"></div>
-                    <div class="flex items-center gap-2"><span class="font-bold w-4 text-center">B</span><input type="text" id="form-q-opt-B" required placeholder="Pernyataan 2 (B)" class="flex-1 px-3 py-1.5 rounded-xl border border-slate-300"></div>
-                    <div class="flex items-center gap-2"><span class="font-bold w-4 text-center">C</span><input type="text" id="form-q-opt-C" required placeholder="Pernyataan 3 (C)" class="flex-1 px-3 py-1.5 rounded-xl border border-slate-300"></div>
-                    <div class="flex items-center gap-2"><span class="font-bold w-4 text-center">D</span><input type="text" id="form-q-opt-D" placeholder="Pernyataan 4 (D - Opsional)" class="flex-1 px-3 py-1.5 rounded-xl border border-slate-300"></div>
-                    <div class="flex items-center gap-2"><span class="font-bold w-4 text-center">E</span><input type="text" id="form-q-opt-E" placeholder="Pernyataan 5 (E - Opsional)" class="flex-1 px-3 py-1.5 rounded-xl border border-slate-300"></div>
+                    <div class="flex items-center gap-2"><span class="font-bold w-4 text-center">A</span><input type="text" id="form-q-opt-A" oninput="syncFormOptionsWithKeyInputs()" required placeholder="Pernyataan 1 (A)" class="flex-1 px-3 py-1.5 rounded-xl border border-slate-300"></div>
+                    <div class="flex items-center gap-2"><span class="font-bold w-4 text-center">B</span><input type="text" id="form-q-opt-B" oninput="syncFormOptionsWithKeyInputs()" required placeholder="Pernyataan 2 (B)" class="flex-1 px-3 py-1.5 rounded-xl border border-slate-300"></div>
+                    <div class="flex items-center gap-2"><span class="font-bold w-4 text-center">C</span><input type="text" id="form-q-opt-C" oninput="syncFormOptionsWithKeyInputs()" required placeholder="Pernyataan 3 (C)" class="flex-1 px-3 py-1.5 rounded-xl border border-slate-300"></div>
+                    <div class="flex items-center gap-2"><span class="font-bold w-4 text-center">D</span><input type="text" id="form-q-opt-D" oninput="syncFormOptionsWithKeyInputs()" placeholder="Pernyataan 4 (D - Opsional)" class="flex-1 px-3 py-1.5 rounded-xl border border-slate-300"></div>
+                    <div class="flex items-center gap-2"><span class="font-bold w-4 text-center">E</span><input type="text" id="form-q-opt-E" oninput="syncFormOptionsWithKeyInputs()" placeholder="Pernyataan 5 (E - Opsional)" class="flex-1 px-3 py-1.5 rounded-xl border border-slate-300"></div>
                 </div>
             </div>
 
@@ -690,8 +690,8 @@
                         <option value="A">Opsi A</option>
                         <option value="B">Opsi B</option>
                         <option value="C">Opsi C</option>
-                        <option value="D">Opsi D</option>
-                        <option value="E">Opsi E</option>
+                        <option value="D" id="pg-opt-key-D">Opsi D</option>
+                        <option value="E" id="pg-opt-key-E">Opsi E</option>
                     </select>
                 </div>
 
@@ -701,8 +701,8 @@
                         <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="key_checkbox" value="A"> Opsi A</label>
                         <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="key_checkbox" value="B"> Opsi B</label>
                         <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="key_checkbox" value="C"> Opsi C</label>
-                        <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="key_checkbox" value="D"> Opsi D</label>
-                        <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="key_checkbox" value="E"> Opsi E</label>
+                        <label id="cb-label-D" class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="key_checkbox" value="D"> Opsi D</label>
+                        <label id="cb-label-E" class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="key_checkbox" value="E"> Opsi E</label>
                     </div>
                 </div>
 
@@ -715,7 +715,7 @@
                         </select>
                     </div>
 
-                    <p class="text-[11px] text-slate-500 mb-1">Pilih status untuk masing-masing pernyataan A - E:</p>
+                    <p class="text-[11px] text-slate-500 mb-1">Pilih status untuk masing-masing pernyataan yang diisi:</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <div class="flex items-center justify-between bg-white p-1.5 rounded-lg border">
                             <span class="font-bold">Pernyataan A:</span>
@@ -729,11 +729,11 @@
                             <span class="font-bold">Pernyataan C:</span>
                             <select id="key_matrix_C" class="matrix-opt-select px-2 py-1 rounded border text-xs"><option value="B">Benar (B)</option><option value="S">Salah (S)</option></select>
                         </div>
-                        <div class="flex items-center justify-between bg-white p-1.5 rounded-lg border">
+                        <div id="matrix-row-D" class="flex items-center justify-between bg-white p-1.5 rounded-lg border">
                             <span class="font-bold">Pernyataan D:</span>
                             <select id="key_matrix_D" class="matrix-opt-select px-2 py-1 rounded border text-xs"><option value="B">Benar (B)</option><option value="S">Salah (S)</option></select>
                         </div>
-                        <div class="flex items-center justify-between bg-white p-1.5 rounded-lg border">
+                        <div id="matrix-row-E" class="flex items-center justify-between bg-white p-1.5 rounded-lg border">
                             <span class="font-bold">Pernyataan E:</span>
                             <select id="key_matrix_E" class="matrix-opt-select px-2 py-1 rounded border text-xs"><option value="B">Benar (B)</option><option value="S">Salah (S)</option></select>
                         </div>
@@ -1582,84 +1582,31 @@
         if (type === 'pg') pgContainer.style.display = 'block';
         if (type === 'pgk_checkbox') cbContainer.style.display = 'block';
         if (type === 'pgk_matrix') mxContainer.style.display = 'block';
+
+        syncFormOptionsWithKeyInputs();
     }
 
-    function updateMatrixKeyLabels() {
-        const mType = document.getElementById('form-q-matrix-type').value;
-        const col1 = mType === 'bs' ? 'Benar (B)' : 'Sesuai';
-        const col2 = mType === 'bs' ? 'Salah (S)' : 'Tidak Sesuai';
+    function syncFormOptionsWithKeyInputs() {
+        const hasD = (document.getElementById('form-q-opt-D').value.trim() !== '');
+        const hasE = (document.getElementById('form-q-opt-E').value.trim() !== '');
 
-        ['A', 'B', 'C', 'D', 'E'].forEach(lettr => {
-            const sel = document.getElementById(`key_matrix_${lettr}`);
-            if (sel) {
-                sel.options[0].text = col1;
-                sel.options[1].text = col2;
-            }
-        });
-    }
+        // Sync PG Select Dropdown Options
+        const pgD = document.getElementById('pg-opt-key-D');
+        const pgE = document.getElementById('pg-opt-key-E');
+        if (pgD) pgD.style.display = hasD ? 'block' : 'none';
+        if (pgE) pgE.style.display = hasE ? 'block' : 'none';
 
-    function handleImageFileUpload(e) {
-        const file = e.target.files[0];
-        if (!file) return;
+        // Sync Checkbox Labels
+        const cbD = document.getElementById('cb-label-D');
+        const cbE = document.getElementById('cb-label-E');
+        if (cbD) cbD.style.display = hasD ? 'inline-flex' : 'none';
+        if (cbE) cbE.style.display = hasE ? 'inline-flex' : 'none';
 
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            const img = new Image();
-            img.onload = function() {
-                const canvas = document.createElement('canvas');
-                let width = img.width;
-                let height = img.height;
-                const maxDim = 800;
-
-                if (width > maxDim || height > maxDim) {
-                    if (width > height) {
-                        height = Math.round((height * maxDim) / width);
-                        width = maxDim;
-                    } else {
-                        width = Math.round((height * maxDim) / img.height);
-                        height = maxDim;
-                    }
-                }
-
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
-
-                const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
-                document.getElementById('form-q-image-url').value = compressedDataUrl;
-                showImagePreview(compressedDataUrl);
-            };
-            img.src = event.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-
-    function handleUrlImagePreview() {
-        const rawUrl = document.getElementById('form-q-image-url').value.trim();
-        if (rawUrl) {
-            const formatted = formatGoogleDriveUrl(rawUrl);
-            showImagePreview(formatted);
-        } else {
-            removeQuestionImage();
-        }
-    }
-
-    function showImagePreview(url) {
-        const container = document.getElementById('image-upload-preview-container');
-        const img = document.getElementById('image-upload-preview');
-        if (container && img && url) {
-            img.src = url;
-            container.style.display = 'flex';
-        }
-    }
-
-    function removeQuestionImage() {
-        document.getElementById('form-q-image-url').value = '';
-        const fileInput = document.getElementById('form-q-image-file');
-        if (fileInput) fileInput.value = '';
-        const container = document.getElementById('image-upload-preview-container');
-        if (container) container.style.display = 'none';
+        // Sync Matrix Key Select Rows
+        const mxD = document.getElementById('matrix-row-D');
+        const mxE = document.getElementById('matrix-row-E');
+        if (mxD) mxD.style.display = hasD ? 'flex' : 'none';
+        if (mxE) mxE.style.display = hasE ? 'flex' : 'none';
     }
 
     function openQuestionModal(qId = null) {
@@ -1717,6 +1664,7 @@
             }
         }
 
+        syncFormOptionsWithKeyInputs();
         openModal('modal-question');
     }
 
@@ -1979,5 +1927,3 @@
         }
     };
 </script>
-</body>
-</html>
