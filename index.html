@@ -1569,6 +1569,29 @@
         });
     }
 
+    function syncFormOptionsWithKeyInputs() {
+        const valD = (document.getElementById('form-q-opt-D')?.value || '').trim();
+        const valE = (document.getElementById('form-q-opt-E')?.value || '').trim();
+
+        // 1. Pilihan Ganda Sederhana
+        const pgOptD = document.getElementById('pg-opt-key-D');
+        const pgOptE = document.getElementById('pg-opt-key-E');
+        if (pgOptD) pgOptD.style.display = valD ? 'block' : 'none';
+        if (pgOptE) pgOptE.style.display = valE ? 'block' : 'none';
+
+        // 2. Checkbox (MCMA)
+        const cbLabelD = document.getElementById('cb-label-D');
+        const cbLabelE = document.getElementById('cb-label-E');
+        if (cbLabelD) cbLabelD.style.display = valD ? 'inline-flex' : 'none';
+        if (cbLabelE) cbLabelE.style.display = valE ? 'inline-flex' : 'none';
+
+        // 3. Matriks (Tabel Benar/Salah)
+        const matrixRowD = document.getElementById('matrix-row-D');
+        const matrixRowE = document.getElementById('matrix-row-E');
+        if (matrixRowD) matrixRowD.style.display = valD ? 'flex' : 'none';
+        if (matrixRowE) matrixRowE.style.display = valE ? 'flex' : 'none';
+    }
+
     function toggleFormQuestionType() {
         const type = document.getElementById('form-q-type').value;
         const pgContainer = document.getElementById('key-input-pg');
@@ -1586,27 +1609,89 @@
         syncFormOptionsWithKeyInputs();
     }
 
-    function syncFormOptionsWithKeyInputs() {
-        const hasD = (document.getElementById('form-q-opt-D').value.trim() !== '');
-        const hasE = (document.getElementById('form-q-opt-E').value.trim() !== '');
+    // --- MISSING IMAGE & MATRIX HELPER FUNCTIONS ---
+    function removeQuestionImage() {
+        const urlInput = document.getElementById('form-q-image-url');
+        const fileInput = document.getElementById('form-q-image-file');
+        const previewContainer = document.getElementById('image-upload-preview-container');
+        const previewImg = document.getElementById('image-upload-preview');
 
-        // Sync PG Select Dropdown Options
-        const pgD = document.getElementById('pg-opt-key-D');
-        const pgE = document.getElementById('pg-opt-key-E');
-        if (pgD) pgD.style.display = hasD ? 'block' : 'none';
-        if (pgE) pgE.style.display = hasE ? 'block' : 'none';
+        if (urlInput) urlInput.value = '';
+        if (fileInput) fileInput.value = '';
+        if (previewImg) previewImg.src = '';
+        if (previewContainer) previewContainer.style.display = 'none';
+    }
 
-        // Sync Checkbox Labels
-        const cbD = document.getElementById('cb-label-D');
-        const cbE = document.getElementById('cb-label-E');
-        if (cbD) cbD.style.display = hasD ? 'inline-flex' : 'none';
-        if (cbE) cbE.style.display = hasE ? 'inline-flex' : 'none';
+    function showImagePreview(url) {
+        const previewContainer = document.getElementById('image-upload-preview-container');
+        const previewImg = document.getElementById('image-upload-preview');
+        if (previewImg) previewImg.src = url;
+        if (previewContainer) previewContainer.style.display = 'flex';
+    }
 
-        // Sync Matrix Key Select Rows
-        const mxD = document.getElementById('matrix-row-D');
-        const mxE = document.getElementById('matrix-row-E');
-        if (mxD) mxD.style.display = hasD ? 'flex' : 'none';
-        if (mxE) mxE.style.display = hasE ? 'flex' : 'none';
+    function handleUrlImagePreview() {
+        const urlInput = document.getElementById('form-q-image-url');
+        const val = urlInput ? urlInput.value.trim() : '';
+        if (val) {
+            showImagePreview(formatGoogleDriveUrl(val));
+        } else {
+            removeQuestionImage();
+        }
+    }
+
+    function handleImageFileUpload(event) {
+        const file = event.target ? event.target.files[0] : null;
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                const maxDim = 800;
+
+                if (width > maxDim || height > maxDim) {
+                    if (width > height) {
+                        height = Math.round((height * maxDim) / width);
+                        width = maxDim;
+                    } else {
+                        width = Math.round((width * maxDim) / height);
+                        height = maxDim;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                const urlInput = document.getElementById('form-q-image-url');
+                if (urlInput) urlInput.value = compressedBase64;
+                showImagePreview(compressedBase64);
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function updateMatrixKeyLabels() {
+        const typeSelect = document.getElementById('form-q-matrix-type');
+        if (!typeSelect) return;
+        const isBs = typeSelect.value === 'bs';
+
+        ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
+            const sel = document.getElementById(`key_matrix_${letter}`);
+            if (sel) {
+                const currentVal = sel.value;
+                sel.innerHTML = isBs
+                    ? `<option value="B">Benar (B)</option><option value="S">Salah (S)</option>`
+                    : `<option value="B">Sesuai</option><option value="S">Tidak Sesuai</option>`;
+                sel.value = currentVal || 'B';
+            }
+        });
     }
 
     function openQuestionModal(qId = null) {
