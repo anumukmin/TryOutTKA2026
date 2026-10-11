@@ -1883,35 +1883,6 @@
             .catch(err => console.log('Info: Menggunakan bank soal lokal', err));
     }
 
-        fetchCloudQuestions();
-        fetchCloudResults();
-
-        if (googleSheetsUrl && questionsData.length > 0) {
-            fetch(googleSheetsUrl, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: 'SYNC_ALL', questions: questionsData })
-            })
-            .then(() => {
-                if (statusEl) {
-                    statusEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-300"></i> <span>Tersambung ke Google Sheets (Data Real-Time Sync)</span>`;
-                }
-                alert('Berhasil terhubung dan tersinkronisasi dengan Google Sheets!');
-            })
-            .catch(() => {
-                if (statusEl) {
-                    statusEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-300"></i> <span>Tersambung ke Google Sheets</span>`;
-                }
-            });
-        } else {
-            if (statusEl) {
-                statusEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-300"></i> <span>Tersambung ke Google Sheets</span>`;
-            }
-            alert('Berhasil terhubung ke Google Sheets!');
-        }
-    }
-
     // --- REAL-TIME CLOUD RESULTS SYNC & PAGINATION ---
     function fetchCloudResults() {
         if (!googleSheetsUrl) return;
