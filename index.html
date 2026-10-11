@@ -1077,6 +1077,8 @@
     let violationCount = 0;
     let isExamActive = false;
     let currentFontSizeClass = 'text-base';
+    let optionFontSizeClass = 'text-sm';
+    let currentFontSizeMode = 'normal';
 
     // --- PAGINASI REKAP HASIL (50 ANAK PER PAGE) ---
     let resultsDataList = [];
@@ -1483,13 +1485,33 @@
     }
 
     function changeFontSize(sizeMode) {
-        if (sizeMode === 'small') currentFontSizeClass = 'text-sm';
-        else if (sizeMode === 'normal') currentFontSizeClass = 'text-base';
-        else if (sizeMode === 'large') currentFontSizeClass = 'text-xl';
+        currentFontSizeMode = sizeMode;
+        if (sizeMode === 'small') {
+            currentFontSizeClass = 'text-sm';
+            optionFontSizeClass = 'text-xs';
+        } else if (sizeMode === 'large') {
+            currentFontSizeClass = 'text-xl';
+            optionFontSizeClass = 'text-lg';
+        } else {
+            currentFontSizeClass = 'text-base';
+            optionFontSizeClass = 'text-sm';
+        }
 
         const qTextEl = document.getElementById('q-text');
         if (qTextEl) {
             qTextEl.className = `${currentFontSizeClass} text-slate-800 font-semibold leading-relaxed mb-6 space-y-2`;
+        }
+
+        const stimEl = document.getElementById('q-stimulus-text');
+        if (stimEl) {
+            stimEl.className = `${optionFontSizeClass} option-text-target whitespace-pre-line text-slate-700 leading-relaxed`;
+        }
+
+        const optContainer = document.getElementById('q-options');
+        if (optContainer) {
+            optContainer.querySelectorAll('.option-text-target').forEach(el => {
+                el.className = el.className.replace(/\btext-(xs|sm|base|lg|xl)\b/g, optionFontSizeClass);
+            });
         }
     }
 
@@ -1515,7 +1537,9 @@
 
         const stimContainer = document.getElementById('q-stimulus-container');
         if (q.stimulus) {
-            document.getElementById('q-stimulus-text').textContent = q.stimulus;
+            const stimText = document.getElementById('q-stimulus-text');
+            stimText.textContent = q.stimulus;
+            stimText.className = `${optionFontSizeClass} option-text-target whitespace-pre-line text-slate-700 leading-relaxed`;
             stimContainer.style.display = 'block';
         } else {
             stimContainer.style.display = 'none';
@@ -1530,7 +1554,7 @@
         }
 
         document.getElementById('q-text').textContent = q.question;
-        changeFontSize('normal');
+        changeFontSize(currentFontSizeMode);
 
         const optContainer = document.getElementById('q-options');
         optContainer.innerHTML = '';
@@ -1549,7 +1573,7 @@
                 };
                 btn.innerHTML = `
                     <span class="w-8 h-8 rounded-xl flex items-center justify-center border font-bold text-sm ${isSelected ? 'bg-brand-600 text-white border-brand-600' : 'bg-slate-100 text-slate-600 border-slate-300'}">${letter}</span>
-                    <span class="text-sm flex-1">${q.options[letter]}</span>
+                    <span class="${optionFontSizeClass} option-text-target flex-1">${q.options[letter]}</span>
                 `;
                 optContainer.appendChild(btn);
             });
@@ -1573,7 +1597,7 @@
                     <span class="w-8 h-8 rounded-xl flex items-center justify-center border font-bold text-sm ${isChecked ? 'bg-sky-600 text-white border-sky-600' : 'bg-slate-100 text-slate-600 border-slate-300'}">
                         ${isChecked ? '<i class="fa-solid fa-check"></i>' : letter}
                     </span>
-                    <span class="text-sm flex-1">${q.options[letter]}</span>
+                    <span class="${optionFontSizeClass} option-text-target flex-1">${q.options[letter]}</span>
                 `;
                 optContainer.appendChild(btn);
             });
@@ -1589,9 +1613,9 @@
             table.innerHTML = `
                 <thead>
                     <tr class="bg-slate-100 text-slate-800 font-bold border-b border-slate-200">
-                        <th class="p-3">Pernyataan</th>
-                        <th class="p-3 w-28 text-center">${col1}</th>
-                        <th class="p-3 w-28 text-center">${col2}</th>
+                        <th class="p-3 ${optionFontSizeClass} option-text-target">Pernyataan</th>
+                        <th class="p-3 w-28 text-center ${optionFontSizeClass} option-text-target">${col1}</th>
+                        <th class="p-3 w-28 text-center ${optionFontSizeClass} option-text-target">${col2}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -1600,7 +1624,7 @@
                         const ans = userAnswersObj[letter];
                         return `
                             <tr>
-                                <td class="p-3 font-semibold text-slate-700">${letter}. ${q.options[letter]}</td>
+                                <td class="p-3 font-semibold text-slate-700 ${optionFontSizeClass} option-text-target">${letter}. ${q.options[letter]}</td>
                                 <td class="p-3 text-center">
                                     <button type="button" onclick="setMatrixAnswer('${q.id}', '${letter}', 'B')" class="px-3 py-1.5 rounded-lg border font-bold text-xs transition ${ans === 'B' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white border-slate-300 text-slate-600 hover:bg-slate-100'}">${col1}</button>
                                 </td>
