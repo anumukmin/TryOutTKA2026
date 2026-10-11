@@ -27,9 +27,8 @@
         }
     </script>
 
-    <!-- Font Awesome Icons & SheetJS CDN -->
+    <!-- Font Awesome Icons CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -466,7 +465,7 @@
                             <th class="p-3.5 w-24 text-center">Bobot</th>
                             <th class="p-3.5">Pertanyaan</th>
                             <th class="p-3.5 text-center w-28">Kunci</th>
-                            <th class="p-3.5 text-center w-28">Aksi</th>
+                            <th class="p-3.5 text-center w-36">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="bank-table-body" class="divide-y divide-slate-100">
@@ -595,6 +594,142 @@
             <h3 id="modal-q-title" class="font-bold text-slate-800 text-base">Tambah Soal TKA Baru</h3>
             <button onclick="closeModal('modal-question')" class="text-slate-400 hover:text-slate-600 p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
         </div>
+
+        <form id="question-form" onsubmit="saveQuestion(event)" class="space-y-4 text-xs">
+            <input type="hidden" id="form-q-id">
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Mata Pelajaran / Subtes <span class="text-rose-500">*</span></label>
+                    <select id="form-q-category" required class="w-full p-2.5 rounded-xl border border-slate-300 font-semibold bg-white outline-none focus:ring-2 focus:ring-brand-500">
+                        <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                        <option value="Matematika">Matematika</option>
+                        <option value="Bahasa Inggris">Bahasa Inggris</option>
+                        <option value="Kewirausahaan">Kewirausahaan</option>
+                        <option value="SMK - Teknik Kendaraan Ringan">SMK - Teknik Kendaraan Ringan</option>
+                        <option value="SMK - Teknik Sepeda Motor">SMK - Teknik Sepeda Motor</option>
+                        <option value="SMK - Agribisnis Tanaman Pangan dan Hortikultura">SMK - Agribisnis Tanaman Pangan dan Hortikultura</option>
+                        <option value="SMK - Teknik Instalasi Tenaga Listrik">SMK - Teknik Instalasi Tenaga Listrik</option>
+                        <option value="SMK - Teknik Audio Video">SMK - Teknik Audio Video</option>
+                        <option value="SMK - Nautika Kapal Penangkap Ikan">SMK - Nautika Kapal Penangkap Ikan</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Bentuk Soal <span class="text-rose-500">*</span></label>
+                    <select id="form-q-type" onchange="toggleFormQuestionType()" required class="w-full p-2.5 rounded-xl border border-slate-300 font-semibold bg-white outline-none focus:ring-2 focus:ring-brand-500">
+                        <option value="pg">PG Sederhana (1 Jawaban)</option>
+                        <option value="pgk_checkbox">PG Kompleks (Banyak Jawaban)</option>
+                        <option value="pgk_matrix">PG Kompleks (Kategori / Matriks)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Bobot Nilai Soal <span class="text-rose-500">*</span></label>
+                    <input type="number" id="form-q-weight" value="3" min="1" max="100" required class="w-full p-2.5 rounded-xl border border-slate-300 font-bold bg-white outline-none focus:ring-2 focus:ring-brand-500">
+                </div>
+            </div>
+
+            <div>
+                <label class="block font-bold text-slate-700 mb-1">Stimulus / Teks Bacaan (Opsional)</label>
+                <textarea id="form-q-stimulus" rows="3" placeholder="Masukkan teks bacaan / wacana stimulus jika ada..." class="w-full p-2.5 rounded-xl border border-slate-300 bg-white outline-none focus:ring-2 focus:ring-brand-500 custom-scrollbar"></textarea>
+            </div>
+
+            <div>
+                <label class="block font-bold text-slate-700 mb-1">Pertanyaan / Soal <span class="text-rose-500">*</span></label>
+                <textarea id="form-q-text" rows="3" required placeholder="Tuliskan pertanyaan soal..." class="w-full p-2.5 rounded-xl border border-slate-300 bg-white font-medium outline-none focus:ring-2 focus:ring-brand-500 custom-scrollbar"></textarea>
+            </div>
+
+            <div>
+                <label class="block font-bold text-slate-700 mb-1">Gambar Soal (Opsional - URL atau Upload)</label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <input type="text" id="form-q-image-url" oninput="handleUrlImagePreview()" placeholder="Tempel URL Gambar (Google Drive / Direct Link)" class="w-full p-2 rounded-xl border border-slate-300 bg-white outline-none focus:ring-2 focus:ring-brand-500">
+                    <input type="file" id="form-q-image-file" accept="image/*" onchange="handleImageFileUpload(event)" class="w-full p-1.5 text-xs text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100">
+                </div>
+                <div id="image-upload-preview-container" style="display: none;" class="mt-2 p-2 bg-slate-50 border rounded-xl flex items-center justify-between">
+                    <img id="image-upload-preview" src="" alt="Pratinjau Gambar" class="max-h-20 rounded object-contain">
+                    <button type="button" onclick="removeQuestionImage()" class="px-2 py-1 bg-rose-100 text-rose-700 text-[11px] font-bold rounded-lg hover:bg-rose-200">
+                        <i class="fa-solid fa-trash"></i> Hapus Gambar
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-2">
+                <span class="font-bold text-slate-700 block mb-1">Pilihan Jawaban (A - E):</span>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <input type="text" id="form-q-opt-A" oninput="syncFormOptionsWithKeyInputs()" placeholder="Pilihan A" required class="p-2 rounded-xl border border-slate-300 bg-white">
+                    <input type="text" id="form-q-opt-B" oninput="syncFormOptionsWithKeyInputs()" placeholder="Pilihan B" required class="p-2 rounded-xl border border-slate-300 bg-white">
+                    <input type="text" id="form-q-opt-C" oninput="syncFormOptionsWithKeyInputs()" placeholder="Pilihan C" required class="p-2 rounded-xl border border-slate-300 bg-white">
+                    <input type="text" id="form-q-opt-D" oninput="syncFormOptionsWithKeyInputs()" placeholder="Pilihan D (Kosongkan jika hanya 3 opsi)" class="p-2 rounded-xl border border-slate-300 bg-white">
+                    <input type="text" id="form-q-opt-E" oninput="syncFormOptionsWithKeyInputs()" placeholder="Pilihan E (Kosongkan jika hanya 3 opsi)" class="p-2 rounded-xl border border-slate-300 bg-white sm:col-span-2">
+                </div>
+            </div>
+
+            <!-- KUNCI JAWABAN DINAMIS -->
+            <div id="key-input-pg" class="bg-emerald-50 p-3.5 rounded-2xl border border-emerald-200">
+                <label class="block font-bold text-emerald-950 mb-1">Kunci Jawaban Benar (PG Sederhana):</label>
+                <select id="form-q-correct-pg" class="w-full p-2.5 rounded-xl border border-emerald-300 font-bold text-emerald-900 bg-white outline-none">
+                    <option value="A">Opsi A</option>
+                    <option value="B">Opsi B</option>
+                    <option value="C">Opsi C</option>
+                    <option value="D" id="pg-opt-key-D">Opsi D</option>
+                    <option value="E" id="pg-opt-key-E">Opsi E</option>
+                </select>
+            </div>
+
+            <div id="key-input-checkbox" style="display: none;" class="bg-purple-50 p-3.5 rounded-2xl border border-purple-200">
+                <label class="block font-bold text-purple-950 mb-1">Kunci Jawaban Benar (Centang Semua Pilihan yang Benar):</label>
+                <div class="flex flex-wrap gap-3 font-semibold text-purple-900 pt-1">
+                    <label class="inline-flex items-center gap-1.5"><input type="checkbox" name="key_checkbox" value="A" class="rounded text-purple-600"> Opsi A</label>
+                    <label class="inline-flex items-center gap-1.5"><input type="checkbox" name="key_checkbox" value="B" class="rounded text-purple-600"> Opsi B</label>
+                    <label class="inline-flex items-center gap-1.5"><input type="checkbox" name="key_checkbox" value="C" class="rounded text-purple-600"> Opsi C</label>
+                    <label class="inline-flex items-center gap-1.5" id="cb-label-D"><input type="checkbox" name="key_checkbox" value="D" class="rounded text-purple-600"> Opsi D</label>
+                    <label class="inline-flex items-center gap-1.5" id="cb-label-E"><input type="checkbox" name="key_checkbox" value="E" class="rounded text-purple-600"> Opsi E</label>
+                </div>
+            </div>
+
+            <div id="key-input-matrix" style="display: none;" class="bg-amber-50 p-3.5 rounded-2xl border border-amber-200 space-y-2">
+                <div class="flex justify-between items-center">
+                    <label class="font-bold text-amber-950">Kunci Jawaban Kategori / Matriks:</label>
+                    <select id="form-q-matrix-type" onchange="updateMatrixKeyLabels()" class="p-1 rounded border text-xs font-semibold bg-white">
+                        <option value="bs">Benar / Salah</option>
+                        <option value="sesuai">Sesuai / Tidak Sesuai</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    <div class="flex items-center justify-between bg-white p-2 rounded-xl border border-amber-200">
+                        <span>Pernyataan A:</span>
+                        <select id="key_matrix_A" class="p-1 rounded font-bold border"><option value="B">Benar (B)</option><option value="S">Salah (S)</option></select>
+                    </div>
+                    <div class="flex items-center justify-between bg-white p-2 rounded-xl border border-amber-200">
+                        <span>Pernyataan B:</span>
+                        <select id="key_matrix_B" class="p-1 rounded font-bold border"><option value="B">Benar (B)</option><option value="S">Salah (S)</option></select>
+                    </div>
+                    <div class="flex items-center justify-between bg-white p-2 rounded-xl border border-amber-200">
+                        <span>Pernyataan C:</span>
+                        <select id="key_matrix_C" class="p-1 rounded font-bold border"><option value="B">Benar (B)</option><option value="S">Salah (S)</option></select>
+                    </div>
+                    <div class="flex items-center justify-between bg-white p-2 rounded-xl border border-amber-200" id="matrix-row-D">
+                        <span>Pernyataan D:</span>
+                        <select id="key_matrix_D" class="p-1 rounded font-bold border"><option value="B">Benar (B)</option><option value="S">Salah (S)</option></select>
+                    </div>
+                    <div class="flex items-center justify-between bg-white p-2 rounded-xl border border-amber-200 sm:col-span-2" id="matrix-row-E">
+                        <span>Pernyataan E:</span>
+                        <select id="key_matrix_E" class="p-1 rounded font-bold border"><option value="B">Benar (B)</option><option value="S">Salah (S)</option></select>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <label class="block font-bold text-slate-700 mb-1">Pembahasan Soal (Opsional)</label>
+                <textarea id="form-q-discussion" rows="2" placeholder="Tuliskan pembahasan soal di sini..." class="w-full p-2.5 rounded-xl border border-slate-300 bg-white outline-none focus:ring-2 focus:ring-brand-500 custom-scrollbar"></textarea>
+            </div>
+
+            <div class="flex gap-2 pt-2">
+                <button type="button" onclick="closeModal('modal-question')" class="flex-1 py-2.5 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition">Batal</button>
+                <button type="submit" class="flex-1 py-2.5 bg-brand-600 text-white font-bold rounded-xl hover:bg-brand-700 transition shadow">Simpan Soal</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <!-- Modal Pratinjau Soal (Simulasi Layar Siswa CBT) -->
 <div id="modal-preview-question" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-xs overflow-y-auto">
@@ -1475,9 +1610,9 @@
                 <td class="p-3.5 font-medium text-slate-800 max-w-xs truncate">${q.question}</td>
                 <td class="p-3.5 text-center font-mono font-bold text-emerald-700">${q.correct}</td>
                 <td class="p-3.5 text-center space-x-1 whitespace-nowrap">
-                    <button onclick="previewQuestion('${q.id}')" title="Pratinjau Layar Siswa" class="px-2.5 py-1.5 bg-sky-100 hover:bg-sky-200 text-sky-900 rounded-lg font-semibold text-xs"><i class="fa-solid fa-eye"></i></button>
-                    <button onclick="editQuestion('${q.id}')" title="Edit Soal" class="px-2.5 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-lg font-semibold text-xs"><i class="fa-solid fa-pen"></i></button>
-                    <button onclick="deleteQuestion('${q.id}')" title="Hapus Soal" class="px-2.5 py-1.5 bg-rose-100 hover:bg-rose-200 text-rose-800 rounded-lg font-semibold text-xs"><i class="fa-solid fa-trash"></i></button>
+                    <button onclick="previewQuestion('${q.id}')" title="Pratinjau Layar Siswa" class="px-2.5 py-1.5 bg-sky-100 hover:bg-sky-200 text-sky-900 rounded-lg font-semibold text-xs transition"><i class="fa-solid fa-eye"></i></button>
+                    <button onclick="editQuestion('${q.id}')" title="Edit Soal" class="px-2.5 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-lg font-semibold text-xs transition"><i class="fa-solid fa-pen"></i></button>
+                    <button onclick="deleteQuestion('${q.id}')" title="Hapus Soal" class="px-2.5 py-1.5 bg-rose-100 hover:bg-rose-200 text-rose-800 rounded-lg font-semibold text-xs transition"><i class="fa-solid fa-trash"></i></button>
                 </td>
             `;
             tbody.appendChild(tr);
@@ -1626,18 +1761,18 @@
         const cbContainer = document.getElementById('key-input-checkbox');
         const mxContainer = document.getElementById('key-input-matrix');
 
-        pgContainer.style.display = 'none';
-        cbContainer.style.display = 'none';
-        mxContainer.style.display = 'none';
+        if (pgContainer) pgContainer.style.display = 'none';
+        if (cbContainer) cbContainer.style.display = 'none';
+        if (mxContainer) mxContainer.style.display = 'none';
 
-        if (type === 'pg') pgContainer.style.display = 'block';
-        if (type === 'pgk_checkbox') cbContainer.style.display = 'block';
-        if (type === 'pgk_matrix') mxContainer.style.display = 'block';
+        if (type === 'pg' && pgContainer) pgContainer.style.display = 'block';
+        if (type === 'pgk_checkbox' && cbContainer) cbContainer.style.display = 'block';
+        if (type === 'pgk_matrix' && mxContainer) mxContainer.style.display = 'block';
 
         syncFormOptionsWithKeyInputs();
     }
 
-    // --- MISSING IMAGE & MATRIX HELPER FUNCTIONS ---
+    // --- IMAGE & MATRIX HELPER FUNCTIONS ---
     function removeQuestionImage() {
         const urlInput = document.getElementById('form-q-image-url');
         const fileInput = document.getElementById('form-q-image-file');
@@ -1723,57 +1858,78 @@
     }
 
     function openQuestionModal(qId = null) {
-        document.getElementById('question-form').reset();
-        document.getElementById('form-q-id').value = '';
-        document.getElementById('modal-q-title').textContent = 'Tambah Soal TKA Baru';
+        const form = document.getElementById('question-form');
+        if (form) form.reset();
+        
+        const idInput = document.getElementById('form-q-id');
+        if (idInput) idInput.value = '';
+        
+        const modalTitle = document.getElementById('modal-q-title');
+        if (modalTitle) modalTitle.textContent = 'Tambah Soal TKA Baru';
+        
         removeQuestionImage();
         toggleFormQuestionType();
 
         if (qId) {
             const q = questionsData.find(item => item.id === qId);
             if (q) {
-                document.getElementById('form-q-id').value = q.id;
-                document.getElementById('form-q-category').value = q.category;
-                document.getElementById('form-q-type').value = q.type || 'pg';
-                document.getElementById('form-q-weight').value = q.weight || 3;
-                document.getElementById('form-q-stimulus').value = q.stimulus || '';
-                document.getElementById('form-q-text').value = q.question;
+                if (idInput) idInput.value = q.id;
+                
+                const catEl = document.getElementById('form-q-category');
+                if (catEl) catEl.value = q.category;
+                
+                const typeEl = document.getElementById('form-q-type');
+                if (typeEl) typeEl.value = q.type || 'pg';
+                
+                const weightEl = document.getElementById('form-q-weight');
+                if (weightEl) weightEl.value = q.weight || 3;
+                
+                const stimEl = document.getElementById('form-q-stimulus');
+                if (stimEl) stimEl.value = q.stimulus || '';
+                
+                const textEl = document.getElementById('form-q-text');
+                if (textEl) textEl.value = q.question;
                 
                 if (q.image) {
                     const imgUrl = formatGoogleDriveUrl(q.image);
-                    document.getElementById('form-q-image-url').value = q.image;
+                    const urlInput = document.getElementById('form-q-image-url');
+                    if (urlInput) urlInput.value = q.image;
                     showImagePreview(imgUrl);
                 }
                 
-                document.getElementById('form-q-opt-A').value = q.options ? (q.options.A || '') : '';
-                document.getElementById('form-q-opt-B').value = q.options ? (q.options.B || '') : '';
-                document.getElementById('form-q-opt-C').value = q.options ? (q.options.C || '') : '';
-                document.getElementById('form-q-opt-D').value = q.options ? (q.options.D || '') : '';
-                document.getElementById('form-q-opt-E').value = q.options ? (q.options.E || '') : '';
+                const optA = document.getElementById('form-q-opt-A'); if (optA) optA.value = q.options ? (q.options.A || '') : '';
+                const optB = document.getElementById('form-q-opt-B'); if (optB) optB.value = q.options ? (q.options.B || '') : '';
+                const optC = document.getElementById('form-q-opt-C'); if (optC) optC.value = q.options ? (q.options.C || '') : '';
+                const optD = document.getElementById('form-q-opt-D'); if (optD) optD.value = q.options ? (q.options.D || '') : '';
+                const optE = document.getElementById('form-q-opt-E'); if (optE) optE.value = q.options ? (q.options.E || '') : '';
 
                 toggleFormQuestionType();
 
                 if (q.type === 'pg') {
-                    document.getElementById('form-q-correct-pg').value = q.correct || 'A';
+                    const corrPg = document.getElementById('form-q-correct-pg');
+                    if (corrPg) corrPg.value = q.correct || 'A';
                 } else if (q.type === 'pgk_checkbox') {
                     const keys = String(q.correct).split(',');
                     document.querySelectorAll('input[name="key_checkbox"]').forEach(cb => {
                         cb.checked = keys.includes(cb.value);
                     });
                 } else if (q.type === 'pgk_matrix') {
-                    document.getElementById('form-q-matrix-type').value = q.matrixType || 'bs';
+                    const mxType = document.getElementById('form-q-matrix-type');
+                    if (mxType) mxType.value = q.matrixType || 'bs';
                     updateMatrixKeyLabels();
 
                     const keys = String(q.correct).split(',');
-                    if (keys[0]) document.getElementById('key_matrix_A').value = keys[0];
-                    if (keys[1]) document.getElementById('key_matrix_B').value = keys[1];
-                    if (keys[2]) document.getElementById('key_matrix_C').value = keys[2];
-                    if (keys[3]) document.getElementById('key_matrix_D').value = keys[3];
-                    if (keys[4]) document.getElementById('key_matrix_E').value = keys[4];
+                    if (keys[0] && document.getElementById('key_matrix_A')) document.getElementById('key_matrix_A').value = keys[0];
+                    if (keys[1] && document.getElementById('key_matrix_B')) document.getElementById('key_matrix_B').value = keys[1];
+                    if (keys[2] && document.getElementById('key_matrix_C')) document.getElementById('key_matrix_C').value = keys[2];
+                    if (keys[3] && document.getElementById('key_matrix_D')) document.getElementById('key_matrix_D').value = keys[3];
+                    if (keys[4] && document.getElementById('key_matrix_E')) document.getElementById('key_matrix_E').value = keys[4];
                 }
 
-                document.getElementById('form-q-discussion').value = q.discussion || '';
-                document.getElementById('modal-q-title').textContent = 'Edit Soal TKA';
+                const discEl = document.getElementById('form-q-discussion');
+                if (discEl) discEl.value = q.discussion || '';
+                
+                if (modalTitle) modalTitle.textContent = 'Edit Soal TKA';
             }
         }
 
@@ -2031,3 +2187,5 @@
         }
     };
 </script>
+</body>
+</html>
