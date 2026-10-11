@@ -757,7 +757,7 @@
 <script>
     // --- GLOBAL CONFIGURATION ---
     const ADMIN_PIN = "505609";
-    let googleSheetsUrl = "https://script.google.com/macros/s/AKfycbybdyNH1OlGXFaePBGtcWOP0kpdC2zwAnLsWBNWiOyC73s65HSZFDzCy_qZButRqxF2fw/exec";
+    let googleSheetsUrl = "https://script.google.com/macros/s/AKfycbzY7QGF0AvmgOK_2zpCgSbFt-YhZgntiIDS9C2Fmwz7Tk1fHshtYfVA-ZtA11lLBNmDnw/exec";
 
     // --- MODAL & UI HELPER FUNCTIONS ---
     function openModal(modalId) {
@@ -1855,13 +1855,33 @@
             localStorage.setItem('google_sheets_url', googleSheetsUrl);
         }
 
-        questionsData = deduplicateQuestions(questionsData);
-        saveBankQuestions();
-
         const statusEl = document.getElementById('sheets-sync-status');
         if (statusEl) {
-            statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-amber-300"></i> <span>Menghubungkan ke Google Sheets...</span>`;
+            statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-amber-300"></i> <span>Menghubungkan & Menarik Data dari Google Sheets...</span>`;
         }
+
+        // HANYA TARIK DATA DARI GOOGLE SHEETS (JANGAN TIMPA SHEET)
+        fetchCloudQuestions();
+        fetchCloudResults();
+    }
+
+    function fetchCloudQuestions() {
+        if (!googleSheetsUrl) return;
+        const cacheBusterUrl = googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
+        fetch(cacheBusterUrl)
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data) && data.length > 0) {
+                    questionsData = deduplicateQuestions(data);
+                    saveBankQuestions();
+                    const statusEl = document.getElementById('sheets-sync-status');
+                    if (statusEl) {
+                        statusEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-300"></i> <span>Tersambung ke Google Sheets (${questionsData.length} Soal Terisi)</span>`;
+                    }
+                }
+            })
+            .catch(err => console.log('Info: Menggunakan bank soal lokal', err));
+    }
 
         fetchCloudQuestions();
         fetchCloudResults();
