@@ -466,7 +466,7 @@
                             <th class="p-3.5 w-24 text-center">Bobot</th>
                             <th class="p-3.5">Pertanyaan</th>
                             <th class="p-3.5 text-center w-28">Kunci</th>
-                            <th class="p-3.5 text-center w-24">Aksi</th>
+                            <th class="p-3.5 text-center w-28">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="bank-table-body" class="divide-y divide-slate-100">
@@ -596,161 +596,75 @@
             <button onclick="closeModal('modal-question')" class="text-slate-400 hover:text-slate-600 p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
         </div>
 
-        <form id="question-form" onsubmit="saveQuestion(event)" class="space-y-4 text-xs">
-            <input type="hidden" id="form-q-id">
-            
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+<!-- Modal Pratinjau Soal (Simulasi Layar Siswa CBT) -->
+<div id="modal-preview-question" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-xs overflow-y-auto">
+    <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 p-6 sm:p-8 max-w-3xl w-full my-6 relative">
+        <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-200">
+            <div class="flex items-center gap-2">
+                <span class="w-8 h-8 rounded-xl bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-sm">
+                    <i class="fa-solid fa-eye"></i>
+                </span>
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Mata Pelajaran / Subtes <span class="text-red-500">*</span></label>
-                    <select id="form-q-category" required class="w-full px-3 py-2 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-brand-500">
-                        <option value="Bahasa Indonesia">Bahasa Indonesia</option>
-                        <option value="Matematika">Matematika</option>
-                        <option value="Bahasa Inggris">Bahasa Inggris</option>
-                        <option value="Kewirausahaan">Kewirausahaan</option>
-                        <option value="SMK - Teknik Kendaraan Ringan">SMK - Teknik Kendaraan Ringan</option>
-                        <option value="SMK - Teknik Sepeda Motor">SMK - Teknik Sepeda Motor</option>
-                        <option value="SMK - Agribisnis Tanaman Pangan dan Hortikultura">SMK - Agribisnis Tanaman Pangan dan Hortikultura</option>
-                        <option value="SMK - Teknik Instalasi Tenaga Listrik">SMK - Teknik Instalasi Tenaga Listrik</option>
-                        <option value="SMK - Teknik Audio Video">SMK - Teknik Audio Video</option>
-                        <option value="SMK - Nautika Kapal Penangkap Ikan">SMK - Nautika Kapal Penangkap Ikan</option>
-                    </select>
+                    <h3 class="font-bold text-slate-800 text-base">Pratinjau Soal (Simulasi Layar Siswa)</h3>
+                    <p id="prev-q-meta" class="text-xs text-slate-500">Subtes: - | Bobot: - Poin</p>
                 </div>
+            </div>
+            <button onclick="closeModal('modal-preview-question')" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
 
+        <div class="bg-slate-50 p-4 sm:p-6 rounded-2xl border border-slate-200 space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar">
+            <div class="flex justify-between items-center pb-2 border-b border-slate-200">
+                <span id="prev-q-type-badge" class="px-3 py-1 rounded-lg text-xs font-bold bg-sky-100 text-sky-800 border border-sky-200">
+                    Pilihan Ganda Sederhana
+                </span>
+                <span class="text-xs font-semibold text-slate-500">
+                    Bobot Nilai: <strong id="prev-q-weight" class="text-amber-700">3 Poin</strong>
+                </span>
+            </div>
+
+            <div id="prev-q-stimulus-container" style="display: none;" class="bg-amber-50/80 p-4 rounded-xl border border-amber-200 text-xs text-slate-800">
+                <div class="font-bold text-amber-900 mb-1 flex items-center gap-1.5 uppercase">
+                    <i class="fa-solid fa-file-lines text-amber-600"></i> Stimulus Bacaan:
+                </div>
+                <div id="prev-q-stimulus-text" class="whitespace-pre-line text-slate-700 leading-relaxed"></div>
+            </div>
+
+            <div id="prev-q-image-container" style="display: none;" class="bg-white p-2 rounded-xl border border-slate-200 text-center">
+                <img id="prev-q-image" src="" alt="Gambar Soal" class="max-h-60 mx-auto object-contain rounded-lg">
+            </div>
+
+            <div id="prev-q-text" class="text-slate-800 font-bold text-base leading-relaxed">
+                Isi Pertanyaan Soal...
+            </div>
+
+            <div id="prev-q-options" class="space-y-2 pt-2">
+            </div>
+
+            <!-- Khusus Koordinator: Kunci & Pembahasan -->
+            <div class="mt-6 pt-4 border-t border-slate-300 bg-emerald-50/80 p-4 rounded-xl border border-emerald-200 text-xs space-y-2">
+                <div class="font-bold text-emerald-950 flex items-center gap-1.5 uppercase">
+                    <i class="fa-solid fa-key text-emerald-600"></i> Kunci Jawaban & Pembahasan (Khusus Koordinator):
+                </div>
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Bentuk Soal TKA <span class="text-red-500">*</span></label>
-                    <select id="form-q-type" onchange="toggleFormQuestionType()" required class="w-full px-3 py-2 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-brand-500 font-bold text-brand-900">
-                        <option value="pg">Pilihan Ganda Sederhana (1 Jawaban Benar)</option>
-                        <option value="pgk_checkbox">Pilihan Ganda Kompleks (MCMA - Centang > 1 Benar)</option>
-                        <option value="pgk_matrix">Pilihan Ganda Kompleks Kategori (Tabel Benar/Salah / Sesuai/T.Sesuai)</option>
-                    </select>
+                    <span class="text-slate-600">Kunci Jawaban Benar:</span>
+                    <strong id="prev-q-key" class="font-mono text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded ml-1 text-sm">A</strong>
                 </div>
-
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Bobot Nilai / Skor Maksimal <span class="text-red-500">*</span></label>
-                    <input type="number" id="form-q-weight" value="5" min="1" max="100" required placeholder="Contoh: 5, 10" class="w-full px-3 py-2 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-brand-500 font-bold text-brand-900">
-                </div>
-            </div>
-
-            <div>
-                <label class="block font-semibold text-slate-700 mb-1">Stimulus / Wacana Bacaan HOTS (Opsional)</label>
-                <textarea id="form-q-stimulus" rows="2" placeholder="Teks wacana, cerita, atau stimulus bacaan untuk soal..." class="w-full px-3 py-2 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-brand-500"></textarea>
-            </div>
-
-            <div>
-                <label class="block font-semibold text-slate-700 mb-1">Pertanyaan / Teks Soal <span class="text-red-500">*</span></label>
-                <textarea id="form-q-text" rows="2" required placeholder="Ketikkan isi pertanyaan soal di sini..." class="w-full px-3 py-2 rounded-xl border border-slate-300 outline-none focus:ring-2 focus:ring-brand-500"></textarea>
-            </div>
-
-            <div>
-                <label class="block font-semibold text-slate-700 mb-1">Gambar / Diagram Soal (Opsional)</label>
-                <div class="space-y-2">
-                    <div class="flex gap-2 items-center">
-                        <input type="url" id="form-q-image-url" oninput="handleUrlImagePreview()" placeholder="Paste URL Gambar / Google Drive (https://...)" class="w-full px-3 py-2 rounded-xl border border-slate-300 outline-none text-xs">
-                        <button type="button" onclick="document.getElementById('form-q-image-file').click()" class="px-3.5 py-2 bg-slate-100 border border-slate-300 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition text-xs whitespace-nowrap flex items-center gap-1.5 shadow-xs">
-                            <i class="fa-solid fa-upload text-brand-600"></i> Upload Komputer
-                        </button>
-                        <input type="file" id="form-q-image-file" accept="image/*" class="hidden" onchange="handleImageFileUpload(event)">
-                    </div>
-
-                    <div id="image-upload-preview-container" style="display: none;" class="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-                        <div class="flex items-center gap-3">
-                            <img id="image-upload-preview" src="" alt="Preview Gambar Soal" class="h-16 w-24 object-contain rounded-lg border bg-white shadow-xs" onerror="this.src='https://placehold.co/200x150/fee2e2/dc2626?text=Gambar+Gagal+Muat'">
-                            <div>
-                                <span class="text-xs font-bold text-slate-700 block">Pratinjau Gambar Soal</span>
-                                <span class="text-[10px] text-emerald-600 font-semibold"><i class="fa-solid fa-circle-check"></i> Siap disimpan ke soal</span>
-                            </div>
-                        </div>
-                        <button type="button" onclick="removeQuestionImage()" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-semibold transition flex items-center gap-1">
-                            <i class="fa-solid fa-trash"></i> Hapus
-                        </button>
+                    <span class="text-slate-600 block mb-0.5">Pembahasan:</span>
+                    <div id="prev-q-discussion" class="text-slate-800 italic bg-white/80 p-2.5 rounded-lg border border-emerald-200">
+                        Belum ada pembahasan.
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div id="form-options-container" class="space-y-2">
-                <div class="flex justify-between items-center">
-                    <label id="form-options-label" class="block font-semibold text-slate-700">Pilihan Jawaban / Pernyataan (A - E)</label>
-                    <span id="form-key-hint" class="text-[11px] text-brand-700 font-medium">Isi Opsi dan Tentukan Kunci</span>
-                </div>
-
-                <div class="space-y-1.5">
-                    <div class="flex items-center gap-2"><span class="font-bold w-4 text-center">A</span><input type="text" id="form-q-opt-A" oninput="syncFormOptionsWithKeyInputs()" required placeholder="Pernyataan 1 (A)" class="flex-1 px-3 py-1.5 rounded-xl border border-slate-300"></div>
-                    <div class="flex items-center gap-2"><span class="font-bold w-4 text-center">B</span><input type="text" id="form-q-opt-B" oninput="syncFormOptionsWithKeyInputs()" required placeholder="Pernyataan 2 (B)" class="flex-1 px-3 py-1.5 rounded-xl border border-slate-300"></div>
-                    <div class="flex items-center gap-2"><span class="font-bold w-4 text-center">C</span><input type="text" id="form-q-opt-C" oninput="syncFormOptionsWithKeyInputs()" required placeholder="Pernyataan 3 (C)" class="flex-1 px-3 py-1.5 rounded-xl border border-slate-300"></div>
-                    <div class="flex items-center gap-2"><span class="font-bold w-4 text-center">D</span><input type="text" id="form-q-opt-D" oninput="syncFormOptionsWithKeyInputs()" placeholder="Pernyataan 4 (D - Opsional)" class="flex-1 px-3 py-1.5 rounded-xl border border-slate-300"></div>
-                    <div class="flex items-center gap-2"><span class="font-bold w-4 text-center">E</span><input type="text" id="form-q-opt-E" oninput="syncFormOptionsWithKeyInputs()" placeholder="Pernyataan 5 (E - Opsional)" class="flex-1 px-3 py-1.5 rounded-xl border border-slate-300"></div>
-                </div>
-            </div>
-
-            <div id="form-correct-container" class="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                <label class="block font-bold text-slate-800 mb-1">Kunci Jawaban Benar <span class="text-red-500">*</span></label>
-                
-                <div id="key-input-pg">
-                    <select id="form-q-correct-pg" class="w-full px-3 py-2 rounded-xl border border-slate-300 outline-none">
-                        <option value="A">Opsi A</option>
-                        <option value="B">Opsi B</option>
-                        <option value="C">Opsi C</option>
-                        <option value="D" id="pg-opt-key-D">Opsi D</option>
-                        <option value="E" id="pg-opt-key-E">Opsi E</option>
-                    </select>
-                </div>
-
-                <div id="key-input-checkbox" style="display: none;" class="space-y-1 text-slate-700">
-                    <p class="text-[11px] text-slate-500 mb-1">Centang semua pilihan yang benar:</p>
-                    <div class="flex flex-wrap gap-3">
-                        <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="key_checkbox" value="A"> Opsi A</label>
-                        <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="key_checkbox" value="B"> Opsi B</label>
-                        <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="key_checkbox" value="C"> Opsi C</label>
-                        <label id="cb-label-D" class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="key_checkbox" value="D"> Opsi D</label>
-                        <label id="cb-label-E" class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="key_checkbox" value="E"> Opsi E</label>
-                    </div>
-                </div>
-
-                <div id="key-input-matrix" style="display: none;" class="space-y-2 text-slate-700">
-                    <div class="mb-2 pb-2 border-b border-slate-200">
-                        <label class="block font-semibold text-slate-700 mb-1">Format Label Kategori Tabel:</label>
-                        <select id="form-q-matrix-type" onchange="updateMatrixKeyLabels()" class="w-full px-3 py-1.5 rounded-xl border border-slate-300 outline-none font-semibold text-brand-900 bg-white">
-                            <option value="bs" selected>Benar / Salah (B / S)</option>
-                            <option value="sts">Sesuai / Tidak Sesuai (Sesuai / T.Sesuai)</option>
-                        </select>
-                    </div>
-
-                    <p class="text-[11px] text-slate-500 mb-1">Pilih status untuk masing-masing pernyataan yang diisi:</p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <div class="flex items-center justify-between bg-white p-1.5 rounded-lg border">
-                            <span class="font-bold">Pernyataan A:</span>
-                            <select id="key_matrix_A" class="matrix-opt-select px-2 py-1 rounded border text-xs"><option value="B">Benar (B)</option><option value="S">Salah (S)</option></select>
-                        </div>
-                        <div class="flex items-center justify-between bg-white p-1.5 rounded-lg border">
-                            <span class="font-bold">Pernyataan B:</span>
-                            <select id="key_matrix_B" class="matrix-opt-select px-2 py-1 rounded border text-xs"><option value="B">Benar (B)</option><option value="S">Salah (S)</option></select>
-                        </div>
-                        <div class="flex items-center justify-between bg-white p-1.5 rounded-lg border">
-                            <span class="font-bold">Pernyataan C:</span>
-                            <select id="key_matrix_C" class="matrix-opt-select px-2 py-1 rounded border text-xs"><option value="B">Benar (B)</option><option value="S">Salah (S)</option></select>
-                        </div>
-                        <div id="matrix-row-D" class="flex items-center justify-between bg-white p-1.5 rounded-lg border">
-                            <span class="font-bold">Pernyataan D:</span>
-                            <select id="key_matrix_D" class="matrix-opt-select px-2 py-1 rounded border text-xs"><option value="B">Benar (B)</option><option value="S">Salah (S)</option></select>
-                        </div>
-                        <div id="matrix-row-E" class="flex items-center justify-between bg-white p-1.5 rounded-lg border">
-                            <span class="font-bold">Pernyataan E:</span>
-                            <select id="key_matrix_E" class="matrix-opt-select px-2 py-1 rounded border text-xs"><option value="B">Benar (B)</option><option value="S">Salah (S)</option></select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <label class="block font-semibold text-slate-700 mb-1">Pembahasan Soal</label>
-                <textarea id="form-q-discussion" rows="2" placeholder="Penjelasan/cara cepat pengerjaan..." class="w-full px-3 py-2 rounded-xl border border-slate-300 outline-none"></textarea>
-            </div>
-
-            <div class="flex justify-end gap-2 pt-2">
-                <button type="button" onclick="closeModal('modal-question')" class="px-4 py-2 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200">Batal</button>
-                <button type="submit" class="px-5 py-2 bg-brand-600 text-white font-bold rounded-xl hover:bg-brand-700">Simpan Soal TKA</button>
-            </div>
-        </form>
+        <div class="mt-5 flex justify-end">
+            <button onclick="closeModal('modal-preview-question')" class="px-5 py-2.5 bg-slate-800 text-white font-bold text-xs rounded-xl hover:bg-slate-900 transition">
+                Tutup Pratinjau
+            </button>
+        </div>
     </div>
 </div>
 
@@ -1561,12 +1475,126 @@
                 <td class="p-3.5 font-medium text-slate-800 max-w-xs truncate">${q.question}</td>
                 <td class="p-3.5 text-center font-mono font-bold text-emerald-700">${q.correct}</td>
                 <td class="p-3.5 text-center space-x-1 whitespace-nowrap">
-                    <button onclick="editQuestion('${q.id}')" class="px-2.5 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-lg font-semibold text-xs"><i class="fa-solid fa-pen"></i></button>
-                    <button onclick="deleteQuestion('${q.id}')" class="px-2.5 py-1.5 bg-rose-100 hover:bg-rose-200 text-rose-800 rounded-lg font-semibold text-xs"><i class="fa-solid fa-trash"></i></button>
+                    <button onclick="previewQuestion('${q.id}')" title="Pratinjau Layar Siswa" class="px-2.5 py-1.5 bg-sky-100 hover:bg-sky-200 text-sky-900 rounded-lg font-semibold text-xs"><i class="fa-solid fa-eye"></i></button>
+                    <button onclick="editQuestion('${q.id}')" title="Edit Soal" class="px-2.5 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-lg font-semibold text-xs"><i class="fa-solid fa-pen"></i></button>
+                    <button onclick="deleteQuestion('${q.id}')" title="Hapus Soal" class="px-2.5 py-1.5 bg-rose-100 hover:bg-rose-200 text-rose-800 rounded-lg font-semibold text-xs"><i class="fa-solid fa-trash"></i></button>
                 </td>
             `;
             tbody.appendChild(tr);
         });
+    }
+
+    // --- PREVIEW QUESTION IN CBT SIMULATION MODAL ---
+    function previewQuestion(qId) {
+        const q = questionsData.find(item => item.id === qId);
+        if (!q) return;
+
+        document.getElementById('prev-q-meta').textContent = `Subtes: ${q.category} | ID: ${q.id}`;
+        document.getElementById('prev-q-weight').textContent = `${q.weight || 3} Poin`;
+
+        const badge = document.getElementById('prev-q-type-badge');
+        if (q.type === 'pg') {
+            badge.textContent = 'Pilihan Ganda Sederhana';
+            badge.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-sky-100 text-sky-800 border border-sky-200';
+        } else if (q.type === 'pgk_checkbox') {
+            badge.textContent = 'Pilihan Ganda Kompleks (MCMA)';
+            badge.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-purple-100 text-purple-800 border border-purple-200';
+        } else {
+            badge.textContent = 'Pilihan Ganda Kompleks Kategori';
+            badge.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200';
+        }
+
+        const stimContainer = document.getElementById('prev-q-stimulus-container');
+        if (q.stimulus) {
+            document.getElementById('prev-q-stimulus-text').textContent = q.stimulus;
+            stimContainer.style.display = 'block';
+        } else {
+            stimContainer.style.display = 'none';
+        }
+
+        const imgContainer = document.getElementById('prev-q-image-container');
+        if (q.image) {
+            document.getElementById('prev-q-image').src = formatGoogleDriveUrl(q.image);
+            imgContainer.style.display = 'block';
+        } else {
+            imgContainer.style.display = 'none';
+        }
+
+        document.getElementById('prev-q-text').textContent = q.question;
+
+        const optContainer = document.getElementById('prev-q-options');
+        optContainer.innerHTML = '';
+
+        if (q.type === 'pg') {
+            ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
+                if (!q.options || !q.options[letter]) return;
+                const isCorrect = q.correct === letter;
+                const div = document.createElement('div');
+                div.className = `p-3.5 rounded-xl border flex items-center gap-3 text-xs ${isCorrect ? 'bg-emerald-50 border-emerald-400 font-bold text-emerald-950' : 'bg-white border-slate-200 text-slate-800'}`;
+                div.innerHTML = `
+                    <span class="w-7 h-7 rounded-lg flex items-center justify-center font-bold ${isCorrect ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700'}">${letter}</span>
+                    <span class="flex-1">${q.options[letter]}</span>
+                    ${isCorrect ? '<span class="text-[10px] bg-emerald-200 text-emerald-800 font-bold px-2 py-0.5 rounded"><i class="fa-solid fa-check"></i> Kunci</span>' : ''}
+                `;
+                optContainer.appendChild(div);
+            });
+        } else if (q.type === 'pgk_checkbox') {
+            const keys = String(q.correct).split(',');
+            ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
+                if (!q.options || !q.options[letter]) return;
+                const isCorrect = keys.includes(letter);
+                const div = document.createElement('div');
+                div.className = `p-3.5 rounded-xl border flex items-center gap-3 text-xs ${isCorrect ? 'bg-purple-50 border-purple-400 font-bold text-purple-950' : 'bg-white border-slate-200 text-slate-800'}`;
+                div.innerHTML = `
+                    <span class="w-7 h-7 rounded-lg flex items-center justify-center font-bold ${isCorrect ? 'bg-purple-600 text-white' : 'bg-slate-100 text-slate-700'}">
+                        ${isCorrect ? '<i class="fa-solid fa-check"></i>' : letter}
+                    </span>
+                    <span class="flex-1">${q.options[letter]}</span>
+                    ${isCorrect ? '<span class="text-[10px] bg-purple-200 text-purple-800 font-bold px-2 py-0.5 rounded"><i class="fa-solid fa-check"></i> Kunci Benar</span>' : ''}
+                `;
+                optContainer.appendChild(div);
+            });
+        } else if (q.type === 'pgk_matrix') {
+            const matrixType = q.matrixType || 'bs';
+            const col1 = matrixType === 'bs' ? 'Benar (B)' : 'Sesuai';
+            const col2 = matrixType === 'bs' ? 'Salah (S)' : 'Tidak Sesuai';
+            const keysArr = String(q.correct).split(',');
+
+            const table = document.createElement('table');
+            table.className = 'w-full text-left border-collapse border border-slate-200 text-xs rounded-xl overflow-hidden';
+            table.innerHTML = `
+                <thead>
+                    <tr class="bg-slate-100 text-slate-800 font-bold border-b border-slate-200">
+                        <th class="p-2.5">Pernyataan</th>
+                        <th class="p-2.5 w-24 text-center">${col1}</th>
+                        <th class="p-2.5 w-24 text-center">${col2}</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    ${['A', 'B', 'C', 'D', 'E'].map((letter, idx) => {
+                        if (!q.options || !q.options[letter]) return '';
+                        const kVal = keysArr[idx] || 'B';
+                        return `
+                            <tr>
+                                <td class="p-2.5 font-semibold text-slate-700">${letter}. ${q.options[letter]}</td>
+                                <td class="p-2.5 text-center">
+                                    <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold ${kVal === 'B' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-400'}">${col1}</span>
+                                </td>
+                                <td class="p-2.5 text-center">
+                                    <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold ${kVal === 'S' ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-400'}">${col2}</span>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            `;
+            optContainer.appendChild(table);
+        }
+
+        document.getElementById('prev-q-key').textContent = q.correct || '-';
+        document.getElementById('prev-q-discussion').textContent = q.discussion || 'Tidak ada pembahasan.';
+
+        openModal('modal-preview-question');
     }
 
     function syncFormOptionsWithKeyInputs() {
