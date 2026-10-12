@@ -547,6 +547,24 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- PAGINATION CONTROLS BANK SOAL (50 Soal Per Page) -->
+            <div class="p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs">
+                <div class="text-slate-500 font-medium">
+                    Menampilkan <span id="bank-range-start" class="font-bold text-slate-800">0</span> - <span id="bank-range-end" class="font-bold text-slate-800">0</span> dari <span id="bank-total-count" class="font-bold text-brand-700">0</span> data soal
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="changeBankPage(-1)" id="btn-bank-prev" class="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed font-semibold transition">
+                        <i class="fa-solid fa-chevron-left mr-1"></i> Prev
+                    </button>
+                    <span id="bank-page-indicator" class="px-3 py-1 bg-brand-50 border border-brand-200 text-brand-800 rounded-lg font-bold">
+                        Halaman 1 / 1
+                    </span>
+                    <button onclick="changeBankPage(1)" id="btn-bank-next" class="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed font-semibold transition">
+                        Next <i class="fa-solid fa-chevron-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -963,7 +981,198 @@
     let googleSheetsUrl = "https://script.google.com/macros/s/AKfycbzY7QGF0AvmgOK_2zpCgSbFt-YhZgntiIDS9C2Fmwz7Tk1fHshtYfVA-ZtA11lLBNmDnw/exec";
     let activeCbtToken = localStorage.getItem('cbt_active_token') || "TKA2026";
 
-    // Subtest-specific configuration map loader/saver
+    // --- GLOBAL STATE VARIABLES ---
+    let questionsData = [];
+    let resultsDataList = [];
+    let isAdminLoggedIn = false;
+    let currentStudent = null;
+    let currentExamQuestions = [];
+    let studentAnswers = {};
+    let bookmarkedQuestions = new Set();
+    let currentQIndex = 0;
+    let remainingTimeSeconds = 0;
+    let examTimerInterval = null;
+    let violationCount = 0;
+    let isExamActive = false;
+    let currentFontSizeMode = 'normal';
+    let currentFontSizeClass = 'text-base';
+    let optionFontSizeClass = 'text-sm';
+
+    // --- PAGINASI DATA ---
+    let bankCurrentPage = 1;
+    const BANK_PER_PAGE = 50;
+    let currentResultsPage = 1;
+    const RESULTS_PER_PAGE = 50;
+
+    // --- HELPER & MODAL FUNCTIONS ---
+    function openModal(id) {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'flex';
+    }
+
+    function closeModal(id) {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    }
+
+    function showAlert(title, msg, type = 'info') {
+        const titleEl = document.getElementById('custom-alert-title');
+        const msgEl = document.getElementById('custom-alert-msg');
+        const iconBox = document.getElementById('custom-alert-icon-box');
+
+        if (titleEl) titleEl.textContent = title;
+        if (msgEl) msgEl.textContent = msg;
+
+        if (iconBox) {
+            if (type === 'error') {
+                iconBox.className = 'w-12 h-12 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl';
+                iconBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+            } else if (type === 'success') {
+                iconBox.className = 'w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl';
+                iconBox.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+            } else {
+                iconBox.className = 'w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl';
+                iconBox.innerHTML = '<i class="fa-solid fa-circle-info"></i>';
+            }
+        }
+        openModal('modal-custom-alert');
+    }
+
+    function showConfirm(title, msg, onOk) {
+        const titleEl = document.getElementById('custom-confirm-title');
+        const msgEl = document.getElementById('custom-confirm-msg');
+        const okBtn = document.getElementById('custom-confirm-ok-btn');
+
+        if (titleEl) titleEl.textContent = title;
+        if (msgEl) msgEl.textContent = msg;
+
+        if (okBtn) {
+            okBtn.onclick = function() {
+                closeModal('modal-custom-confirm');
+                if (typeof onOk === 'function') onOk();
+            };
+        }
+        openModal('modal-custom-confirm');
+    }
+
+    function handleLogoError(img) {
+        img.onerror = null;
+        img.src = 'https://placehold.co/100x100/0284c7/ffffff?text=SMKN1';
+    }
+
+    function toggleMobileMenu() {
+        const menu = document.getElementById('mobile-menu');
+        if (menu) {
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+    }
+
+    function submitAdminAuth(e) {
+        e.preventDefault();
+        const pinInput = document.getElementById('admin-pin-input');
+        const errEl = document.getElementById('admin-pin-error');
+        if (!pinInput) return;
+
+        if (pinInput.value === ADMIN_PIN) {
+            isAdminLoggedIn = true;
+            closeModal('modal-admin-auth');
+            pinInput.value = '';
+            if (errEl) errEl.classList.add('hidden');
+            updateNavUI();
+            switchTab('bank');
+        } else {
+            if (errEl) {
+                errEl.textContent = 'PIN Koordinator salah!';
+                errEl.classList.remove('hidden');
+            }
+        }
+    }
+
+    function formatGoogleDriveUrl(url) {
+        if (!url) return '';
+        if (url.includes('drive.google.com') && url.includes('/d/')) {
+            const matches = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+            if (matches && matches[1]) {
+                return `https://drive.google.com/uc?export=view&id=${matches[1]}`;
+            }
+        }
+        return url;
+    }
+
+    function formatImageUrl(url) {
+        return formatGoogleDriveUrl(url);
+    }
+
+    function deduplicateQuestions(data) {
+        const seen = new Set();
+        const result = [];
+        data.forEach(q => {
+            if (!q || !q.question) return;
+            const key = (q.category || '').toLowerCase() + '___' + q.question.trim().toLowerCase();
+            if (!seen.has(key)) {
+                seen.add(key);
+                result.push(q);
+            }
+        });
+        return result;
+    }
+
+    function getSubtestConfig(subtest) {
+        const map = getSubtestSettingsMap();
+        if (map[subtest]) {
+            return map[subtest];
+        }
+        return {
+            token: activeCbtToken || "TKA2026",
+            shuffleQ: true,
+            shuffleOpt: true
+        };
+    }
+
+    function getInitialDefaultQuestions() {
+        return [
+            {
+                id: 'q_default_1',
+                category: 'Bahasa Indonesia',
+                type: 'pg',
+                weight: 3,
+                stimulus: 'Teks wacana Laporan Hasil Observasi lingkungan sekolah SMKN 1 Bulakamba.',
+                question: 'Manakah gagasan utama dari paragraf di atas?',
+                options: {
+                    A: 'Kebersihan lingkungan sekolah menentukan kenyamanan belajar.',
+                    B: 'Siswa SMKN 1 Bulakamba selalu piket bersama.',
+                    C: 'Terdapat 6 jurusan unggulan di sekolah.',
+                    D: 'Fasilitas bengkel TKR sangat lengkap.',
+                    E: 'Kantin sekolah menyediakan makanan sehat.'
+                },
+                correct: 'A',
+                discussion: 'Gagasan utama terletak di awal paragraf yang mendeskripsikan kebersihan lingkungan.'
+            }
+        ];
+    }
+
+    function loadBankQuestions() {
+        const local = localStorage.getItem('tryout_bank_questions');
+        if (local) {
+            try {
+                questionsData = JSON.parse(local);
+            } catch(e) {
+                questionsData = getInitialDefaultQuestions();
+            }
+        } else {
+            questionsData = getInitialDefaultQuestions();
+        }
+        if (!Array.isArray(questionsData) || questionsData.length === 0) {
+            questionsData = getInitialDefaultQuestions();
+        }
+        renderBankTable();
+    }
+
+    function saveBankQuestions() {
+        localStorage.setItem('tryout_bank_questions', JSON.stringify(questionsData));
+        renderBankTable();
+    }
+
     function getSubtestSettingsMap() {
         try {
             return JSON.parse(localStorage.getItem('cbt_subtest_settings_map')) || {};
@@ -972,19 +1181,25 @@
         }
     }
 
-    function getSubtestConfig(subtestName) {
+    function saveActiveTokenSetting() {
+        const subtestSelect = document.getElementById('bank-filter-subtest');
+        const selectedSubtest = subtestSelect ? subtestSelect.value : 'ALL';
+        const tokenVal = (document.getElementById('setting-cbt-token')?.value || 'TKA2026').trim().toUpperCase();
+        const shuffleQVal = document.getElementById('setting-cbt-shuffle-q')?.checked !== false;
+        const shuffleOptVal = document.getElementById('setting-cbt-shuffle-opt')?.checked !== false;
+
         const map = getSubtestSettingsMap();
-        if (map[subtestName]) {
-            return map[subtestName];
-        }
-        if (map['ALL']) {
-            return map['ALL'];
-        }
-        return {
-            token: activeCbtToken,
-            shuffleQ: localStorage.getItem('cbt_shuffle_questions') !== 'false',
-            shuffleOpt: localStorage.getItem('cbt_shuffle_options') !== 'false'
+        map[selectedSubtest] = {
+            token: tokenVal,
+            shuffleQ: shuffleQVal,
+            shuffleOpt: shuffleOptVal
         };
+
+        localStorage.setItem('cbt_subtest_settings_map', JSON.stringify(map));
+        activeCbtToken = tokenVal;
+        localStorage.setItem('cbt_active_token', activeCbtToken);
+
+        showAlert('Pengaturan Tersimpan', `Pengaturan Token (${tokenVal}), Acak Soal, dan Acak Opsi untuk subtes "${selectedSubtest}" berhasil disimpan!`, 'success');
     }
 
     function loadSubtestSettingsToForm() {
@@ -1009,230 +1224,19 @@
     }
 
     function onBankFilterSubtestChange() {
+        bankCurrentPage = 1;
         renderBankTable();
         loadSubtestSettingsToForm();
     }
 
-    function saveActiveTokenSetting() {
-        const subtestSelect = document.getElementById('bank-filter-subtest');
-        const selectedSubtest = subtestSelect ? subtestSelect.value : 'ALL';
+    function changeBankPage(direction) {
+        const filterVal = document.getElementById('bank-filter-subtest').value;
+        const filtered = filterVal === 'ALL' ? questionsData : questionsData.filter(q => q.category === filterVal);
+        const totalPages = Math.ceil(filtered.length / BANK_PER_PAGE) || 1;
 
-        const tokenInput = document.getElementById('setting-cbt-token');
-        const inputVal = tokenInput ? tokenInput.value.trim().toUpperCase() : '';
-
-        if (!inputVal) {
-            showAlert('Peringatan', 'Token Ujian tidak boleh kosong!', 'error');
-            return;
-        }
-
-        const shuffleQ = document.getElementById('setting-cbt-shuffle-q')?.checked !== false;
-        const shuffleOpt = document.getElementById('setting-cbt-shuffle-opt')?.checked !== false;
-
-        const map = getSubtestSettingsMap();
-        map[selectedSubtest] = {
-            token: inputVal,
-            shuffleQ: shuffleQ,
-            shuffleOpt: shuffleOpt
-        };
-
-        localStorage.setItem('cbt_subtest_settings_map', JSON.stringify(map));
-
-        if (selectedSubtest === 'ALL') {
-            activeCbtToken = inputVal;
-            localStorage.setItem('cbt_active_token', activeCbtToken);
-            localStorage.setItem('cbt_shuffle_questions', shuffleQ ? 'true' : 'false');
-            localStorage.setItem('cbt_shuffle_options', shuffleOpt ? 'true' : 'false');
-        }
-
-        const subtestLabel = selectedSubtest === 'ALL' ? 'Semua Mata Pelajaran (Global Default)' : selectedSubtest;
-        showAlert('Berhasil', `Pengaturan [${subtestLabel}] berhasil disimpan!\n• Token: ${inputVal}\n• Acak Soal: ${shuffleQ ? 'Aktif' : 'Nonaktif'}\n• Acak Opsi: ${shuffleOpt ? 'Aktif' : 'Nonaktif'}`, 'success');
-    }
-
-    function showAlert(title, message, type = 'info') {
-        const titleEl = document.getElementById('custom-alert-title');
-        const msgEl = document.getElementById('custom-alert-msg');
-        const iconBox = document.getElementById('custom-alert-icon-box');
-
-        if (titleEl) titleEl.textContent = title;
-        if (msgEl) msgEl.textContent = message;
-
-        if (iconBox) {
-            if (type === 'error') {
-                iconBox.className = 'w-12 h-12 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl';
-                iconBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
-            } else if (type === 'success') {
-                iconBox.className = 'w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl';
-                iconBox.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
-            } else {
-                iconBox.className = 'w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl';
-                iconBox.innerHTML = '<i class="fa-solid fa-circle-info"></i>';
-            }
-        }
-        openModal('modal-custom-alert');
-    }
-
-    function showConfirm(title, message, onConfirmCallback) {
-        const titleEl = document.getElementById('custom-confirm-title');
-        const msgEl = document.getElementById('custom-confirm-msg');
-        const okBtn = document.getElementById('custom-confirm-ok-btn');
-
-        if (titleEl) titleEl.textContent = title;
-        if (msgEl) msgEl.textContent = message;
-
-        if (okBtn) {
-            okBtn.onclick = function() {
-                closeModal('modal-custom-confirm');
-                if (typeof onConfirmCallback === 'function') onConfirmCallback();
-            };
-        }
-        openModal('modal-custom-confirm');
-    }
-
-    // --- MODAL & UI HELPER FUNCTIONS ---
-    function openModal(modalId) {
-        const modal = document.getElementById(modalId);
-        if (modal) modal.style.display = 'flex';
-    }
-
-    function closeModal(modalId) {
-        const modal = document.getElementById(modalId);
-        if (modal) modal.style.display = 'none';
-    }
-
-    function toggleMobileMenu() {
-        const menu = document.getElementById('mobile-menu');
-        if (menu) {
-            menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'block' : 'none';
-        }
-    }
-
-    function submitAdminAuth(e) {
-        e.preventDefault();
-        const pinInput = document.getElementById('admin-pin-input');
-        const pinError = document.getElementById('admin-pin-error');
-        const pinValue = pinInput ? pinInput.value.trim() : '';
-
-        if (pinValue === ADMIN_PIN) {
-            isAdminLoggedIn = true;
-            if (pinError) pinError.classList.add('hidden');
-            if (pinInput) pinInput.value = '';
-            closeModal('modal-admin-auth');
-            updateNavUI();
-            switchTab('bank');
-        } else {
-            if (pinError) {
-                pinError.textContent = 'PIN Koordinator salah!';
-                pinError.classList.remove('hidden');
-            }
-        }
-    }
-
-    const INITIAL_QUESTIONS = [
-        {
-            id: "demo_1",
-            category: "Bahasa Indonesia",
-            type: "pg",
-            weight: 3,
-            stimulus: "Bacalah teks berikut dengan saksama sebelum menjawab pertanyaan.",
-            question: "Manakah yang merupakan ide pokok dari teks stimulus di atas?",
-            image: "",
-            options: {
-                A: "Gagasan utama pada paragraf pertama",
-                B: "Gagasan pendukung paragraf pertama",
-                C: "Kesimpulan umum teks wacana",
-                D: "Pernyataan penjelas paragraf kedua",
-                E: "Saran dan pandangan penulis"
-            },
-            correct: "A",
-            discussion: "Ide pokok terletak di awal kalimat paragraf utama."
-        }
-    ];
-
-    function handleLogoError(img) {
-        if (img) img.style.display = 'none';
-    }
-
-    function formatGoogleDriveUrl(url) {
-        if (!url) return '';
-        if (url.startsWith('data:image')) return url;
-        const match = url.match(/(?:drive\.google\.com\/(?:file\/d\/|open\?id=)|lh3\.googleusercontent\.com\/d\/)([a-zA-Z0-9_-]+)/);
-        if (match && match[1]) {
-            return `https://lh3.googleusercontent.com/d/${match[1]}`;
-        }
-        return url;
-    }
-
-    function formatImageUrl(url) {
-        return formatGoogleDriveUrl(url);
-    }
-
-    let currentStudent = null;
-    let isAdminLoggedIn = false;
-    let questionsData = [];
-    let currentExamQuestions = [];
-    let studentAnswers = {};
-    let bookmarkedQuestions = new Set();
-    let currentQIndex = 0;
-    let examTimerInterval = null;
-    let remainingTimeSeconds = 0;
-    let violationCount = 0;
-    let isExamActive = false;
-    let currentFontSizeClass = 'text-base';
-    let optionFontSizeClass = 'text-sm';
-    let currentFontSizeMode = 'normal';
-
-    // --- PAGINASI REKAP HASIL (50 ANAK PER PAGE) ---
-    let resultsDataList = [];
-    let currentResultsPage = 1;
-    const RESULTS_PER_PAGE = 50;
-
-    // --- ACCURATE DEDUPLICATION ENGINE ---
-    function deduplicateQuestions(list) {
-        if (!Array.isArray(list)) return [];
-        const seenKeys = new Set();
-        const result = [];
-
-        list.forEach(q => {
-            if (!q || !q.question) return;
-            const cleanText = String(q.question).trim().toLowerCase();
-            const catText = String(q.category || '').trim().toLowerCase();
-            const contentKey = `${catText}___${cleanText}`;
-
-            if (seenKeys.has(contentKey)) return;
-
-            seenKeys.add(contentKey);
-            result.push(q);
-        });
-
-        return result;
-    }
-
-    function loadBankQuestions() {
-        const stored = localStorage.getItem('tryout_bank_questions');
-        if (stored) {
-            try {
-                questionsData = deduplicateQuestions(JSON.parse(stored));
-            } catch(e) {
-                questionsData = [...INITIAL_QUESTIONS];
-            }
-        } else {
-            questionsData = [...INITIAL_QUESTIONS];
-        }
-
-        const sheetsUrl = localStorage.getItem('google_sheets_url');
-        if (sheetsUrl) {
-            googleSheetsUrl = sheetsUrl;
-        }
-
-        renderBankTable();
-        if (googleSheetsUrl) {
-            fetchCloudQuestions();
-        }
-    }
-
-    function saveBankQuestions() {
-        questionsData = deduplicateQuestions(questionsData);
-        localStorage.setItem('tryout_bank_questions', JSON.stringify(questionsData));
+        bankCurrentPage += direction;
+        if (bankCurrentPage < 1) bankCurrentPage = 1;
+        if (bankCurrentPage > totalPages) bankCurrentPage = totalPages;
         renderBankTable();
     }
 
@@ -2113,10 +2117,22 @@
         tbody.innerHTML = '';
         if (filtered.length === 0) {
             tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">Belum ada soal pada kategori ini.</td></tr>`;
+            updateBankPaginationControls(0);
             return;
         }
 
-        filtered.forEach((q, idx) => {
+        const totalItems = filtered.length;
+        const totalPages = Math.ceil(totalItems / BANK_PER_PAGE) || 1;
+
+        if (bankCurrentPage > totalPages) bankCurrentPage = totalPages;
+        if (bankCurrentPage < 1) bankCurrentPage = 1;
+
+        const startIndex = (bankCurrentPage - 1) * BANK_PER_PAGE;
+        const endIndex = Math.min(startIndex + BANK_PER_PAGE, totalItems);
+        const pageItems = filtered.slice(startIndex, endIndex);
+
+        pageItems.forEach((q, idx) => {
+            const globalNum = startIndex + idx + 1;
             const tr = document.createElement('tr');
             tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
 
@@ -2132,7 +2148,7 @@
             }
 
             tr.innerHTML = `
-                <td class="p-3.5 text-center font-bold text-slate-500">${idx + 1}</td>
+                <td class="p-3.5 text-center font-bold text-slate-500">${globalNum}</td>
                 <td class="p-3.5 font-bold text-slate-700">${q.category}</td>
                 <td class="p-3.5 text-center"><span class="px-2.5 py-1 rounded-lg font-bold text-[11px] border ${typeBadgeClass}">${typeStr}</span></td>
                 <td class="p-3.5 text-center font-bold text-amber-700">⭐ ${q.weight || 3} Poin</td>
@@ -2146,6 +2162,28 @@
             `;
             tbody.appendChild(tr);
         });
+
+        updateBankPaginationControls(totalItems, startIndex + 1, endIndex, totalPages);
+    }
+
+    function updateBankPaginationControls(totalItems, rangeStart = 0, rangeEnd = 0, totalPages = 1) {
+        const totalCountEl = document.getElementById('bank-total-count');
+        if (totalCountEl) totalCountEl.textContent = totalItems;
+
+        const startEl = document.getElementById('bank-range-start');
+        if (startEl) startEl.textContent = totalItems > 0 ? rangeStart : 0;
+
+        const endEl = document.getElementById('bank-range-end');
+        if (endEl) endEl.textContent = totalItems > 0 ? rangeEnd : 0;
+
+        const indicatorEl = document.getElementById('bank-page-indicator');
+        if (indicatorEl) indicatorEl.textContent = `Halaman ${bankCurrentPage} / ${totalPages}`;
+
+        const prevBtn = document.getElementById('btn-bank-prev');
+        if (prevBtn) prevBtn.disabled = (bankCurrentPage <= 1);
+
+        const nextBtn = document.getElementById('btn-bank-next');
+        if (nextBtn) nextBtn.disabled = (bankCurrentPage >= totalPages || totalItems === 0);
     }
 
     function previewQuestion(qId) {
@@ -2802,6 +2840,11 @@
         }
 
         loadSubtestSettingsToForm();
+
+        // Otomatis tarik & sinkronkan bank soal dari Google Sheets saat aplikasi dimuat
+        if (googleSheetsUrl) {
+            fetchCloudQuestions();
+        }
     };
 </script>
 </body>
