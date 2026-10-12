@@ -858,6 +858,8 @@
                         <option value="bs">Benar / Salah</option>
                         <option value="sesuai">Sesuai / Tidak Sesuai</option>
                         <option value="opsi_ab">Opsi A / Opsi B</option>
+                        <option value="true_false">True / False</option>
+                        <option value="relates">Relates / Unrelates</option>
                     </select>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
@@ -1220,6 +1222,26 @@
     function saveBankQuestions() {
         localStorage.setItem('tryout_bank_questions', JSON.stringify(questionsData));
         renderBankTable();
+    }
+
+    // --- HELPER UNTUK KATEGORI MATRIX (PG KOMPLEKS MATRIX) ---
+    function getMatrixLabels(matrixType) {
+        let col1 = 'Benar (B)';
+        let col2 = 'Salah (S)';
+        if (matrixType === 'sesuai') {
+            col1 = 'Sesuai';
+            col2 = 'Tidak Sesuai';
+        } else if (matrixType === 'opsi_ab') {
+            col1 = 'Opsi A';
+            col2 = 'Opsi B';
+        } else if (matrixType === 'true_false') {
+            col1 = 'True';
+            col2 = 'False';
+        } else if (matrixType === 'relates') {
+            col1 = 'Relates';
+            col2 = 'Unrelates';
+        }
+        return { col1, col2 };
     }
 
     // --- SHUFFLE UTILITIES ---
@@ -1772,15 +1794,7 @@
                 });
             } else if (q.type === 'pgk_matrix') {
                 const matrixType = q.matrixType || 'bs';
-                let col1 = 'Benar (B)';
-                let col2 = 'Salah (S)';
-                if (matrixType === 'sesuai') {
-                    col1 = 'Sesuai';
-                    col2 = 'Tidak Sesuai';
-                } else if (matrixType === 'opsi_ab') {
-                    col1 = 'Opsi A';
-                    col2 = 'Opsi B';
-                }
+                const { col1, col2 } = getMatrixLabels(matrixType);
 
                 const userAnswersObj = studentAnswers[q.id] ? JSON.parse(studentAnswers[q.id]) : {};
 
@@ -2259,15 +2273,7 @@
                 });
             } else if (q.type === 'pgk_matrix') {
                 const matrixType = q.matrixType || 'bs';
-                let col1 = 'Benar (B)';
-                let col2 = 'Salah (S)';
-                if (matrixType === 'sesuai') {
-                    col1 = 'Sesuai';
-                    col2 = 'Tidak Sesuai';
-                } else if (matrixType === 'opsi_ab') {
-                    col1 = 'Opsi A';
-                    col2 = 'Opsi B';
-                }
+                const { col1, col2 } = getMatrixLabels(matrixType);
                 const keysArr = String(q.correct).split(',');
 
                 const table = document.createElement('table');
@@ -2432,18 +2438,13 @@
         const typeSelect = document.getElementById('form-q-matrix-type');
         if (!typeSelect) return;
         const val = typeSelect.value;
+        const { col1, col2 } = getMatrixLabels(val);
 
         ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
             const sel = document.getElementById(`key_matrix_${letter}`);
             if (sel) {
                 const currentVal = sel.value;
-                if (val === 'opsi_ab') {
-                    sel.innerHTML = `<option value="B">Opsi A</option><option value="S">Opsi B</option>`;
-                } else if (val === 'sesuai') {
-                    sel.innerHTML = `<option value="B">Sesuai</option><option value="S">Tidak Sesuai</option>`;
-                } else {
-                    sel.innerHTML = `<option value="B">Benar (B)</option><option value="S">Salah (S)</option>`;
-                }
+                sel.innerHTML = `<option value="B">${col1}</option><option value="S">${col2}</option>`;
                 sel.value = currentVal || 'B';
             }
         });
