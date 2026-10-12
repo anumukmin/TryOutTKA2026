@@ -854,7 +854,7 @@
             <div id="key-input-matrix" style="display: none;" class="bg-amber-50 p-3.5 rounded-2xl border border-amber-200 space-y-2">
                 <div class="flex justify-between items-center">
                     <label class="font-bold text-amber-950">Kunci Jawaban Kategori / Matriks:</label>
-                    <select id="form-q-matrix-type" onchange="updateMatrixKeyLabels()" class="p-1 rounded border text-xs font-semibold bg-white">
+                    <select id="form-q-matrix-type" onchange="updateMatrixKeyLabels()" class="p-1.5 rounded border text-xs font-bold bg-white outline-none">
                         <option value="bs">Benar / Salah</option>
                         <option value="sesuai">Sesuai / Tidak Sesuai</option>
                         <option value="opsi_ab">Opsi A / Opsi B</option>
@@ -999,6 +999,43 @@
     let currentResultsPage = 1;
     const RESULTS_PER_PAGE = 50;
 
+    // --- FUNGSI OTOMATIS: MENGEMBALIKAN DATE OBJECT GOOGLE SHEETS MENJADI PECAHAN MATEMATIKA ---
+    function sanitizeMathFractionText(str) {
+        if (!str || typeof str !== 'string') return str;
+        
+        // Deteksi jika Google Sheets mengubah pecahan '1/4' atau '1/2' menjadi string tanggal
+        if (str.includes('GMT') || str.includes('00:00:00') || str.includes('Waktu Indonesia Barat')) {
+            const dateObj = new Date(str);
+            if (!isNaN(dateObj.getTime())) {
+                const day = dateObj.getDate();
+                const month = dateObj.getMonth() + 1; // Januari = 1, April = 4, dst.
+                return `${day}/${month}`;
+            }
+        }
+        return str;
+    }
+
+    // --- HELPER UNTUK LABEL KATEGORI MATRIKS (TERMASUK TRUE/FALSE & RELATES/UNRELATES) ---
+    function getMatrixLabels(matrixType) {
+        let col1 = 'Benar (B)';
+        let col2 = 'Salah (S)';
+
+        if (matrixType === 'sesuai') {
+            col1 = 'Sesuai';
+            col2 = 'Tidak Sesuai';
+        } else if (matrixType === 'opsi_ab') {
+            col1 = 'Opsi A';
+            col2 = 'Opsi B';
+        } else if (matrixType === 'true_false') {
+            col1 = 'True';
+            col2 = 'False';
+        } else if (matrixType === 'relates') {
+            col1 = 'Relates';
+            col2 = 'Unrelates';
+        }
+        return { col1, col2 };
+    }
+
     // --- HELPER & MODAL FUNCTIONS ---
     function openModal(id) {
         const el = document.getElementById(id);
@@ -1088,7 +1125,7 @@
         if (url.includes('drive.google.com') && url.includes('/d/')) {
             const matches = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
             if (matches && matches[1]) {
-                return `https://drive.google.com/uc?export=view&id=${matches[1]}`;
+                return `https://lh3.googleusercontent.com/d/${matches[1]}`;
             }
         }
         return url;
@@ -1222,26 +1259,6 @@
     function saveBankQuestions() {
         localStorage.setItem('tryout_bank_questions', JSON.stringify(questionsData));
         renderBankTable();
-    }
-
-    // --- HELPER UNTUK KATEGORI MATRIX (PG KOMPLEKS MATRIX) ---
-    function getMatrixLabels(matrixType) {
-        let col1 = 'Benar (B)';
-        let col2 = 'Salah (S)';
-        if (matrixType === 'sesuai') {
-            col1 = 'Sesuai';
-            col2 = 'Tidak Sesuai';
-        } else if (matrixType === 'opsi_ab') {
-            col1 = 'Opsi A';
-            col2 = 'Opsi B';
-        } else if (matrixType === 'true_false') {
-            col1 = 'True';
-            col2 = 'False';
-        } else if (matrixType === 'relates') {
-            col1 = 'Relates';
-            col2 = 'Unrelates';
-        }
-        return { col1, col2 };
     }
 
     // --- SHUFFLE UTILITIES ---
@@ -1722,7 +1739,7 @@
             if (q.stimulus) {
                 const stimText = document.getElementById('q-stimulus-text');
                 if (stimText) {
-                    stimText.textContent = q.stimulus;
+                    stimText.textContent = sanitizeMathFractionText(q.stimulus);
                     stimText.className = `${optionFontSizeClass} option-text-target whitespace-pre-line text-slate-700 leading-relaxed`;
                 }
                 stimContainer.style.display = 'block';
@@ -1743,7 +1760,7 @@
         }
 
         const qTextEl = document.getElementById('q-text');
-        if (qTextEl) qTextEl.textContent = q.question;
+        if (qTextEl) qTextEl.textContent = sanitizeMathFractionText(q.question);
         changeFontSize(currentFontSizeMode);
 
         const optContainer = document.getElementById('q-options');
@@ -1753,6 +1770,7 @@
             if (q.type === 'pg') {
                 ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
                     if (!q.options || !q.options[letter]) return;
+                    const optTextClean = sanitizeMathFractionText(q.options[letter]);
                     const isSelected = studentAnswers[q.id] === letter;
                     const btn = document.createElement('div');
                     btn.className = `p-4 rounded-2xl border cursor-pointer transition flex items-center gap-3 ${isSelected ? 'bg-brand-50 border-brand-500 text-brand-900 font-bold shadow-sm' : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-800'}`;
@@ -1764,7 +1782,7 @@
                     };
                     btn.innerHTML = `
                         <span class="w-8 h-8 rounded-xl flex items-center justify-center border font-bold text-sm ${isSelected ? 'bg-brand-600 text-white border-brand-600' : 'bg-slate-100 text-slate-600 border-slate-300'}">${letter}</span>
-                        <span class="${optionFontSizeClass} option-text-target flex-1">${q.options[letter]}</span>
+                        <span class="${optionFontSizeClass} option-text-target flex-1">${optTextClean}</span>
                     `;
                     optContainer.appendChild(btn);
                 });
@@ -1772,6 +1790,7 @@
                 const currentSelected = studentAnswers[q.id] ? studentAnswers[q.id].split(',') : [];
                 ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
                     if (!q.options || !q.options[letter]) return;
+                    const optTextClean = sanitizeMathFractionText(q.options[letter]);
                     const isChecked = currentSelected.includes(letter);
                     const btn = document.createElement('div');
                     btn.className = `p-4 rounded-2xl border cursor-pointer transition flex items-center gap-3 ${isChecked ? 'bg-sky-50 border-sky-500 text-sky-900 font-bold shadow-sm' : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-800'}`;
@@ -1788,14 +1807,12 @@
                         <span class="w-8 h-8 rounded-xl flex items-center justify-center border font-bold text-sm ${isChecked ? 'bg-sky-600 text-white border-sky-600' : 'bg-slate-100 text-slate-600 border-slate-300'}">
                             ${isChecked ? '<i class="fa-solid fa-check"></i>' : letter}
                         </span>
-                        <span class="${optionFontSizeClass} option-text-target flex-1">${q.options[letter]}</span>
+                        <span class="${optionFontSizeClass} option-text-target flex-1">${optTextClean}</span>
                     `;
                     optContainer.appendChild(btn);
                 });
             } else if (q.type === 'pgk_matrix') {
-                const matrixType = q.matrixType || 'bs';
-                const { col1, col2 } = getMatrixLabels(matrixType);
-
+                const { col1, col2 } = getMatrixLabels(q.matrixType || 'bs');
                 const userAnswersObj = studentAnswers[q.id] ? JSON.parse(studentAnswers[q.id]) : {};
 
                 const table = document.createElement('table');
@@ -1811,10 +1828,11 @@
                     <tbody class="divide-y divide-slate-100">
                         ${['A', 'B', 'C', 'D', 'E'].map(letter => {
                             if (!q.options || !q.options[letter]) return '';
+                            const optTextClean = sanitizeMathFractionText(q.options[letter]);
                             const ans = userAnswersObj[letter];
                             return `
                                 <tr>
-                                    <td class="p-3 font-semibold text-slate-700 ${optionFontSizeClass} option-text-target">${letter}. ${q.options[letter]}</td>
+                                    <td class="p-3 font-semibold text-slate-700 ${optionFontSizeClass} option-text-target">${letter}. ${optTextClean}</td>
                                     <td class="p-3 text-center">
                                         <button type="button" onclick="setMatrixAnswer('${q.id}', '${letter}', 'B')" class="px-3 py-1.5 rounded-lg border font-bold text-xs transition ${ans === 'B' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white border-slate-300 text-slate-600 hover:bg-slate-100'}">${col1}</button>
                                     </td>
@@ -2147,12 +2165,14 @@
                 typeBadgeClass = 'bg-amber-100 text-amber-800 border-amber-200';
             }
 
+            const cleanQText = sanitizeMathFractionText(q.question);
+
             tr.innerHTML = `
                 <td class="p-3.5 text-center font-bold text-slate-500">${globalNum}</td>
                 <td class="p-3.5 font-bold text-slate-700">${q.category}</td>
                 <td class="p-3.5 text-center"><span class="px-2.5 py-1 rounded-lg font-bold text-[11px] border ${typeBadgeClass}">${typeStr}</span></td>
                 <td class="p-3.5 text-center font-bold text-amber-700">⭐ ${q.weight || 3} Poin</td>
-                <td class="p-3.5 font-medium text-slate-800 max-w-xs truncate">${q.question}</td>
+                <td class="p-3.5 font-medium text-slate-800 max-w-xs truncate">${cleanQText}</td>
                 <td class="p-3.5 text-center font-mono font-bold text-emerald-700">${q.correct}</td>
                 <td class="p-3.5 text-center space-x-1 whitespace-nowrap">
                     <button onclick="previewQuestion('${q.id}')" title="Pratinjau Layar Siswa" class="px-2.5 py-1.5 bg-sky-100 hover:bg-sky-200 text-sky-900 rounded-lg font-semibold text-xs transition"><i class="fa-solid fa-eye"></i></button>
@@ -2217,7 +2237,7 @@
         if (stimContainer) {
             if (q.stimulus) {
                 const stimTxt = document.getElementById('prev-q-stimulus-text');
-                if (stimTxt) stimTxt.textContent = q.stimulus;
+                if (stimTxt) stimTxt.textContent = sanitizeMathFractionText(q.stimulus);
                 stimContainer.style.display = 'block';
             } else {
                 stimContainer.style.display = 'none';
@@ -2236,7 +2256,7 @@
         }
 
         const qTxt = document.getElementById('prev-q-text');
-        if (qTxt) qTxt.textContent = q.question;
+        if (qTxt) qTxt.textContent = sanitizeMathFractionText(q.question);
 
         const optContainer = document.getElementById('prev-q-options');
         if (optContainer) {
@@ -2246,11 +2266,12 @@
                 ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
                     if (!q.options || !q.options[letter]) return;
                     const isCorrect = q.correct === letter;
+                    const optTextClean = sanitizeMathFractionText(q.options[letter]);
                     const div = document.createElement('div');
                     div.className = `p-3.5 rounded-xl border flex items-center gap-3 text-xs ${isCorrect ? 'bg-emerald-50 border-emerald-400 font-bold text-emerald-950' : 'bg-white border-slate-200 text-slate-800'}`;
                     div.innerHTML = `
                         <span class="w-7 h-7 rounded-lg flex items-center justify-center font-bold ${isCorrect ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700'}">${letter}</span>
-                        <span class="flex-1">${q.options[letter]}</span>
+                        <span class="flex-1">${optTextClean}</span>
                         ${isCorrect ? '<span class="text-[10px] bg-emerald-200 text-emerald-800 font-bold px-2 py-0.5 rounded"><i class="fa-solid fa-check"></i> Kunci</span>' : ''}
                     `;
                     optContainer.appendChild(div);
@@ -2260,20 +2281,20 @@
                 ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
                     if (!q.options || !q.options[letter]) return;
                     const isCorrect = keys.includes(letter);
+                    const optTextClean = sanitizeMathFractionText(q.options[letter]);
                     const div = document.createElement('div');
                     div.className = `p-3.5 rounded-xl border flex items-center gap-3 text-xs ${isCorrect ? 'bg-purple-50 border-purple-400 font-bold text-purple-950' : 'bg-white border-slate-200 text-slate-800'}`;
                     div.innerHTML = `
                         <span class="w-7 h-7 rounded-lg flex items-center justify-center font-bold ${isCorrect ? 'bg-purple-600 text-white' : 'bg-slate-100 text-slate-700'}">
                             ${isCorrect ? '<i class="fa-solid fa-check"></i>' : letter}
                         </span>
-                        <span class="flex-1">${q.options[letter]}</span>
+                        <span class="flex-1">${optTextClean}</span>
                         ${isCorrect ? '<span class="text-[10px] bg-purple-200 text-purple-800 font-bold px-2 py-0.5 rounded"><i class="fa-solid fa-check"></i> Kunci Benar</span>' : ''}
                     `;
                     optContainer.appendChild(div);
                 });
             } else if (q.type === 'pgk_matrix') {
-                const matrixType = q.matrixType || 'bs';
-                const { col1, col2 } = getMatrixLabels(matrixType);
+                const { col1, col2 } = getMatrixLabels(q.matrixType || 'bs');
                 const keysArr = String(q.correct).split(',');
 
                 const table = document.createElement('table');
@@ -2290,9 +2311,10 @@
                         ${['A', 'B', 'C', 'D', 'E'].map((letter, idx) => {
                             if (!q.options || !q.options[letter]) return '';
                             const kVal = keysArr[idx] || 'B';
+                            const optTextClean = sanitizeMathFractionText(q.options[letter]);
                             return `
                                 <tr>
-                                    <td class="p-2.5 font-semibold text-slate-700">${letter}. ${q.options[letter]}</td>
+                                    <td class="p-2.5 font-semibold text-slate-700">${letter}. ${optTextClean}</td>
                                     <td class="p-2.5 text-center">
                                         <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold ${kVal === 'B' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-400'}">${col1}</span>
                                     </td>
@@ -2478,10 +2500,10 @@
                 if (weightEl) weightEl.value = q.weight || 3;
                 
                 const stimEl = document.getElementById('form-q-stimulus');
-                if (stimEl) stimEl.value = q.stimulus || '';
+                if (stimEl) stimEl.value = sanitizeMathFractionText(q.stimulus) || '';
                 
                 const textEl = document.getElementById('form-q-text');
-                if (textEl) textEl.value = q.question;
+                if (textEl) textEl.value = sanitizeMathFractionText(q.question);
                 
                 if (q.image) {
                     const imgUrl = formatGoogleDriveUrl(q.image);
@@ -2490,11 +2512,11 @@
                     showImagePreview(imgUrl);
                 }
                 
-                const optA = document.getElementById('form-q-opt-A'); if (optA) optA.value = q.options ? (q.options.A || '') : '';
-                const optB = document.getElementById('form-q-opt-B'); if (optB) optB.value = q.options ? (q.options.B || '') : '';
-                const optC = document.getElementById('form-q-opt-C'); if (optC) optC.value = q.options ? (q.options.C || '') : '';
-                const optD = document.getElementById('form-q-opt-D'); if (optD) optD.value = q.options ? (q.options.D || '') : '';
-                const optE = document.getElementById('form-q-opt-E'); if (optE) optE.value = q.options ? (q.options.E || '') : '';
+                const optA = document.getElementById('form-q-opt-A'); if (optA) optA.value = q.options ? sanitizeMathFractionText(q.options.A || '') : '';
+                const optB = document.getElementById('form-q-opt-B'); if (optB) optB.value = q.options ? sanitizeMathFractionText(q.options.B || '') : '';
+                const optC = document.getElementById('form-q-opt-C'); if (optC) optC.value = q.options ? sanitizeMathFractionText(q.options.C || '') : '';
+                const optD = document.getElementById('form-q-opt-D'); if (optD) optD.value = q.options ? sanitizeMathFractionText(q.options.D || '') : '';
+                const optE = document.getElementById('form-q-opt-E'); if (optE) optE.value = q.options ? sanitizeMathFractionText(q.options.E || '') : '';
 
                 toggleFormQuestionType();
 
