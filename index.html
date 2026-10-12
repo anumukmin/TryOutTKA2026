@@ -127,7 +127,7 @@
 <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
 
     <section id="tab-tryout" class="tab-content relative">
-        <!-- 1A. STUDENT LOGIN FORM (SIMPLE & ELEGANT CENTERED CARD) -->
+        <!-- 1A. STUDENT LOGIN FORM -->
         <div id="student-login-card" class="max-w-md mx-auto bg-white rounded-3xl shadow-xl border border-slate-200/80 p-6 sm:p-8 relative z-10 my-8">
             <div class="text-center mb-6">
                 <div class="inline-flex items-center justify-center p-3 bg-brand-50 border border-brand-100 rounded-2xl mb-3 shadow-xs">
@@ -233,7 +233,6 @@
                     </div>
                 </div>
 
-                <!-- FITUR TOKEN UJIAN -->
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Token Ujian (Dari Pengawas) <span class="text-red-500">*</span></label>
                     <div class="relative">
@@ -280,7 +279,6 @@
                         </div>
                     </div>
 
-                    <!-- Compact Mobile Timer Badge -->
                     <div class="sm:hidden bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-lg flex items-center gap-1.5">
                         <i class="fa-regular fa-clock text-amber-400 text-xs animate-pulse"></i>
                         <span id="exam-timer-mobile" class="font-mono text-xs font-bold text-amber-300">00:00:00</span>
@@ -288,7 +286,6 @@
                 </div>
 
                 <div class="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 border-slate-800 pt-2.5 sm:pt-0">
-                    <!-- FONT RESIZER CONTROLS -->
                     <div class="bg-slate-800 border border-slate-700 p-1 rounded-xl flex items-center gap-1 text-xs">
                         <span class="text-slate-400 px-1 text-[10px] uppercase font-bold hidden sm:inline">Ukuran Teks:</span>
                         <button onclick="changeFontSize('small')" class="px-2 py-1 rounded bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs">A-</button>
@@ -314,7 +311,6 @@
             <div class="flex-grow grid grid-cols-1 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-slate-200">
                 <div class="lg:col-span-3 p-4 sm:p-8 flex flex-col justify-between">
                     <div>
-                        <!-- Header Bar Soal (Nomor, Tipe, Bobot, Bookmark) -->
                         <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-6 border-b border-slate-200">
                             <div class="flex items-center gap-3">
                                 <span class="bg-brand-600 text-white font-black text-sm sm:text-base px-3.5 py-1.5 rounded-xl shadow-xs">
@@ -374,7 +370,6 @@
                             <span class="text-[11px] font-semibold text-slate-400">Pilih Nomor</span>
                         </div>
 
-                        <!-- Keterangan Status Warna Ringkas & Sejajar (Horizontal Inline Pills) -->
                         <div class="flex flex-wrap items-center gap-1.5 mb-3.5 pt-1 border-t border-slate-200/80 text-[11px]">
                             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-brand-50 text-brand-700 font-medium border border-brand-200">
                                 <span class="w-2 h-2 rounded-full bg-brand-600"></span> Dijawab
@@ -491,7 +486,6 @@
                     </select>
                 </div>
 
-                <!-- PENGATURAN TOKEN & ACAK SEJAJAR DI SAMPING FILTER SUBTES -->
                 <div class="flex flex-wrap items-center gap-2 pt-2 sm:pt-0 sm:border-l sm:border-slate-200 sm:pl-3">
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1"><i class="fa-solid fa-key text-amber-500"></i> Token Ujian</label>
@@ -548,7 +542,6 @@
                 </table>
             </div>
 
-            <!-- PAGINATION CONTROLS BANK SOAL (50 Soal Per Page) -->
             <div class="p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs">
                 <div class="text-slate-500 font-medium">
                     Menampilkan <span id="bank-range-start" class="font-bold text-slate-800">0</span> - <span id="bank-range-end" class="font-bold text-slate-800">0</span> dari <span id="bank-total-count" class="font-bold text-brand-700">0</span> data soal
@@ -568,7 +561,7 @@
         </div>
     </section>
 
-    <!-- 3. RESULTS & RECAP SECTION WITH 50 PER PAGE PAGINATION & CLASS FILTER -->
+    <!-- 3. RESULTS & RECAP SECTION -->
     <section id="tab-results" class="tab-content hidden space-y-6">
         <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div>
@@ -612,7 +605,6 @@
                 </table>
             </div>
 
-            <!-- PAGINATION CONTROLS (50 Anak Per Page) -->
             <div class="p-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs no-print">
                 <div class="text-slate-500 font-medium">
                     Menampilkan <span id="results-range-start" class="font-bold text-slate-800">0</span> - <span id="results-range-end" class="font-bold text-slate-800">0</span> dari <span id="results-total-count" class="font-bold text-brand-700">0</span> data siswa
@@ -646,7 +638,7 @@
     </div>
 </footer>
 
-<!-- CUSTOM MODAL ALERT DIALOG (REPLACES NATIVE alert()) -->
+<!-- CUSTOM MODAL ALERT DIALOG -->
 <div id="modal-custom-alert" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
     <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 p-6 sm:p-7 max-w-sm w-full text-center relative">
         <div id="custom-alert-icon-box" class="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl">
@@ -660,7 +652,7 @@
     </div>
 </div>
 
-<!-- CUSTOM MODAL CONFIRM DIALOG (REPLACES NATIVE confirm()) -->
+<!-- CUSTOM MODAL CONFIRM DIALOG -->
 <div id="modal-custom-confirm" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
     <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 p-6 sm:p-7 max-w-sm w-full text-center relative">
         <div id="custom-confirm-icon-box" class="w-12 h-12 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl">
@@ -675,7 +667,7 @@
     </div>
 </div>
 
-<!-- MODAL IMPORT SOAL MASSAL (CSV / JSON / PASTE) -->
+<!-- MODAL IMPORT SOAL MASSAL -->
 <div id="modal-import-questions" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
     <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 p-6 sm:p-7 max-w-2xl w-full my-8 relative">
         <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
@@ -865,6 +857,7 @@
                     <select id="form-q-matrix-type" onchange="updateMatrixKeyLabels()" class="p-1 rounded border text-xs font-semibold bg-white">
                         <option value="bs">Benar / Salah</option>
                         <option value="sesuai">Sesuai / Tidak Sesuai</option>
+                        <option value="opsi_ab">Opsi A / Opsi B</option>
                     </select>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
@@ -998,7 +991,7 @@
     let currentFontSizeClass = 'text-base';
     let optionFontSizeClass = 'text-sm';
 
-    // --- PAGINASI DATA ---
+    // --- PAGINASI DATA (50 Per Halaman) ---
     let bankCurrentPage = 1;
     const BANK_PER_PAGE = 50;
     let currentResultsPage = 1;
@@ -1117,6 +1110,14 @@
         return result;
     }
 
+    function getSubtestSettingsMap() {
+        try {
+            return JSON.parse(localStorage.getItem('cbt_subtest_settings_map')) || {};
+        } catch(e) {
+            return {};
+        }
+    }
+
     function getSubtestConfig(subtest) {
         const map = getSubtestSettingsMap();
         if (map[subtest]) {
@@ -1127,58 +1128,6 @@
             shuffleQ: true,
             shuffleOpt: true
         };
-    }
-
-    function getInitialDefaultQuestions() {
-        return [
-            {
-                id: 'q_default_1',
-                category: 'Bahasa Indonesia',
-                type: 'pg',
-                weight: 3,
-                stimulus: 'Teks wacana Laporan Hasil Observasi lingkungan sekolah SMKN 1 Bulakamba.',
-                question: 'Manakah gagasan utama dari paragraf di atas?',
-                options: {
-                    A: 'Kebersihan lingkungan sekolah menentukan kenyamanan belajar.',
-                    B: 'Siswa SMKN 1 Bulakamba selalu piket bersama.',
-                    C: 'Terdapat 6 jurusan unggulan di sekolah.',
-                    D: 'Fasilitas bengkel TKR sangat lengkap.',
-                    E: 'Kantin sekolah menyediakan makanan sehat.'
-                },
-                correct: 'A',
-                discussion: 'Gagasan utama terletak di awal paragraf yang mendeskripsikan kebersihan lingkungan.'
-            }
-        ];
-    }
-
-    function loadBankQuestions() {
-        const local = localStorage.getItem('tryout_bank_questions');
-        if (local) {
-            try {
-                questionsData = JSON.parse(local);
-            } catch(e) {
-                questionsData = getInitialDefaultQuestions();
-            }
-        } else {
-            questionsData = getInitialDefaultQuestions();
-        }
-        if (!Array.isArray(questionsData) || questionsData.length === 0) {
-            questionsData = getInitialDefaultQuestions();
-        }
-        renderBankTable();
-    }
-
-    function saveBankQuestions() {
-        localStorage.setItem('tryout_bank_questions', JSON.stringify(questionsData));
-        renderBankTable();
-    }
-
-    function getSubtestSettingsMap() {
-        try {
-            return JSON.parse(localStorage.getItem('cbt_subtest_settings_map')) || {};
-        } catch(e) {
-            return {};
-        }
     }
 
     function saveActiveTokenSetting() {
@@ -1229,81 +1178,51 @@
         loadSubtestSettingsToForm();
     }
 
-    function changeBankPage(direction) {
-        const filterVal = document.getElementById('bank-filter-subtest').value;
-        const filtered = filterVal === 'ALL' ? questionsData : questionsData.filter(q => q.category === filterVal);
-        const totalPages = Math.ceil(filtered.length / BANK_PER_PAGE) || 1;
+    function getInitialDefaultQuestions() {
+        return [
+            {
+                id: 'q_default_1',
+                category: 'Bahasa Indonesia',
+                type: 'pg',
+                weight: 3,
+                stimulus: 'Teks wacana Laporan Hasil Observasi lingkungan sekolah SMKN 1 Bulakamba.',
+                question: 'Manakah gagasan utama dari paragraf di atas?',
+                options: {
+                    A: 'Kebersihan lingkungan sekolah menentukan kenyamanan belajar.',
+                    B: 'Siswa SMKN 1 Bulakamba selalu piket bersama.',
+                    C: 'Terdapat 6 jurusan unggulan di sekolah.',
+                    D: 'Fasilitas bengkel TKR sangat lengkap.',
+                    E: 'Kantin sekolah menyediakan makanan sehat.'
+                },
+                correct: 'A',
+                discussion: 'Gagasan utama terletak di awal paragraf yang mendeskripsikan kebersihan lingkungan.'
+            }
+        ];
+    }
 
-        bankCurrentPage += direction;
-        if (bankCurrentPage < 1) bankCurrentPage = 1;
-        if (bankCurrentPage > totalPages) bankCurrentPage = totalPages;
+    function loadBankQuestions() {
+        const local = localStorage.getItem('tryout_bank_questions');
+        if (local) {
+            try {
+                questionsData = JSON.parse(local);
+            } catch(e) {
+                questionsData = getInitialDefaultQuestions();
+            }
+        } else {
+            questionsData = getInitialDefaultQuestions();
+        }
+        if (!Array.isArray(questionsData) || questionsData.length === 0) {
+            questionsData = getInitialDefaultQuestions();
+        }
         renderBankTable();
     }
 
-    // --- AUTO-SAVE & RESUME EXAM SESSION ---
-    function saveActiveExamSession() {
-        if (!isExamActive || !currentStudent) return;
-        const sessionData = {
-            student: currentStudent,
-            subtest: document.getElementById('exam-subtest-filter').value,
-            questions: currentExamQuestions,
-            answers: studentAnswers,
-            bookmarks: Array.from(bookmarkedQuestions),
-            remainingTime: remainingTimeSeconds,
-            qIndex: currentQIndex,
-            violations: violationCount
-        };
-        localStorage.setItem('tryout_active_session', JSON.stringify(sessionData));
+    function saveBankQuestions() {
+        localStorage.setItem('tryout_bank_questions', JSON.stringify(questionsData));
+        renderBankTable();
     }
 
-    function checkActiveExamSession() {
-        const saved = localStorage.getItem('tryout_active_session');
-        if (!saved) return;
-
-        try {
-            const data = JSON.parse(saved);
-            if (data && data.student && data.questions && data.questions.length > 0) {
-                showConfirm('Sesi Ujian Ditemukan!', `Sistem menemukan sesi pengerjaan ujian (${data.subtest}) atas nama ${data.student.name} yang belum selesai. Apakah Anda ingin melanjutkan ujian?`, () => {
-                    resumeExamSession(data);
-                });
-            }
-        } catch(e) {
-            localStorage.removeItem('tryout_active_session');
-        }
-    }
-
-    function resumeExamSession(data) {
-        currentStudent = data.student;
-        currentExamQuestions = data.questions;
-        studentAnswers = data.answers || {};
-        bookmarkedQuestions = new Set(data.bookmarks || []);
-        remainingTimeSeconds = data.remainingTime || 3600;
-        currentQIndex = data.qIndex || 0;
-        violationCount = data.violations || 0;
-        isExamActive = true;
-
-        document.getElementById('student-login-card').style.display = 'none';
-        document.getElementById('student-prep-card').style.display = 'none';
-        document.getElementById('cbt-screen').style.display = 'flex';
-        const globalFooter = document.getElementById('global-footer');
-        if (globalFooter) globalFooter.style.display = 'none';
-
-        document.getElementById('cbt-student-display').textContent = currentStudent.name;
-        document.getElementById('cbt-class-display').textContent = currentStudent.studentClass || 'Peserta';
-        document.getElementById('cbt-subtest-display').textContent = `Subtes: ${data.subtest}`;
-        document.getElementById('violation-count-display').textContent = violationCount;
-
-        startExamTimer();
-        setupAntiCheatListeners();
-        renderQuestion();
-        renderQuestionGridNav();
-    }
-
-    function clearActiveExamSession() {
-        localStorage.removeItem('tryout_active_session');
-    }
-
-    // --- FISHER-YATES SHUFFLE FOR QUESTIONS & OPTIONS ---
+    // --- SHUFFLE UTILITIES ---
     function shuffleArray(array) {
         const arr = [...array];
         for (let i = arr.length - 1; i > 0; i--) {
@@ -1313,7 +1232,6 @@
         return arr;
     }
 
-    // LOGIKA PENGACAKAN OPSI JAWABAN (DENGAN PENYESUAIAN KUNCI OTOMATIS)
     function applyOptionShuffle(questions) {
         return questions.map(qOriginal => {
             const q = JSON.parse(JSON.stringify(qOriginal));
@@ -1538,7 +1456,6 @@
         const selectedSubtest = document.getElementById('exam-subtest-filter').value;
         const subtestConfig = getSubtestConfig(selectedSubtest);
 
-        // 1. VERIFIKASI TOKEN UJIAN SESUAI SUBTES
         const inputToken = document.getElementById('exam-token-input').value.trim().toUpperCase();
         if (inputToken !== subtestConfig.token) {
             showAlert('Token Salah', `Token Ujian untuk mata pelajaran (${selectedSubtest}) yang Anda masukkan salah / tidak aktif. Silakan tanyakan ke pengawas.`, 'error');
@@ -1558,26 +1475,12 @@
 
         function matchMajorCategory(qCategory) {
             const catUpper = (qCategory || '').toUpperCase();
-            
-            if (classStr.includes('TAV') || majorStr.includes('AUDIO') || majorStr.includes('TAV')) {
-                return catUpper.includes('AUDIO') || catUpper.includes('TAV');
-            }
-            if (classStr.includes('TKR') || majorStr.includes('KENDARAAN') || majorStr.includes('TKR')) {
-                return catUpper.includes('KENDARAAN') || catUpper.includes('TKR');
-            }
-            if (classStr.includes('TSM') || classStr.includes('TBSM') || majorStr.includes('MOTOR') || majorStr.includes('TSM')) {
-                return catUpper.includes('MOTOR') || catUpper.includes('TSM');
-            }
-            if (classStr.includes('TITL') || majorStr.includes('LISTRIK') || majorStr.includes('TITL')) {
-                return catUpper.includes('LISTRIK') || catUpper.includes('TITL');
-            }
-            if (classStr.includes('ATPH') || majorStr.includes('AGRIBISNIS') || majorStr.includes('HORTI') || majorStr.includes('ATPH')) {
-                return catUpper.includes('AGRIBISNIS') || catUpper.includes('HORTI') || catUpper.includes('ATPH');
-            }
-            if (classStr.includes('NKPI') || majorStr.includes('NAUTIKA') || majorStr.includes('KAPAL') || majorStr.includes('NKPI')) {
-                return catUpper.includes('NAUTIKA') || catUpper.includes('KAPAL') || catUpper.includes('NKPI');
-            }
-
+            if (classStr.includes('TAV') || majorStr.includes('AUDIO') || majorStr.includes('TAV')) return catUpper.includes('AUDIO') || catUpper.includes('TAV');
+            if (classStr.includes('TKR') || majorStr.includes('KENDARAAN') || majorStr.includes('TKR')) return catUpper.includes('KENDARAAN') || catUpper.includes('TKR');
+            if (classStr.includes('TSM') || classStr.includes('TBSM') || majorStr.includes('MOTOR') || majorStr.includes('TSM')) return catUpper.includes('MOTOR') || catUpper.includes('TSM');
+            if (classStr.includes('TITL') || majorStr.includes('LISTRIK') || majorStr.includes('TITL')) return catUpper.includes('LISTRIK') || catUpper.includes('TITL');
+            if (classStr.includes('ATPH') || majorStr.includes('AGRIBISNIS') || majorStr.includes('HORTI') || majorStr.includes('ATPH')) return catUpper.includes('AGRIBISNIS') || catUpper.includes('HORTI') || catUpper.includes('ATPH');
+            if (classStr.includes('NKPI') || majorStr.includes('NAUTIKA') || majorStr.includes('KAPAL') || majorStr.includes('NKPI')) return catUpper.includes('NAUTIKA') || catUpper.includes('KAPAL') || catUpper.includes('NKPI');
             return catUpper.includes(majorStr) || majorStr.includes(catUpper.replace('SMK - ', ''));
         }
 
@@ -1592,12 +1495,10 @@
             return;
         }
 
-        // 2. ACAK SOAL SESUAI PENGATURAN SUBTES
         if (subtestConfig.shuffleQ) {
             currentExamQuestions = shuffleArray(currentExamQuestions);
         }
 
-        // 3. ACAK OPSI JAWABAN SESUAI PENGATURAN SUBTES
         if (subtestConfig.shuffleOpt) {
             currentExamQuestions = applyOptionShuffle(currentExamQuestions);
         }
@@ -1650,7 +1551,6 @@
             const mobileTimer = document.getElementById('exam-timer-mobile');
             if (mobileTimer) mobileTimer.textContent = formattedTime;
 
-            // Auto save every 10 seconds
             if (remainingTimeSeconds % 10 === 0) {
                 saveActiveExamSession();
             }
@@ -1676,6 +1576,68 @@
 
     function closeViolationModal() {
         closeModal('modal-violation');
+    }
+
+    function saveActiveExamSession() {
+        if (!isExamActive || !currentStudent) return;
+        const sessionData = {
+            student: currentStudent,
+            subtest: document.getElementById('exam-subtest-filter').value,
+            questions: currentExamQuestions,
+            answers: studentAnswers,
+            bookmarks: Array.from(bookmarkedQuestions),
+            remainingTime: remainingTimeSeconds,
+            qIndex: currentQIndex,
+            violations: violationCount
+        };
+        localStorage.setItem('tryout_active_session', JSON.stringify(sessionData));
+    }
+
+    function checkActiveExamSession() {
+        const saved = localStorage.getItem('tryout_active_session');
+        if (!saved) return;
+
+        try {
+            const data = JSON.parse(saved);
+            if (data && data.student && data.questions && data.questions.length > 0) {
+                showConfirm('Sesi Ujian Ditemukan!', `Sistem menemukan sesi pengerjaan ujian (${data.subtest}) atas nama ${data.student.name} yang belum selesai. Apakah Anda ingin melanjutkan ujian?`, () => {
+                    resumeExamSession(data);
+                });
+            }
+        } catch(e) {
+            localStorage.removeItem('tryout_active_session');
+        }
+    }
+
+    function resumeExamSession(data) {
+        currentStudent = data.student;
+        currentExamQuestions = data.questions;
+        studentAnswers = data.answers || {};
+        bookmarkedQuestions = new Set(data.bookmarks || []);
+        remainingTimeSeconds = data.remainingTime || 3600;
+        currentQIndex = data.qIndex || 0;
+        violationCount = data.violations || 0;
+        isExamActive = true;
+
+        document.getElementById('student-login-card').style.display = 'none';
+        document.getElementById('student-prep-card').style.display = 'none';
+        document.getElementById('cbt-screen').style.display = 'flex';
+        const globalFooter = document.getElementById('global-footer');
+        if (globalFooter) globalFooter.style.display = 'none';
+
+        document.getElementById('cbt-student-display').textContent = currentStudent.name;
+        document.getElementById('cbt-class-display').textContent = currentStudent.studentClass || 'Peserta';
+        document.getElementById('cbt-subtest-display').textContent = `Subtes: ${data.subtest}`;
+        document.getElementById('violation-count-display').textContent = violationCount;
+
+        startExamTimer();
+        setupAntiCheatListeners();
+        renderQuestion();
+        renderQuestionGridNav();
+    }
+
+    function clearActiveExamSession() {
+        localStorage.removeItem('tryout_active_session');
     }
 
     function changeFontSize(sizeMode) {
@@ -1709,7 +1671,6 @@
         }
     }
 
-    // --- QUESTION RENDERING ENGINE & KATEX FORMULA RENDER ---
     function renderQuestion() {
         if (!currentExamQuestions || currentExamQuestions.length === 0) return;
 
@@ -1811,8 +1772,15 @@
                 });
             } else if (q.type === 'pgk_matrix') {
                 const matrixType = q.matrixType || 'bs';
-                const col1 = matrixType === 'bs' ? 'Benar (B)' : 'Sesuai';
-                const col2 = matrixType === 'bs' ? 'Salah (S)' : 'Tidak Sesuai';
+                let col1 = 'Benar (B)';
+                let col2 = 'Salah (S)';
+                if (matrixType === 'sesuai') {
+                    col1 = 'Sesuai';
+                    col2 = 'Tidak Sesuai';
+                } else if (matrixType === 'opsi_ab') {
+                    col1 = 'Opsi A';
+                    col2 = 'Opsi B';
+                }
 
                 const userAnswersObj = studentAnswers[q.id] ? JSON.parse(studentAnswers[q.id]) : {};
 
@@ -1871,15 +1839,17 @@
             if (btnSubmit) btnSubmit.style.display = 'none';
         }
 
-        // Render Math Equations with KaTeX if present
         if (window.renderMathInElement) {
-            renderMathInElement(document.getElementById('cbt-screen'), {
-                delimiters: [
-                    {left: '$$', right: '$$', display: true},
-                    {left: '$', right: '$', display: false}
-                ],
-                throwOnError: false
-            });
+            const cbtScreen = document.getElementById('cbt-screen');
+            if (cbtScreen) {
+                renderMathInElement(cbtScreen, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
         }
     }
 
@@ -1920,6 +1890,7 @@
 
     function renderQuestionGridNav() {
         const grid = document.getElementById('q-grid-nav');
+        if (!grid) return;
         grid.innerHTML = '';
 
         currentExamQuestions.forEach((q, idx) => {
@@ -1951,7 +1922,6 @@
         });
     }
 
-    // --- FINISH EXAM & AUTO SAVE TO CLOUD ---
     function finishExam(forced = false) {
         isExamActive = false;
         clearInterval(examTimerInterval);
@@ -1967,7 +1937,7 @@
         let emptyCount = 0;
 
         const detailListEl = document.getElementById('res-detail-list');
-        detailListEl.innerHTML = '';
+        if (detailListEl) detailListEl.innerHTML = '';
 
         currentExamQuestions.forEach((q, idx) => {
             const maxWeight = q.weight || 3;
@@ -2030,15 +2000,17 @@
 
             totalEarnedPoints += earned;
 
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200';
-            itemDiv.innerHTML = `
-                <span><b>Soal No. ${idx + 1}</b> (${q.type === 'pg' ? 'PG Sederhana' : 'PG Kompleks'}):</span>
-                <span class="font-bold ${earned === maxWeight ? 'text-emerald-600' : (earned > 0 ? 'text-amber-600' : 'text-rose-600')}">
-                    ${earned.toFixed(1)} / ${maxWeight} Poin
-                </span>
-            `;
-            detailListEl.appendChild(itemDiv);
+            if (detailListEl) {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200';
+                itemDiv.innerHTML = `
+                    <span><b>Soal No. ${idx + 1}</b> (${q.type === 'pg' ? 'PG Sederhana' : 'PG Kompleks'}):</span>
+                    <span class="font-bold ${earned === maxWeight ? 'text-emerald-600' : (earned > 0 ? 'text-amber-600' : 'text-rose-600')}">
+                        ${earned.toFixed(1)} / ${maxWeight} Poin
+                    </span>
+                `;
+                detailListEl.appendChild(itemDiv);
+            }
         });
 
         const finalScore100 = totalMaxPoints > 0 ? Math.round((totalEarnedPoints / totalMaxPoints) * 100) : 0;
@@ -2085,7 +2057,17 @@
         }
     }
 
-    // --- BANK SOAL TABLE & SCORE INDICATORS ---
+    function changeBankPage(direction) {
+        const filterVal = document.getElementById('bank-filter-subtest').value;
+        const filtered = filterVal === 'ALL' ? questionsData : questionsData.filter(q => q.category === filterVal);
+        const totalPages = Math.ceil(filtered.length / BANK_PER_PAGE) || 1;
+
+        bankCurrentPage += direction;
+        if (bankCurrentPage < 1) bankCurrentPage = 1;
+        if (bankCurrentPage > totalPages) bankCurrentPage = totalPages;
+        renderBankTable();
+    }
+
     function renderBankTable() {
         const tbody = document.getElementById('bank-table-body');
         if (!tbody) return;
@@ -2094,23 +2076,27 @@
         const filtered = filterVal === 'ALL' ? questionsData : questionsData.filter(q => q.category === filterVal);
 
         const summaryContainer = document.getElementById('summary-badge-container');
-        if (filterVal === 'ALL') {
-            summaryContainer.style.display = 'none';
-        } else {
-            summaryContainer.style.display = 'flex';
-            let totalWeight = 0;
-            filtered.forEach(q => totalWeight += (q.weight || 3));
-            document.getElementById('summary-total-q').textContent = filtered.length;
-            
-            const weightEl = document.getElementById('summary-total-weight');
-            weightEl.textContent = `${totalWeight} Poin`;
-
-            if (totalWeight === 100) {
-                summaryContainer.className = "px-3.5 py-2 bg-emerald-50 border border-emerald-300 text-emerald-900 rounded-xl text-xs font-bold flex items-center gap-2 self-end shadow-xs";
-                weightEl.className = "text-emerald-700 font-extrabold";
+        if (summaryContainer) {
+            if (filterVal === 'ALL') {
+                summaryContainer.style.display = 'none';
             } else {
-                summaryContainer.className = "px-3.5 py-2 bg-rose-50 border border-rose-300 text-rose-900 rounded-xl text-xs font-bold flex items-center gap-2 self-end shadow-xs";
-                weightEl.className = "text-rose-700 font-extrabold";
+                summaryContainer.style.display = 'flex';
+                let totalWeight = 0;
+                filtered.forEach(q => totalWeight += (q.weight || 3));
+                document.getElementById('summary-total-q').textContent = filtered.length;
+                
+                const weightEl = document.getElementById('summary-total-weight');
+                if (weightEl) {
+                    weightEl.textContent = `${totalWeight} Poin`;
+
+                    if (totalWeight === 100) {
+                        summaryContainer.className = "px-3.5 py-2 bg-emerald-50 border border-emerald-300 text-emerald-900 rounded-xl text-xs font-bold flex items-center gap-2 self-end shadow-xs";
+                        weightEl.className = "text-emerald-700 font-extrabold";
+                    } else {
+                        summaryContainer.className = "px-3.5 py-2 bg-rose-50 border border-rose-300 text-rose-900 rounded-xl text-xs font-bold flex items-center gap-2 self-end shadow-xs";
+                        weightEl.className = "text-rose-700 font-extrabold";
+                    }
+                }
             }
         }
 
@@ -2187,115 +2173,155 @@
     }
 
     function previewQuestion(qId) {
-        const q = questionsData.find(item => item.id === qId);
-        if (!q) return;
+        const q = questionsData.find(item => String(item.id) === String(qId));
+        if (!q) {
+            showAlert('Soal Tidak Ditemukan', 'Data soal dengan ID tersebut tidak ditemukan.', 'error');
+            return;
+        }
 
-        document.getElementById('prev-q-meta').textContent = `Subtes: ${q.category} | ID: ${q.id}`;
-        document.getElementById('prev-q-weight').textContent = `${q.weight || 3} Poin`;
+        const metaEl = document.getElementById('prev-q-meta');
+        if (metaEl) metaEl.textContent = `Subtes: ${q.category || '-'} | ID: ${q.id}`;
+
+        const wEl = document.getElementById('prev-q-weight');
+        if (wEl) wEl.textContent = `${q.weight || 3} Poin`;
 
         const badge = document.getElementById('prev-q-type-badge');
-        if (q.type === 'pg') {
-            badge.textContent = 'Pilihan Ganda Sederhana';
-            badge.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-sky-100 text-sky-800 border border-sky-200';
-        } else if (q.type === 'pgk_checkbox') {
-            badge.textContent = 'Pilihan Ganda Kompleks (MCMA)';
-            badge.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-purple-100 text-purple-800 border border-purple-200';
-        } else {
-            badge.textContent = 'Pilihan Ganda Kompleks Kategori';
-            badge.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200';
+        if (badge) {
+            if (q.type === 'pg') {
+                badge.textContent = 'Pilihan Ganda Sederhana';
+                badge.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-sky-100 text-sky-800 border border-sky-200';
+            } else if (q.type === 'pgk_checkbox') {
+                badge.textContent = 'Pilihan Ganda Kompleks (MCMA)';
+                badge.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-purple-100 text-purple-800 border border-purple-200';
+            } else {
+                badge.textContent = 'Pilihan Ganda Kompleks Kategori';
+                badge.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200';
+            }
         }
 
         const stimContainer = document.getElementById('prev-q-stimulus-container');
-        if (q.stimulus) {
-            document.getElementById('prev-q-stimulus-text').textContent = q.stimulus;
-            stimContainer.style.display = 'block';
-        } else {
-            stimContainer.style.display = 'none';
+        if (stimContainer) {
+            if (q.stimulus) {
+                const stimTxt = document.getElementById('prev-q-stimulus-text');
+                if (stimTxt) stimTxt.textContent = q.stimulus;
+                stimContainer.style.display = 'block';
+            } else {
+                stimContainer.style.display = 'none';
+            }
         }
 
         const imgContainer = document.getElementById('prev-q-image-container');
-        if (q.image) {
-            document.getElementById('prev-q-image').src = formatGoogleDriveUrl(q.image);
-            imgContainer.style.display = 'block';
-        } else {
-            imgContainer.style.display = 'none';
+        if (imgContainer) {
+            if (q.image) {
+                const prevImg = document.getElementById('prev-q-image');
+                if (prevImg) prevImg.src = formatGoogleDriveUrl(q.image);
+                imgContainer.style.display = 'block';
+            } else {
+                imgContainer.style.display = 'none';
+            }
         }
 
-        document.getElementById('prev-q-text').textContent = q.question;
+        const qTxt = document.getElementById('prev-q-text');
+        if (qTxt) qTxt.textContent = q.question;
 
         const optContainer = document.getElementById('prev-q-options');
-        optContainer.innerHTML = '';
+        if (optContainer) {
+            optContainer.innerHTML = '';
 
-        if (q.type === 'pg') {
-            ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
-                if (!q.options || !q.options[letter]) return;
-                const isCorrect = q.correct === letter;
-                const div = document.createElement('div');
-                div.className = `p-3.5 rounded-xl border flex items-center gap-3 text-xs ${isCorrect ? 'bg-emerald-50 border-emerald-400 font-bold text-emerald-950' : 'bg-white border-slate-200 text-slate-800'}`;
-                div.innerHTML = `
-                    <span class="w-7 h-7 rounded-lg flex items-center justify-center font-bold ${isCorrect ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700'}">${letter}</span>
-                    <span class="flex-1">${q.options[letter]}</span>
-                    ${isCorrect ? '<span class="text-[10px] bg-emerald-200 text-emerald-800 font-bold px-2 py-0.5 rounded"><i class="fa-solid fa-check"></i> Kunci</span>' : ''}
-                `;
-                optContainer.appendChild(div);
-            });
-        } else if (q.type === 'pgk_checkbox') {
-            const keys = String(q.correct).split(',');
-            ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
-                if (!q.options || !q.options[letter]) return;
-                const isCorrect = keys.includes(letter);
-                const div = document.createElement('div');
-                div.className = `p-3.5 rounded-xl border flex items-center gap-3 text-xs ${isCorrect ? 'bg-purple-50 border-purple-400 font-bold text-purple-950' : 'bg-white border-slate-200 text-slate-800'}`;
-                div.innerHTML = `
-                    <span class="w-7 h-7 rounded-lg flex items-center justify-center font-bold ${isCorrect ? 'bg-purple-600 text-white' : 'bg-slate-100 text-slate-700'}">
-                        ${isCorrect ? '<i class="fa-solid fa-check"></i>' : letter}
-                    </span>
-                    <span class="flex-1">${q.options[letter]}</span>
-                    ${isCorrect ? '<span class="text-[10px] bg-purple-200 text-purple-800 font-bold px-2 py-0.5 rounded"><i class="fa-solid fa-check"></i> Kunci Benar</span>' : ''}
-                `;
-                optContainer.appendChild(div);
-            });
-        } else if (q.type === 'pgk_matrix') {
-            const matrixType = q.matrixType || 'bs';
-            const col1 = matrixType === 'bs' ? 'Benar (B)' : 'Sesuai';
-            const col2 = matrixType === 'bs' ? 'Salah (S)' : 'Tidak Sesuai';
-            const keysArr = String(q.correct).split(',');
+            if (q.type === 'pg') {
+                ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
+                    if (!q.options || !q.options[letter]) return;
+                    const isCorrect = q.correct === letter;
+                    const div = document.createElement('div');
+                    div.className = `p-3.5 rounded-xl border flex items-center gap-3 text-xs ${isCorrect ? 'bg-emerald-50 border-emerald-400 font-bold text-emerald-950' : 'bg-white border-slate-200 text-slate-800'}`;
+                    div.innerHTML = `
+                        <span class="w-7 h-7 rounded-lg flex items-center justify-center font-bold ${isCorrect ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700'}">${letter}</span>
+                        <span class="flex-1">${q.options[letter]}</span>
+                        ${isCorrect ? '<span class="text-[10px] bg-emerald-200 text-emerald-800 font-bold px-2 py-0.5 rounded"><i class="fa-solid fa-check"></i> Kunci</span>' : ''}
+                    `;
+                    optContainer.appendChild(div);
+                });
+            } else if (q.type === 'pgk_checkbox') {
+                const keys = String(q.correct).split(',');
+                ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
+                    if (!q.options || !q.options[letter]) return;
+                    const isCorrect = keys.includes(letter);
+                    const div = document.createElement('div');
+                    div.className = `p-3.5 rounded-xl border flex items-center gap-3 text-xs ${isCorrect ? 'bg-purple-50 border-purple-400 font-bold text-purple-950' : 'bg-white border-slate-200 text-slate-800'}`;
+                    div.innerHTML = `
+                        <span class="w-7 h-7 rounded-lg flex items-center justify-center font-bold ${isCorrect ? 'bg-purple-600 text-white' : 'bg-slate-100 text-slate-700'}">
+                            ${isCorrect ? '<i class="fa-solid fa-check"></i>' : letter}
+                        </span>
+                        <span class="flex-1">${q.options[letter]}</span>
+                        ${isCorrect ? '<span class="text-[10px] bg-purple-200 text-purple-800 font-bold px-2 py-0.5 rounded"><i class="fa-solid fa-check"></i> Kunci Benar</span>' : ''}
+                    `;
+                    optContainer.appendChild(div);
+                });
+            } else if (q.type === 'pgk_matrix') {
+                const matrixType = q.matrixType || 'bs';
+                let col1 = 'Benar (B)';
+                let col2 = 'Salah (S)';
+                if (matrixType === 'sesuai') {
+                    col1 = 'Sesuai';
+                    col2 = 'Tidak Sesuai';
+                } else if (matrixType === 'opsi_ab') {
+                    col1 = 'Opsi A';
+                    col2 = 'Opsi B';
+                }
+                const keysArr = String(q.correct).split(',');
 
-            const table = document.createElement('table');
-            table.className = 'w-full text-left border-collapse border border-slate-200 text-xs rounded-xl overflow-hidden';
-            table.innerHTML = `
-                <thead>
-                    <tr class="bg-slate-100 text-slate-800 font-bold border-b border-slate-200">
-                        <th class="p-2.5">Pernyataan</th>
-                        <th class="p-2.5 w-24 text-center">${col1}</th>
-                        <th class="p-2.5 w-24 text-center">${col2}</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100">
-                    ${['A', 'B', 'C', 'D', 'E'].map((letter, idx) => {
-                        if (!q.options || !q.options[letter]) return '';
-                        const kVal = keysArr[idx] || 'B';
-                        return `
-                            <tr>
-                                <td class="p-2.5 font-semibold text-slate-700">${letter}. ${q.options[letter]}</td>
-                                <td class="p-2.5 text-center">
-                                    <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold ${kVal === 'B' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-400'}">${col1}</span>
-                                </td>
-                                <td class="p-2.5 text-center">
-                                    <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold ${kVal === 'S' ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-400'}">${col2}</span>
-                                </td>
-                            </tr>
-                        `;
-                    }).join('')}
-                </tbody>
-            `;
-            optContainer.appendChild(table);
+                const table = document.createElement('table');
+                table.className = 'w-full text-left border-collapse border border-slate-200 text-xs rounded-xl overflow-hidden';
+                table.innerHTML = `
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-800 font-bold border-b border-slate-200">
+                            <th class="p-2.5">Pernyataan</th>
+                            <th class="p-2.5 w-24 text-center">${col1}</th>
+                            <th class="p-2.5 w-24 text-center">${col2}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        ${['A', 'B', 'C', 'D', 'E'].map((letter, idx) => {
+                            if (!q.options || !q.options[letter]) return '';
+                            const kVal = keysArr[idx] || 'B';
+                            return `
+                                <tr>
+                                    <td class="p-2.5 font-semibold text-slate-700">${letter}. ${q.options[letter]}</td>
+                                    <td class="p-2.5 text-center">
+                                        <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold ${kVal === 'B' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-400'}">${col1}</span>
+                                    </td>
+                                    <td class="p-2.5 text-center">
+                                        <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold ${kVal === 'S' ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-400'}">${col2}</span>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                `;
+                optContainer.appendChild(table);
+            }
         }
 
-        document.getElementById('prev-q-key').textContent = q.correct || '-';
-        document.getElementById('prev-q-discussion').textContent = q.discussion || 'Tidak ada pembahasan.';
+        const keyEl = document.getElementById('prev-q-key');
+        if (keyEl) keyEl.textContent = q.correct || '-';
+
+        const discEl = document.getElementById('prev-q-discussion');
+        if (discEl) discEl.textContent = q.discussion || 'Belum ada pembahasan.';
 
         openModal('modal-preview-question');
+
+        if (window.renderMathInElement) {
+            const previewModal = document.getElementById('modal-preview-question');
+            if (previewModal) {
+                renderMathInElement(previewModal, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
     }
 
     function syncFormOptionsWithKeyInputs() {
@@ -2405,15 +2431,19 @@
     function updateMatrixKeyLabels() {
         const typeSelect = document.getElementById('form-q-matrix-type');
         if (!typeSelect) return;
-        const isBs = typeSelect.value === 'bs';
+        const val = typeSelect.value;
 
         ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
             const sel = document.getElementById(`key_matrix_${letter}`);
             if (sel) {
                 const currentVal = sel.value;
-                sel.innerHTML = isBs
-                    ? `<option value="B">Benar (B)</option><option value="S">Salah (S)</option>`
-                    : `<option value="B">Sesuai</option><option value="S">Tidak Sesuai</option>`;
+                if (val === 'opsi_ab') {
+                    sel.innerHTML = `<option value="B">Opsi A</option><option value="S">Opsi B</option>`;
+                } else if (val === 'sesuai') {
+                    sel.innerHTML = `<option value="B">Sesuai</option><option value="S">Tidak Sesuai</option>`;
+                } else {
+                    sel.innerHTML = `<option value="B">Benar (B)</option><option value="S">Salah (S)</option>`;
+                }
                 sel.value = currentVal || 'B';
             }
         });
@@ -2433,7 +2463,7 @@
         toggleFormQuestionType();
 
         if (qId) {
-            const q = questionsData.find(item => item.id === qId);
+            const q = questionsData.find(item => String(item.id) === String(qId));
             if (q) {
                 if (idInput) idInput.value = q.id;
                 
@@ -2542,7 +2572,7 @@
 
         const qObj = { id, category, type, matrixType, weight, stimulus, question, image, options, correct, discussion };
 
-        const existingIdx = questionsData.findIndex(item => item.id === id);
+        const existingIdx = questionsData.findIndex(item => String(item.id) === String(id));
         if (existingIdx >= 0) {
             questionsData[existingIdx] = qObj;
         } else {
@@ -2568,7 +2598,7 @@
 
     function deleteQuestion(id) {
         showConfirm('Hapus Soal', 'Apakah Anda yakin ingin menghapus soal ini dari database?', () => {
-            questionsData = questionsData.filter(q => q.id !== id);
+            questionsData = questionsData.filter(q => String(q.id) !== String(id));
             saveBankQuestions();
 
             if (googleSheetsUrl) {
@@ -2582,7 +2612,6 @@
         });
     }
 
-    // --- BULK IMPORT QUESTIONS (JSON PASTE) ---
     function openImportModal() {
         document.getElementById('import-json-textarea').value = '';
         openModal('modal-import-questions');
@@ -2682,7 +2711,6 @@
             .catch(err => console.log('Info: Menggunakan bank soal lokal', err));
     }
 
-    // --- REAL-TIME CLOUD RESULTS SYNC, CLASS FILTERING & PRINT ---
     function fetchCloudResults() {
         if (!googleSheetsUrl) return;
         const cacheBusterUrl = googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 'action=GET_RESULTS&t=' + Date.now();
@@ -2841,7 +2869,6 @@
 
         loadSubtestSettingsToForm();
 
-        // Otomatis tarik & sinkronkan bank soal dari Google Sheets saat aplikasi dimuat
         if (googleSheetsUrl) {
             fetchCloudQuestions();
         }
