@@ -61,15 +61,20 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
+        .edu-doodle-bg {
+            background-color: #f0f9ff;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='130' height='130' viewBox='0 0 130 130'%3E%3Cg fill='none' stroke='%230284c7' stroke-opacity='0.16' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 24h18l5-8h16l5 8h10v14H10z'/%3E%3Ccircle cx='20' cy='38' r='4'/%3E%3Ccircle cx='48' cy='38' r='4'/%3E%3Ccircle cx='80' cy='30' r='7'/%3E%3Ccircle cx='112' cy='30' r='7'/%3E%3Cpath d='M80 30l10-12h14l10 12M90 18l-5-5h-8'/%3E%3Cpath d='M25 65l10-14h-8l8-14-14 16h8z' fill='%230284c7' fill-opacity='0.12'/%3E%3Cpath d='M95 80c0-12 12-12 12 0-12 0-12 0-12 0zM95 80c0-10-10-10-10 0 10 0 10 0 10 0zM95 80v10'/%3E%3Crect x='12' y='96' width='24' height='16' rx='3'/%3E%3Cpath d='M18 96l-5-7M30 96l5-7'/%3E%3Ccircle cx='29' cy='104' r='3'/%3E%3Ccircle cx='98' cy='100' r='3'/%3E%3Cpath d='M98 103v18M92 108h12M86 115c0 8 24 8 24 0'/%3E%3C/g%3E%3C/svg%3E");
+            background-repeat: repeat;
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between bg-slate-100">
+<body class="min-h-screen flex flex-col justify-between bg-slate-100 edu-doodle-bg">
 
 <header class="bg-brand-900 text-white shadow-lg sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('tryout')">
-                <div class="bg-white/10 p-1 rounded-xl flex items-center justify-center w-11 h-11 border border-white/20 shadow overflow-hidden">
+                <div class="bg-white/10 p-1 rounded-xl backdrop-blur-sm flex items-center justify-center w-11 h-11 border border-white/20 shadow overflow-hidden">
                     <img src="https://raw.githubusercontent.com/anumukmin/tryout2026/fa43cda08e3610ca170f63a90d1d8caa37dc6d71/logo_smkn_1_bulakamba-removebg-preview.png" alt="Logo SMKN 1 Bulakamba" class="w-9 h-9 object-contain" onerror="handleLogoError(this)">
                 </div>
                 <div>
@@ -103,7 +108,7 @@
 
     <section id="tab-tryout" class="tab-content relative">
         <!-- FORM LOGIN SISWA -->
-        <div id="student-login-card" class="max-w-md mx-auto bg-white rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-8 relative z-10 my-8">
+        <div id="student-login-card" class="max-w-md mx-auto bg-white rounded-3xl shadow-xl border border-slate-200/80 p-6 sm:p-8 relative z-10 my-8">
             <div class="text-center mb-6">
                 <div class="inline-flex items-center justify-center p-3 bg-brand-50 border border-brand-100 rounded-2xl mb-3 shadow-xs">
                     <img src="https://raw.githubusercontent.com/anumukmin/tryout2026/fa43cda08e3610ca170f63a90d1d8caa37dc6d71/logo_smkn_1_bulakamba-removebg-preview.png" alt="Logo SMKN 1 Bulakamba" class="w-16 h-16 object-contain" onerror="handleLogoError(this)">
@@ -135,49 +140,84 @@
         </div>
 
         <!-- PERSIAPAN SISWA -->
-        <div id="student-prep-card" style="display: none;" class="max-w-2xl mx-auto bg-white rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-9">
-            <div class="bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-2xl p-4 mb-6 flex items-center justify-between">
-                <div>
-                    <span class="text-[10px] font-bold text-emerald-700 uppercase block">Status Login</span>
-                    <strong class="text-sm font-bold text-emerald-950">Terverifikasi di Sistem CBT</strong>
+        <div id="student-prep-card" style="display: none;" class="max-w-2xl mx-auto bg-white/95 backdrop-blur-md rounded-3xl shadow-xl border border-sky-100 p-6 sm:p-9 relative z-10 overflow-hidden edu-doodle-bg">
+            <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-900 rounded-2xl p-4 mb-6 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-emerald-500 text-white rounded-xl flex items-center justify-center font-bold text-lg shadow">
+                        <i class="fa-solid fa-user-check"></i>
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-bold text-emerald-700 uppercase tracking-widest block">Status Login</span>
+                        <strong class="text-sm font-bold text-emerald-950">Terverifikasi di Sistem CBT</strong>
+                    </div>
                 </div>
-                <button onclick="logoutStudent()" class="text-xs text-slate-500 hover:text-rose-600 font-semibold px-2.5 py-1 bg-white border rounded-lg transition">
+                <button onclick="logoutStudent()" class="text-xs text-slate-500 hover:text-rose-600 font-semibold px-2.5 py-1 bg-white border rounded-lg transition shadow-xs">
                     <i class="fa-solid fa-right-from-bracket"></i> Keluar
                 </button>
             </div>
 
-            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2 mb-6">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3 mb-6">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Data Peserta Ujian</h3>
                 <div>
-                    <span class="text-xs text-slate-500 block">Nama Lengkap Siswa:</span>
-                    <strong id="student-display-name" class="text-lg font-extrabold text-slate-800">Nama Siswa</strong>
+                    <span class="text-xs text-slate-500 block">Nama Lengkap Murid:</span>
+                    <strong id="student-display-name" class="text-xl font-black text-slate-800">Nama Siswa</strong>
                 </div>
-                <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-slate-100">
                     <div>
-                        <span class="text-[11px] text-slate-500 block">Jurusan:</span>
-                        <span id="student-display-major" class="font-bold text-xs text-brand-800">Teknik Kendaraan Ringan</span>
+                        <span class="text-[11px] text-slate-500 block">Program Keahlian:</span>
+                        <span id="student-display-major" class="inline-block px-2.5 py-1 bg-brand-50 text-brand-800 font-bold text-xs rounded-lg border border-brand-200 mt-0.5">Teknik Kendaraan Ringan</span>
                     </div>
                     <div>
                         <span class="text-[11px] text-slate-500 block">Kelas:</span>
-                        <span id="student-display-class" class="font-bold text-xs text-purple-800">XII TKR 1</span>
+                        <span id="student-display-class" class="inline-block px-2.5 py-1 bg-purple-50 text-purple-800 font-bold text-xs rounded-lg border border-purple-200 mt-0.5">XII TKR 1</span>
                     </div>
                 </div>
             </div>
 
             <form onsubmit="handleStartExam(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Pilih Subtes / Mata Pelajaran <span class="text-red-500">*</span></label>
-                    <select id="exam-subtest-filter" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-semibold text-sm">
-                        <option value="Bahasa Indonesia">Bahasa Indonesia</option>
-                        <option value="Matematika">Matematika</option>
-                        <option value="Bahasa Inggris">Bahasa Inggris</option>
-                        <option value="Kewirausahaan">Kewirausahaan</option>
-                        <option value="Program Keahlian">Program Keahlian Sesuai Jurusan</option>
-                    </select>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Pilih Mata Pelajaran / Subtes <span class="text-red-500">*</span></label>
+                        <select id="exam-subtest-filter" onchange="updateExamDurationDisplay()" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none transition bg-white text-sm font-semibold">
+                            <optgroup label="Mata Pelajaran Wajib (75 Menit)">
+                                <option value="Bahasa Indonesia" selected>Bahasa Indonesia</option>
+                                <option value="Matematika">Matematika</option>
+                                <option value="Bahasa Inggris">Bahasa Inggris</option>
+                            </optgroup>
+                            <optgroup label="Mata Pelajaran Pilihan (60 Menit)">
+                                <option value="Kewirausahaan">Kewirausahaan</option>
+                                <option value="Program Keahlian">Program Keahlian Sesuai Jurusan</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Durasi Pengerjaan</label>
+                        <div class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-100 font-semibold text-slate-700 flex items-center justify-between text-sm">
+                            <span class="flex items-center gap-2" id="exam-duration-display"><i class="fa-regular fa-clock text-brand-600"></i> 75 Menit</span>
+                            <span class="text-xs bg-brand-100 text-brand-700 px-2.5 py-0.5 rounded-full font-bold" id="exam-duration-badge">Target Soal</span>
+                        </div>
+                    </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Token Ujian <span class="text-red-500">*</span></label>
-                    <input type="text" id="exam-token-input" required placeholder="Contoh: TKA2026" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-mono font-bold uppercase text-sm tracking-widest">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Token Ujian (Dari Pengawas) <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                            <i class="fa-solid fa-key text-amber-500"></i>
+                        </span>
+                        <input type="text" id="exam-token-input" required placeholder="Masukkan Token (Contoh: TKA2026)" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none uppercase font-mono font-bold text-slate-800 text-sm tracking-widest">
+                    </div>
+                </div>
+
+                <div class="bg-amber-50/90 border border-amber-200 rounded-xl p-4 text-xs text-amber-900 space-y-2 backdrop-blur-sm">
+                    <p class="font-bold text-amber-950 flex items-center gap-1.5">
+                        <i class="fa-solid fa-shield-halved text-amber-600"></i> Peraturan Keamanan CBT (Anti-Kecurangan):
+                    </p>
+                    <ul class="list-disc pl-4 space-y-1 text-slate-700">
+                        <li>Dilarang <b>pindah tab, keluar browser, atau membuka aplikasi lain</b>.</li>
+                        <li>Jawaban tersimpan otomatis secara real-time.</li>
+                        <li>Toleransi pelanggaran maksimal <b>3x</b> (Auto-Submit).</li>
+                    </ul>
                 </div>
 
                 <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition duration-200 flex items-center justify-center gap-2 text-base">
@@ -188,94 +228,148 @@
 
         <!-- LAYAR CBT SOAL -->
         <div id="cbt-screen" style="display: none;" class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden flex flex-col min-h-[600px]">
-            <div class="bg-slate-900 text-white p-4 flex justify-between items-center sticky top-0 z-30">
-                <div>
-                    <span id="cbt-student-display" class="font-bold text-base sm:text-lg">Nama Siswa</span>
-                    <p id="cbt-subtest-display" class="text-xs text-slate-400">Subtes</p>
+            <div class="bg-slate-900 text-white p-3.5 sm:p-5 flex flex-col sm:flex-row justify-between items-center gap-3 border-b border-slate-800 sticky top-0 z-30">
+                <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+                    <div class="flex items-center gap-2.5">
+                        <div class="bg-brand-600 p-2 rounded-xl text-white font-bold flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 shadow">
+                            <i class="fa-solid fa-laptop-code text-base sm:text-lg"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span id="cbt-student-display" class="font-bold text-sm sm:text-lg truncate max-w-[160px] sm:max-w-none">Nama Siswa</span>
+                                <span id="cbt-class-display" class="text-[10px] sm:text-xs bg-brand-800 text-brand-100 px-2 py-0.5 rounded-md">Kelas</span>
+                            </div>
+                            <p id="cbt-subtest-display" class="text-[11px] sm:text-xs text-slate-400 truncate">Subtes: Bahasa Indonesia</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="bg-slate-800 px-4 py-2 rounded-xl text-amber-300 font-mono text-lg font-bold" id="exam-timer">00:00:00</div>
+
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <div id="violation-badge" class="bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs px-3 py-1.5 rounded-xl font-semibold flex items-center gap-1.5">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
+                        <span>Pelanggaran: <strong id="violation-count-display">0</strong>/3</span>
+                    </div>
+
+                    <div class="bg-slate-800 border border-slate-700 px-4 py-2 rounded-xl flex items-center gap-3">
+                        <i class="fa-regular fa-clock text-amber-400 text-lg animate-pulse"></i>
+                        <div>
+                            <span class="text-[10px] text-slate-400 uppercase tracking-widest block leading-none">Sisa Waktu</span>
+                            <span id="exam-timer" class="font-mono text-xl font-bold text-amber-300">00:00:00</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="flex-grow grid grid-cols-1 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-slate-200">
-                <div class="lg:col-span-3 p-6 flex flex-col justify-between">
+                <div class="lg:col-span-3 p-4 sm:p-8 flex flex-col justify-between">
                     <div>
-                        <div class="flex items-center justify-between pb-4 mb-6 border-b border-slate-200">
-                            <span class="bg-brand-600 text-white font-black text-sm px-3.5 py-1.5 rounded-xl">
-                                Soal No. <span id="current-q-num">1</span>
-                            </span>
-                            <button id="bookmark-btn" onclick="toggleBookmark()" class="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50">
+                        <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-6 border-b border-slate-200">
+                            <div class="flex items-center gap-3">
+                                <span class="bg-brand-600 text-white font-black text-sm sm:text-base px-3.5 py-1.5 rounded-xl shadow-xs">
+                                    Soal No. <span id="current-q-num">1</span>
+                                </span>
+                                <span id="current-q-type-badge" class="bg-sky-100 text-sky-800 border border-sky-200 px-2.5 py-0.5 rounded-lg text-xs font-bold">
+                                    Pilihan Ganda Sederhana
+                                </span>
+                            </div>
+
+                            <button id="bookmark-btn" onclick="toggleBookmark()" class="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition flex items-center gap-1.5">
                                 <i class="fa-regular fa-bookmark"></i> Ragu-ragu
                             </button>
                         </div>
 
-                        <div id="q-stimulus-container" style="display: none;" class="mb-5 bg-amber-50 p-4 rounded-2xl border border-amber-200 text-slate-800 text-sm">
+                        <div id="q-stimulus-container" style="display: none;" class="mb-5 bg-amber-50/70 p-4 rounded-2xl border border-amber-200/70 text-slate-800 text-sm leading-relaxed max-h-60 overflow-y-auto custom-scrollbar">
                             <div id="q-stimulus-text" class="whitespace-pre-line text-slate-700"></div>
                         </div>
 
-                        <div id="q-image-container" style="display: none;" class="mb-4 max-w-md mx-auto text-center">
-                            <img id="q-image" src="" alt="Gambar Soal" class="rounded-lg max-h-60 mx-auto object-contain">
+                        <div id="q-image-container" style="display: none;" class="mb-4 max-w-lg mx-auto bg-slate-50 p-2 rounded-xl border border-slate-200">
+                            <img id="q-image" src="" alt="Gambar Soal" class="rounded-lg max-h-64 mx-auto object-contain">
                         </div>
 
-                        <div id="q-text" class="text-slate-800 font-semibold text-base sm:text-lg leading-relaxed mb-6"></div>
+                        <div id="q-text" class="text-slate-800 font-semibold text-base sm:text-lg leading-relaxed mb-6">
+                            Loading pertanyaan...
+                        </div>
 
                         <div id="q-options" class="space-y-3"></div>
                     </div>
 
-                    <div class="mt-8 pt-4 border-t border-slate-100 flex justify-between items-center">
-                        <button onclick="prevQuestion()" id="btn-prev-q" class="px-5 py-2.5 rounded-xl border border-slate-300 font-semibold hover:bg-slate-100">Sebelumnya</button>
-                        <button onclick="nextQuestion()" id="btn-next-q" class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold">Berikutnya</button>
-                        <button onclick="confirmSubmitExam()" id="btn-submit-q" style="display: none;" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold">Selesai & Kumpulkan</button>
+                    <div class="mt-8 pt-4 border-t border-slate-100 flex justify-between items-center gap-2">
+                        <button onclick="prevQuestion()" id="btn-prev-q" class="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold hover:bg-slate-100 transition disabled:opacity-40 flex items-center gap-2">
+                            <i class="fa-solid fa-arrow-left"></i> Sebelum
+                        </button>
+                        <button onclick="nextQuestion()" id="btn-next-q" class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold transition flex items-center gap-2">
+                            Berikut <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                        <button onclick="confirmSubmitExam()" id="btn-submit-q" style="display: none;" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition flex items-center gap-2">
+                            <i class="fa-solid fa-check-double"></i> Selesai & Selesaikan
+                        </button>
                     </div>
                 </div>
 
-                <div class="p-5 bg-slate-50 flex flex-col justify-between">
+                <div class="p-5 sm:p-6 bg-slate-50/80 flex flex-col justify-between">
                     <div>
                         <h4 class="font-bold text-slate-800 text-sm mb-3">Navigasi Soal</h4>
-                        <div id="q-grid-nav" class="grid grid-cols-5 gap-2 max-h-80 overflow-y-auto p-1 custom-scrollbar"></div>
+                        <div id="q-grid-nav" class="grid grid-cols-5 gap-2 max-h-80 overflow-y-auto custom-scrollbar p-1"></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- REKAP HASIL -->
-        <div id="cbt-result-card" style="display: none;" class="max-w-2xl mx-auto bg-white rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-9 text-center">
-            <h3 class="text-2xl font-extrabold text-slate-800 mb-2">Hasil Try Out TKA</h3>
-            <p id="res-student-info" class="text-slate-600 text-sm mb-6">Nama Siswa</p>
-            <div class="bg-brand-900 text-white rounded-2xl p-6 mb-6">
-                <span class="text-xs uppercase tracking-widest text-brand-100">Nilai Akhir</span>
-                <div class="text-5xl font-black my-2" id="res-final-score">0</div>
+        <!-- REKAP HASIL SISWA -->
+        <div id="cbt-result-card" style="display: none;" class="max-w-3xl mx-auto bg-white rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-9">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <h3 class="text-2xl font-extrabold text-slate-800">Hasil Try Out TKA</h3>
+                <p id="res-student-info" class="text-slate-600 font-medium text-sm mt-1">Nama Siswa</p>
             </div>
-            <button onclick="location.reload()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-6 rounded-xl">Kembali ke Depan</button>
+
+            <div class="bg-brand-900 text-white rounded-2xl p-6 text-center shadow-lg mb-6">
+                <span class="text-xs font-semibold uppercase tracking-widest text-brand-100">Nilai Akhir Ujian</span>
+                <div class="text-5xl font-black my-2 tracking-tight" id="res-final-score">0</div>
+            </div>
+
+            <button onclick="location.reload()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 px-4 rounded-xl transition text-center text-sm">
+                Kembali ke Halaman Depan
+            </button>
         </div>
     </section>
 
     <!-- BANK SOAL KOORDINATOR -->
     <section id="tab-bank" class="tab-content hidden space-y-6">
-        <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <select id="bank-filter-subtest" onchange="renderBankTable()" class="px-3 py-2 border rounded-xl text-xs font-semibold">
-                    <option value="ALL">Semua Mata Pelajaran</option>
-                    <option value="Bahasa Indonesia">Bahasa Indonesia</option>
-                    <option value="Matematika">Matematika</option>
-                    <option value="Bahasa Inggris">Bahasa Inggris</option>
-                    <option value="Kewirausahaan">Kewirausahaan</option>
-                </select>
+        <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 flex flex-col xl:flex-row justify-between items-center gap-4">
+            <div class="flex flex-wrap items-center gap-3.5">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Filter Subtes</label>
+                    <select id="bank-filter-subtest" onchange="renderBankTable()" class="px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold bg-white">
+                        <option value="ALL">Semua Mata Pelajaran</option>
+                        <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                        <option value="Matematika">Matematika</option>
+                        <option value="Bahasa Inggris">Bahasa Inggris</option>
+                        <option value="Kewirausahaan">Kewirausahaan</option>
+                    </select>
+                </div>
             </div>
-            <div class="text-xs font-bold text-slate-700">Total Soal: <span id="bank-total-count" class="text-brand-600 font-extrabold">0</span></div>
+            <div class="text-xs font-bold text-slate-700">
+                Total Soal: <span id="bank-total-count" class="text-brand-700 font-extrabold">0</span>
+            </div>
         </div>
 
         <div class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
-            <table class="w-full text-left border-collapse text-xs">
-                <thead>
-                    <tr class="bg-slate-100 text-slate-700 font-bold border-b">
-                        <th class="p-3.5 text-center w-12">No</th>
-                        <th class="p-3.5">Subtes</th>
-                        <th class="p-3.5">Pertanyaan</th>
-                        <th class="p-3.5 text-center w-28">Kunci</th>
-                    </tr>
-                </thead>
-                <tbody id="bank-table-body" class="divide-y"></tbody>
-            </table>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                            <th class="p-3.5 text-center w-12">No</th>
+                            <th class="p-3.5">Subtes</th>
+                            <th class="p-3.5">Pertanyaan</th>
+                            <th class="p-3.5 text-center w-28">Kunci</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bank-table-body" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
         </div>
     </section>
 </main>
@@ -285,7 +379,7 @@
     <div class="bg-white rounded-3xl shadow-2xl p-6 max-w-sm w-full text-center">
         <h3 class="font-bold text-slate-800 text-lg mb-2">Akses Koordinator</h3>
         <form onsubmit="submitAdminAuth(event)">
-            <input type="password" id="admin-pin-input" placeholder="Masukkan PIN" required class="w-full px-4 py-2.5 text-center font-bold rounded-xl border border-slate-300 mb-4">
+            <input type="password" id="admin-pin-input" placeholder="Masukkan PIN" required class="w-full px-4 py-2.5 text-center font-bold text-lg rounded-xl border border-slate-300 mb-4">
             <div class="flex gap-2">
                 <button type="button" onclick="closeModal('modal-admin-auth')" class="flex-1 py-2.5 bg-slate-100 text-slate-700 font-semibold rounded-xl text-xs">Batal</button>
                 <button type="submit" class="flex-1 py-2.5 bg-brand-600 text-white font-bold rounded-xl text-xs">Buka Akses</button>
@@ -297,7 +391,7 @@
 <script>
     const ADMIN_PIN = "505609";
     let googleSheetsUrl = "https://script.google.com/macros/s/AKfycbwiHKzDQVN2KZ7Krgxm-EwYIQejeToE0Prxg00Vee1-_pkJlx8rHMPo92XmUU_hyBGrdw/exec";
-    
+
     let questionsData = [];
     let currentStudent = null;
     let currentExamQuestions = [];
@@ -305,6 +399,9 @@
     let bookmarkedQuestions = new Set();
     let currentQIndex = 0;
     let isAdminLoggedIn = false;
+    let violationCount = 0;
+    let examTimerInterval = null;
+    let remainingTimeSeconds = 0;
 
     function handleLogoError(img) {
         img.onerror = null;
@@ -320,7 +417,7 @@
     }
 
     function submitAdminAuth(e) {
-        if(e) e.preventDefault();
+        if (e) e.preventDefault();
         const pin = document.getElementById('admin-pin-input').value;
         if (pin === ADMIN_PIN) {
             isAdminLoggedIn = true;
@@ -363,6 +460,16 @@
         document.getElementById('student-login-card').style.display = 'block';
     }
 
+    function updateExamDurationDisplay() {
+        const subtest = document.getElementById('exam-subtest-filter').value;
+        const display = document.getElementById('exam-duration-display');
+        if (subtest === 'Bahasa Indonesia' || subtest === 'Matematika' || subtest === 'Bahasa Inggris') {
+            display.innerHTML = `<i class="fa-regular fa-clock text-brand-600"></i> 75 Menit`;
+        } else {
+            display.innerHTML = `<i class="fa-regular fa-clock text-brand-600"></i> 60 Menit`;
+        }
+    }
+
     function handleStartExam(e) {
         e.preventDefault();
         const subtest = document.getElementById('exam-subtest-filter').value;
@@ -380,14 +487,34 @@
 
         studentAnswers = {};
         currentQIndex = 0;
+        violationCount = 0;
 
         document.getElementById('student-prep-card').style.display = 'none';
         document.getElementById('cbt-screen').style.display = 'flex';
         document.getElementById('cbt-student-display').textContent = currentStudent.name;
         document.getElementById('cbt-subtest-display').textContent = subtest;
 
+        remainingTimeSeconds = (subtest === 'Bahasa Indonesia' || subtest === 'Matematika' || subtest === 'Bahasa Inggris') ? 75 * 60 : 60 * 60;
+        startTimer();
+
         renderQuestion();
         renderNav();
+    }
+
+    function startTimer() {
+        clearInterval(examTimerInterval);
+        examTimerInterval = setInterval(() => {
+            if (remainingTimeSeconds <= 0) {
+                clearInterval(examTimerInterval);
+                finishExam();
+                return;
+            }
+            remainingTimeSeconds--;
+            const hrs = Math.floor(remainingTimeSeconds / 3600);
+            const mins = Math.floor((remainingTimeSeconds % 3600) / 60);
+            const secs = remainingTimeSeconds % 60;
+            document.getElementById('exam-timer').textContent = `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }, 1000);
     }
 
     function renderQuestion() {
@@ -480,6 +607,7 @@
     }
 
     function finishExam() {
+        clearInterval(examTimerInterval);
         let score = 0;
         currentExamQuestions.forEach(q => {
             if (studentAnswers[q.id] === q.correct) score += (q.weight || 3);
