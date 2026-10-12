@@ -62,10 +62,10 @@
             background: #94a3b8;
         }
 
-        /* BACKGROUND DOODLE TEMATIK 6 JURUSAN SMKN 1 BULAKAMBA (STATIS, PADAT, RAPI) */
+        /* BACKGROUND DOODLE TEMATIK 6 JURUSAN SMKN 1 BULAKAMBA */
         .edu-doodle-bg {
             background-color: #f0f9ff;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='130' height='130' viewBox='0 0 130 130'%3E%3Cg fill='none' stroke='%230284c7' stroke-opacity='0.16' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3C!-- 1. TKR (Mobil) --%3E%3Cpath d='M10 24h18l5-8h16l5 8h10v14H10z'/%3E%3Ccircle cx='20' cy='38' r='4'/%3E%3Ccircle cx='48' cy='38' r='4'/%3E%3C!-- 2. TSM (Motor) --%3E%3Ccircle cx='80' cy='30' r='7'/%3E%3Ccircle cx='112' cy='30' r='7'/%3E%3Cpath d='M80 30l10-12h14l10 12M90 18l-5-5h-8'/%3E%3C!-- 3. TITL (Petir & Listrik) --%3E%3Cpath d='M25 65l10-14h-8l8-14-14 16h8z' fill='%230284c7' fill-opacity='0.12'/%3E%3C!-- 4. ATPH (Tanaman) --%3E%3Cpath d='M95 80c0-12 12-12 12 0-12 0-12 0-12 0zM95 80c0-10-10-10-10 0 10 0 10 0 10 0zM95 80v10'/%3E%3C!-- 5. TAV (Audio Radio) --%3E%3Crect x='12' y='96' width='24' height='16' rx='3'/%3E%3Cpath d='M18 96l-5-7M30 96l5-7'/%3E%3Ccircle cx='29' cy='104' r='3'/%3E%3C!-- 6. NKPI (Jangkar Kapal) --%3E%3Ccircle cx='98' cy='100' r='3'/%3E%3Cpath d='M98 103v18M92 108h12M86 115c0 8 24 8 24 0'/%3E%3C/g%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='130' height='130' viewBox='0 0 130 130'%3E%3Cg fill='none' stroke='%230284c7' stroke-opacity='0.16' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3C!-- 1. TKR --%3E%3Cpath d='M10 24h18l5-8h16l5 8h10v14H10z'/%3E%3Ccircle cx='20' cy='38' r='4'/%3E%3Ccircle cx='48' cy='38' r='4'/%3E%3C!-- 2. TSM --%3E%3Ccircle cx='80' cy='30' r='7'/%3E%3Ccircle cx='112' cy='30' r='7'/%3E%3Cpath d='M80 30l10-12h14l10 12M90 18l-5-5h-8'/%3E%3C!-- 3. TITL --%3E%3Cpath d='M25 65l10-14h-8l8-14-14 16h8z' fill='%230284c7' fill-opacity='0.12'/%3E%3C!-- 4. ATPH --%3E%3Cpath d='M95 80c0-12 12-12 12 0-12 0-12 0-12 0zM95 80c0-10-10-10-10 0 10 0 10 0 10 0zM95 80v10'/%3E%3C!-- 5. TAV --%3E%3Crect x='12' y='96' width='24' height='16' rx='3'/%3E%3Cpath d='M18 96l-5-7M30 96l5-7'/%3E%3Ccircle cx='29' cy='104' r='3'/%3E%3C!-- 6. NKPI --%3E%3Ccircle cx='98' cy='100' r='3'/%3E%3Cpath d='M98 103v18M92 108h12M86 115c0 8 24 8 24 0'/%3E%3C/g%3E%3C/svg%3E");
             background-repeat: repeat;
         }
     </style>
@@ -466,7 +466,7 @@
             </div>
         </div>
 
-        <!-- TOOLBAR: FILTER SUBTES + PENGATURAN TOKEN & ACAK SOAL/OPSI SEJAJAR -->
+        <!-- TOOLBAR: FILTER SUBTES + PENGATURAN TOKEN & ACAK SOAL/OPSI -->
         <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 flex flex-col xl:flex-row justify-between items-stretch xl:items-center gap-4">
             <div class="flex flex-wrap items-center gap-3.5">
                 <div>
@@ -973,7 +973,7 @@
 <script>
     // --- GLOBAL CONFIGURATION ---
     const ADMIN_PIN = "505609";
-    let googleSheetsUrl = "https://script.google.com/macros/s/AKfycbzY7QGF0AvmgOK_2zpCgSbFt-YhZgntiIDS9C2Fmwz7Tk1fHshtYfVA-ZtA11lLBNmDnw/exec";
+    let googleSheetsUrl = "https://script.google.com/macros/s/AKfycbwdEY9OPSmkkDBJ16bYk0mCP01zmIFBaX2WywllXeqpOlO1PBj1-con9i2m4d1R0xRELA/exec";
     let activeCbtToken = localStorage.getItem('cbt_active_token') || "TKA2026";
 
     // --- GLOBAL STATE VARIABLES ---
@@ -1224,7 +1224,6 @@
         renderBankTable();
     }
 
-    // --- HELPER UNTUK KATEGORI MATRIX (PG KOMPLEKS MATRIX) ---
     function getMatrixLabels(matrixType) {
         let col1 = 'Benar (B)';
         let col2 = 'Salah (S)';
@@ -1244,7 +1243,6 @@
         return { col1, col2 };
     }
 
-    // --- SHUFFLE UTILITIES ---
     function shuffleArray(array) {
         const arr = [...array];
         for (let i = arr.length - 1; i > 0; i--) {
