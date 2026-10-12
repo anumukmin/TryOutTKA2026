@@ -30,7 +30,7 @@
     <!-- Font Awesome Icons CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- KaTeX CSS & JS CDN -->
+    <!-- KaTeX CSS & JS CDN for Math Formula Rendering -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
@@ -70,7 +70,7 @@
         <div class="flex justify-between items-center h-16">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('tryout')">
                 <div class="bg-white/10 p-1 rounded-xl flex items-center justify-center w-11 h-11 border border-white/20 shadow overflow-hidden">
-                    <img src="https://raw.githubusercontent.com/anumukmin/tryout2026/fa43cda08e3610ca170f63a90d1d8caa37dc6d71/logo_smkn_1_bulakamba-removebg-preview.png" alt="Logo SMKN 1 Bulakamba" class="w-9 h-9 object-contain">
+                    <img src="https://raw.githubusercontent.com/anumukmin/tryout2026/fa43cda08e3610ca170f63a90d1d8caa37dc6d71/logo_smkn_1_bulakamba-removebg-preview.png" alt="Logo SMKN 1 Bulakamba" class="w-9 h-9 object-contain" onerror="handleLogoError(this)">
                 </div>
                 <div>
                     <h1 class="font-bold text-lg leading-tight">TRY OUT TKA 2026</h1>
@@ -79,108 +79,199 @@
             </div>
 
             <nav class="hidden md:flex space-x-2 items-center">
-                <button id="nav-login-btn" type="button" onclick="showAdminAuthModal()" class="px-4 py-2 rounded-lg text-sm font-semibold bg-amber-500 hover:bg-amber-600 text-slate-900 border border-amber-400 flex items-center gap-2 shadow">
+                <button id="nav-login-btn" type="button" onclick="showAdminAuthModal()" class="px-4 py-2 rounded-lg text-sm font-semibold transition duration-200 bg-amber-500 hover:bg-amber-600 text-slate-900 border border-amber-400 flex items-center gap-2 shadow">
                     <i class="fa-solid fa-user-lock"></i> Mode Koordinator
                 </button>
-                <button id="nav-bank" onclick="switchTab('bank')" style="display: none;" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 text-brand-100 flex items-center gap-2">
+
+                <button id="nav-bank" onclick="switchTab('bank')" style="display: none;" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition duration-200 hover:bg-brand-700 text-brand-100 flex items-center gap-2">
                     <i class="fa-solid fa-book-open"></i> Bank Soal & Input
                 </button>
-                <button id="nav-results" onclick="switchTab('results')" style="display: none;" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 text-brand-100 flex items-center gap-2">
+                <button id="nav-results" onclick="switchTab('results')" style="display: none;" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition duration-200 hover:bg-brand-700 text-brand-100 flex items-center gap-2">
                     <i class="fa-solid fa-square-poll-vertical"></i> Hasil Ujian (Cloud)
                 </button>
+
+                <div id="admin-badge" style="display: none;" class="ml-2 px-3 py-1.5 bg-amber-500/20 border border-amber-400 text-amber-300 rounded-lg text-xs font-semibold items-center gap-2">
+                    <i class="fa-solid fa-user-shield"></i> Mode Koordinator
+                    <button onclick="logoutAdmin()" title="Kunci Akses Koordinator" class="ml-1 text-slate-300 hover:text-white"><i class="fa-solid fa-right-from-bracket"></i></button>
+                </div>
             </nav>
         </div>
     </div>
 </header>
 
 <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
     <section id="tab-tryout" class="tab-content relative">
-        <div id="student-login-card" class="max-w-md mx-auto bg-white rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-8 my-8">
+        <!-- FORM LOGIN SISWA -->
+        <div id="student-login-card" class="max-w-md mx-auto bg-white rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-8 relative z-10 my-8">
             <div class="text-center mb-6">
-                <h2 class="text-2xl font-extrabold text-slate-800">TRY OUT TKA 2026</h2>
-                <p class="text-brand-600 font-bold text-xs uppercase mt-1">SMK NEGERI 1 BULAKAMBA</p>
+                <div class="inline-flex items-center justify-center p-3 bg-brand-50 border border-brand-100 rounded-2xl mb-3 shadow-xs">
+                    <img src="https://raw.githubusercontent.com/anumukmin/tryout2026/fa43cda08e3610ca170f63a90d1d8caa37dc6d71/logo_smkn_1_bulakamba-removebg-preview.png" alt="Logo SMKN 1 Bulakamba" class="w-16 h-16 object-contain" onerror="handleLogoError(this)">
+                </div>
+                <h2 class="text-2xl font-extrabold text-slate-800 tracking-tight">TRY OUT TKA 2026</h2>
+                <p class="text-brand-600 font-bold text-xs tracking-widest uppercase mt-1">SMK NEGERI 1 BULAKAMBA</p>
             </div>
+
             <form id="student-login-form" onsubmit="handleStudentLogin(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Username</label>
-                    <input type="text" id="login-username" required placeholder="Masukkan Username" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-semibold">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Username <span class="text-red-500">*</span></label>
+                    <input type="text" id="login-username" required placeholder="Masukkan Username" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none transition bg-white text-sm font-semibold text-slate-800">
                 </div>
+
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Password (6 Digit)</label>
-                    <input type="password" id="login-password" maxlength="6" required placeholder="Password Ujian" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-bold tracking-widest">
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Password (6 Digit Angka) <span class="text-red-500">*</span></label>
+                    <input type="password" id="login-password" maxlength="6" pattern="[0-9]{6}" required placeholder="Contoh: 849201" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none transition bg-white text-sm font-bold tracking-widest text-slate-800">
                 </div>
-                <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 rounded-xl text-sm">Masuk Ujian</button>
+
+                <div id="login-error-msg" class="hidden bg-rose-50 border border-rose-200 text-rose-700 px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-circle-exclamation text-rose-500"></i>
+                    <span id="login-error-text">Username atau password salah!</span>
+                </div>
+
+                <button type="submit" id="btn-login-student" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition duration-200 flex items-center justify-center gap-2 text-sm mt-2">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i> Masuk Ujian Try Out
+                </button>
             </form>
         </div>
 
+        <!-- PERSIAPAN SISWA -->
         <div id="student-prep-card" style="display: none;" class="max-w-2xl mx-auto bg-white rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-9">
-            <div class="space-y-4">
-                <h3 class="text-xl font-bold text-slate-800">Persiapan Ujian</h3>
+            <div class="bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-2xl p-4 mb-6 flex items-center justify-between">
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Pilih Subtes</label>
-                    <select id="exam-subtest-filter" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold">
+                    <span class="text-[10px] font-bold text-emerald-700 uppercase block">Status Login</span>
+                    <strong class="text-sm font-bold text-emerald-950">Terverifikasi di Sistem CBT</strong>
+                </div>
+                <button onclick="logoutStudent()" class="text-xs text-slate-500 hover:text-rose-600 font-semibold px-2.5 py-1 bg-white border rounded-lg transition">
+                    <i class="fa-solid fa-right-from-bracket"></i> Keluar
+                </button>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2 mb-6">
+                <div>
+                    <span class="text-xs text-slate-500 block">Nama Lengkap Siswa:</span>
+                    <strong id="student-display-name" class="text-lg font-extrabold text-slate-800">Nama Siswa</strong>
+                </div>
+                <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200">
+                    <div>
+                        <span class="text-[11px] text-slate-500 block">Jurusan:</span>
+                        <span id="student-display-major" class="font-bold text-xs text-brand-800">Teknik Kendaraan Ringan</span>
+                    </div>
+                    <div>
+                        <span class="text-[11px] text-slate-500 block">Kelas:</span>
+                        <span id="student-display-class" class="font-bold text-xs text-purple-800">XII TKR 1</span>
+                    </div>
+                </div>
+            </div>
+
+            <form onsubmit="handleStartExam(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Pilih Subtes / Mata Pelajaran <span class="text-red-500">*</span></label>
+                    <select id="exam-subtest-filter" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-semibold text-sm">
                         <option value="Bahasa Indonesia">Bahasa Indonesia</option>
                         <option value="Matematika">Matematika</option>
                         <option value="Bahasa Inggris">Bahasa Inggris</option>
                         <option value="Kewirausahaan">Kewirausahaan</option>
-                        <option value="Program Keahlian">Program Keahlian Jurusan</option>
+                        <option value="Program Keahlian">Program Keahlian Sesuai Jurusan</option>
                     </select>
                 </div>
+
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Token Ujian</label>
-                    <input type="text" id="exam-token-input" required placeholder="Token dari Pengawas" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-mono font-bold uppercase text-sm">
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Token Ujian <span class="text-red-500">*</span></label>
+                    <input type="text" id="exam-token-input" required placeholder="Contoh: TKA2026" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-mono font-bold uppercase text-sm tracking-widest">
                 </div>
-                <button onclick="handleStartExam(event)" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 rounded-xl text-base">Mulai Ujian Now</button>
+
+                <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition duration-200 flex items-center justify-center gap-2 text-base">
+                    <i class="fa-solid fa-play"></i> Mulai Ujian TKA Sekarang
+                </button>
+            </form>
+        </div>
+
+        <!-- LAYAR CBT SOAL -->
+        <div id="cbt-screen" style="display: none;" class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden flex flex-col min-h-[600px]">
+            <div class="bg-slate-900 text-white p-4 flex justify-between items-center sticky top-0 z-30">
+                <div>
+                    <span id="cbt-student-display" class="font-bold text-base sm:text-lg">Nama Siswa</span>
+                    <p id="cbt-subtest-display" class="text-xs text-slate-400">Subtes</p>
+                </div>
+                <div class="bg-slate-800 px-4 py-2 rounded-xl text-amber-300 font-mono text-lg font-bold" id="exam-timer">00:00:00</div>
+            </div>
+
+            <div class="flex-grow grid grid-cols-1 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-slate-200">
+                <div class="lg:col-span-3 p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between pb-4 mb-6 border-b border-slate-200">
+                            <span class="bg-brand-600 text-white font-black text-sm px-3.5 py-1.5 rounded-xl">
+                                Soal No. <span id="current-q-num">1</span>
+                            </span>
+                            <button id="bookmark-btn" onclick="toggleBookmark()" class="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50">
+                                <i class="fa-regular fa-bookmark"></i> Ragu-ragu
+                            </button>
+                        </div>
+
+                        <div id="q-stimulus-container" style="display: none;" class="mb-5 bg-amber-50 p-4 rounded-2xl border border-amber-200 text-slate-800 text-sm">
+                            <div id="q-stimulus-text" class="whitespace-pre-line text-slate-700"></div>
+                        </div>
+
+                        <div id="q-image-container" style="display: none;" class="mb-4 max-w-md mx-auto text-center">
+                            <img id="q-image" src="" alt="Gambar Soal" class="rounded-lg max-h-60 mx-auto object-contain">
+                        </div>
+
+                        <div id="q-text" class="text-slate-800 font-semibold text-base sm:text-lg leading-relaxed mb-6"></div>
+
+                        <div id="q-options" class="space-y-3"></div>
+                    </div>
+
+                    <div class="mt-8 pt-4 border-t border-slate-100 flex justify-between items-center">
+                        <button onclick="prevQuestion()" id="btn-prev-q" class="px-5 py-2.5 rounded-xl border border-slate-300 font-semibold hover:bg-slate-100">Sebelumnya</button>
+                        <button onclick="nextQuestion()" id="btn-next-q" class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold">Berikutnya</button>
+                        <button onclick="confirmSubmitExam()" id="btn-submit-q" style="display: none;" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold">Selesai & Kumpulkan</button>
+                    </div>
+                </div>
+
+                <div class="p-5 bg-slate-50 flex flex-col justify-between">
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-sm mb-3">Navigasi Soal</h4>
+                        <div id="q-grid-nav" class="grid grid-cols-5 gap-2 max-h-80 overflow-y-auto p-1 custom-scrollbar"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div id="cbt-screen" style="display: none;" class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden flex flex-col min-h-[600px]">
-            <div class="bg-slate-900 text-white p-4 flex justify-between items-center">
-                <div>
-                    <span id="cbt-student-display" class="font-bold text-lg">Siswa</span>
-                    <p id="cbt-subtest-display" class="text-xs text-slate-400">Subtes</p>
-                </div>
-                <div class="bg-slate-800 px-4 py-2 rounded-xl text-amber-300 font-mono text-xl font-bold" id="exam-timer">00:00:00</div>
+        <!-- REKAP HASIL -->
+        <div id="cbt-result-card" style="display: none;" class="max-w-2xl mx-auto bg-white rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-9 text-center">
+            <h3 class="text-2xl font-extrabold text-slate-800 mb-2">Hasil Try Out TKA</h3>
+            <p id="res-student-info" class="text-slate-600 text-sm mb-6">Nama Siswa</p>
+            <div class="bg-brand-900 text-white rounded-2xl p-6 mb-6">
+                <span class="text-xs uppercase tracking-widest text-brand-100">Nilai Akhir</span>
+                <div class="text-5xl font-black my-2" id="res-final-score">0</div>
             </div>
-            <div class="grid grid-cols-1 lg:grid-cols-4 p-6 gap-6">
-                <div class="lg:col-span-3">
-                    <div id="q-stimulus-container" style="display: none;" class="mb-4 p-4 bg-amber-50 border rounded-xl text-sm">
-                        <div id="q-stimulus-text" class="whitespace-pre-line"></div>
-                    </div>
-                    <div id="q-text" class="text-slate-800 font-semibold text-lg mb-6"></div>
-                    <div id="q-options" class="space-y-3"></div>
-                    <div class="mt-8 flex justify-between">
-                        <button onclick="prevQuestion()" id="btn-prev-q" class="px-5 py-2.5 bg-slate-200 rounded-xl font-bold">Sebelumnya</button>
-                        <button onclick="nextQuestion()" id="btn-next-q" class="px-5 py-2.5 bg-brand-600 text-white rounded-xl font-bold">Berikutnya</button>
-                        <button onclick="finishExam(false)" id="btn-submit-q" style="display: none;" class="px-6 py-2.5 bg-emerald-600 text-white rounded-xl font-bold">Selesai</button>
-                    </div>
-                </div>
-                <div class="bg-slate-50 p-4 rounded-xl border">
-                    <h4 class="font-bold text-sm mb-3">Navigasi Soal</h4>
-                    <div id="q-grid-nav" class="grid grid-cols-5 gap-2"></div>
-                </div>
-            </div>
+            <button onclick="location.reload()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-6 rounded-xl">Kembali ke Depan</button>
         </div>
     </section>
 
-    <section id="tab-bank" class="tab-content hidden space-y-4">
-        <div class="flex justify-between items-center bg-white p-4 rounded-2xl border">
-            <select id="bank-filter-subtest" onchange="renderBankTable()" class="p-2 border rounded-xl text-xs font-bold">
-                <option value="ALL">Semua Mata Pelajaran</option>
-                <option value="Bahasa Indonesia">Bahasa Indonesia</option>
-                <option value="Matematika">Matematika</option>
-                <option value="Bahasa Inggris">Bahasa Inggris</option>
-            </select>
-            <span class="text-xs font-bold">Total Soal: <strong id="bank-total-count">0</strong></span>
+    <!-- BANK SOAL KOORDINATOR -->
+    <section id="tab-bank" class="tab-content hidden space-y-6">
+        <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <select id="bank-filter-subtest" onchange="renderBankTable()" class="px-3 py-2 border rounded-xl text-xs font-semibold">
+                    <option value="ALL">Semua Mata Pelajaran</option>
+                    <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                    <option value="Matematika">Matematika</option>
+                    <option value="Bahasa Inggris">Bahasa Inggris</option>
+                    <option value="Kewirausahaan">Kewirausahaan</option>
+                </select>
+            </div>
+            <div class="text-xs font-bold text-slate-700">Total Soal: <span id="bank-total-count" class="text-brand-600 font-extrabold">0</span></div>
         </div>
-        <div class="bg-white rounded-2xl border overflow-hidden">
-            <table class="w-full text-left text-xs">
-                <thead class="bg-slate-100 border-b">
-                    <tr>
-                        <th class="p-3">No</th>
-                        <th class="p-3">Subtes</th>
-                        <th class="p-3">Pertanyaan</th>
-                        <th class="p-3 text-center">Kunci</th>
+
+        <div class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
+            <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                    <tr class="bg-slate-100 text-slate-700 font-bold border-b">
+                        <th class="p-3.5 text-center w-12">No</th>
+                        <th class="p-3.5">Subtes</th>
+                        <th class="p-3.5">Pertanyaan</th>
+                        <th class="p-3.5 text-center w-28">Kunci</th>
                     </tr>
                 </thead>
                 <tbody id="bank-table-body" class="divide-y"></tbody>
@@ -190,106 +281,183 @@
 </main>
 
 <!-- MODAL ADMIN AUTH -->
-<div id="modal-admin-auth" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60">
-    <div class="bg-white p-6 rounded-3xl max-w-sm w-full text-center">
-        <h3 class="font-bold text-lg mb-2">Akses Koordinator</h3>
-        <input type="password" id="admin-pin-input" placeholder="Masukkan PIN" class="w-full p-2.5 border rounded-xl text-center font-bold mb-4">
-        <button onclick="submitAdminAuth()" class="w-full bg-brand-600 text-white py-2 rounded-xl font-bold">Masuk</button>
+<div id="modal-admin-auth" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60">
+    <div class="bg-white rounded-3xl shadow-2xl p-6 max-w-sm w-full text-center">
+        <h3 class="font-bold text-slate-800 text-lg mb-2">Akses Koordinator</h3>
+        <form onsubmit="submitAdminAuth(event)">
+            <input type="password" id="admin-pin-input" placeholder="Masukkan PIN" required class="w-full px-4 py-2.5 text-center font-bold rounded-xl border border-slate-300 mb-4">
+            <div class="flex gap-2">
+                <button type="button" onclick="closeModal('modal-admin-auth')" class="flex-1 py-2.5 bg-slate-100 text-slate-700 font-semibold rounded-xl text-xs">Batal</button>
+                <button type="submit" class="flex-1 py-2.5 bg-brand-600 text-white font-bold rounded-xl text-xs">Buka Akses</button>
+            </div>
+        </form>
     </div>
 </div>
 
 <script>
     const ADMIN_PIN = "505609";
+    let googleSheetsUrl = "https://script.google.com/macros/s/AKfycbzqfuTeXpYp0o0ueBtq6Pl0DR_ElU8yr3FKZD4QTx5Zm7t8SlmyuYdR7Eooi6w_rE5Dlg/exec";
+    
     let questionsData = [];
+    let currentStudent = null;
     let currentExamQuestions = [];
     let studentAnswers = {};
+    let bookmarkedQuestions = new Set();
     let currentQIndex = 0;
-    let bankCurrentPage = 1;
-    const BANK_PER_PAGE = 200; // DIUBAH MENJADI 200 AGAR SELURUH SOAL TERBACA LENGKAP
+    let isAdminLoggedIn = false;
+
+    function handleLogoError(img) {
+        img.onerror = null;
+        img.src = 'https://placehold.co/100x100/0284c7/ffffff?text=SMKN1';
+    }
 
     function showAdminAuthModal() {
         document.getElementById('modal-admin-auth').style.display = 'flex';
     }
 
-    function submitAdminAuth() {
+    function closeModal(id) {
+        document.getElementById(id).style.display = 'none';
+    }
+
+    function submitAdminAuth(e) {
+        if(e) e.preventDefault();
         const pin = document.getElementById('admin-pin-input').value;
         if (pin === ADMIN_PIN) {
-            document.getElementById('modal-admin-auth').style.display = 'none';
+            isAdminLoggedIn = true;
+            closeModal('modal-admin-auth');
             document.getElementById('nav-bank').style.display = 'inline-flex';
+            document.getElementById('admin-badge').style.display = 'inline-flex';
+            document.getElementById('nav-login-btn').style.display = 'none';
             switchTab('bank');
         } else {
-            alert('PIN Salah!');
+            alert('PIN Koordinator Salah!');
         }
     }
 
-    function switchTab(tab) {
+    function switchTab(tabName) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-        document.getElementById('tab-' + tab).classList.remove('hidden');
-        if (tab === 'bank') renderBankTable();
+        document.getElementById('tab-' + tabName).classList.remove('hidden');
+        if (tabName === 'bank') renderBankTable();
     }
 
-    function sanitizeText(str) {
-        if (!str || typeof str !== 'string') return str || '';
-        return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    function logoutAdmin() {
+        isAdminLoggedIn = false;
+        document.getElementById('nav-bank').style.display = 'none';
+        document.getElementById('admin-badge').style.display = 'none';
+        document.getElementById('nav-login-btn').style.display = 'inline-flex';
+        switchTab('tryout');
     }
 
     function handleStudentLogin(e) {
         e.preventDefault();
+        const username = document.getElementById('login-username').value.trim();
+        currentStudent = { name: username.toUpperCase(), studentClass: 'XII', major: 'SMK' };
         document.getElementById('student-login-card').style.display = 'none';
         document.getElementById('student-prep-card').style.display = 'block';
+        document.getElementById('student-display-name').textContent = currentStudent.name;
+    }
+
+    function logoutStudent() {
+        currentStudent = null;
+        document.getElementById('student-prep-card').style.display = 'none';
+        document.getElementById('student-login-card').style.display = 'block';
     }
 
     function handleStartExam(e) {
         e.preventDefault();
         const subtest = document.getElementById('exam-subtest-filter').value;
+        const token = document.getElementById('exam-token-input').value.trim().toUpperCase();
+
+        if (token !== "TKA2026") {
+            alert("Token Ujian Salah! (Gunakan TKA2026)");
+            return;
+        }
+
         currentExamQuestions = questionsData.filter(q => q.category === subtest || subtest === 'Program Keahlian');
         if (currentExamQuestions.length === 0) {
-            currentExamQuestions = questionsData; // fallback
+            currentExamQuestions = questionsData;
         }
+
+        studentAnswers = {};
+        currentQIndex = 0;
+
         document.getElementById('student-prep-card').style.display = 'none';
         document.getElementById('cbt-screen').style.display = 'flex';
+        document.getElementById('cbt-student-display').textContent = currentStudent.name;
+        document.getElementById('cbt-subtest-display').textContent = subtest;
+
         renderQuestion();
         renderNav();
     }
 
     function renderQuestion() {
-        if (currentExamQuestions.length === 0) return;
+        if (!currentExamQuestions || currentExamQuestions.length === 0) return;
+
         const q = currentExamQuestions[currentQIndex];
-        document.getElementById('q-text').innerHTML = sanitizeText(q.question);
-        
-        const optBox = document.getElementById('q-options');
-        optBox.innerHTML = '';
+        document.getElementById('current-q-num').textContent = currentQIndex + 1;
+
+        const stimBox = document.getElementById('q-stimulus-container');
+        if (q.stimulus) {
+            document.getElementById('q-stimulus-text').textContent = q.stimulus;
+            stimBox.style.display = 'block';
+        } else {
+            stimBox.style.display = 'none';
+        }
+
+        document.getElementById('q-text').textContent = q.question;
+
+        const optContainer = document.getElementById('q-options');
+        optContainer.innerHTML = '';
+
         ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
             if (!q.options || !q.options[letter]) return;
             const isSelected = studentAnswers[q.id] === letter;
             const div = document.createElement('div');
-            div.className = `p-3 rounded-xl border cursor-pointer font-medium ${isSelected ? 'bg-brand-50 border-brand-500 font-bold' : 'bg-white'}`;
+            div.className = `p-4 rounded-2xl border cursor-pointer transition flex items-center gap-3 ${isSelected ? 'bg-brand-50 border-brand-500 font-bold shadow-xs' : 'bg-white border-slate-200 hover:bg-slate-50'}`;
             div.onclick = () => {
                 studentAnswers[q.id] = letter;
                 renderQuestion();
                 renderNav();
             };
-            div.innerHTML = `<b>${letter}.</b> ${sanitizeText(q.options[letter])}`;
-            optBox.appendChild(div);
+            div.innerHTML = `
+                <span class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-sm ${isSelected ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-600'}">${letter}</span>
+                <span class="flex-1 text-sm text-slate-800">${q.options[letter]}</span>
+            `;
+            optContainer.appendChild(div);
         });
 
         document.getElementById('btn-prev-q').disabled = (currentQIndex === 0);
         if (currentQIndex === currentExamQuestions.length - 1) {
             document.getElementById('btn-next-q').style.display = 'none';
-            document.getElementById('btn-submit-q').style.display = 'inline-block';
+            document.getElementById('btn-submit-q').style.display = 'inline-flex';
         } else {
-            document.getElementById('btn-next-q').style.display = 'inline-block';
+            document.getElementById('btn-next-q').style.display = 'inline-flex';
             document.getElementById('btn-submit-q').style.display = 'none';
+        }
+
+        if (window.renderMathInElement) {
+            renderMathInElement(document.getElementById('cbt-screen'), {
+                delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
+                throwOnError: false
+            });
         }
     }
 
     function renderNav() {
         const grid = document.getElementById('q-grid-nav');
+        if (!grid) return;
         grid.innerHTML = '';
+
         currentExamQuestions.forEach((q, idx) => {
+            const isAnswered = !!studentAnswers[q.id];
+            const isCurrent = idx === currentQIndex;
+
+            let bgClass = 'bg-white text-slate-700 border-slate-300';
+            if (isAnswered) bgClass = 'bg-brand-600 text-white border-brand-600 font-bold';
+            if (isCurrent) bgClass += ' ring-2 ring-brand-500 font-black';
+
             const btn = document.createElement('button');
-            const isAns = !!studentAnswers[q.id];
-            btn.className = `h-9 rounded-lg border font-bold text-xs ${idx === currentQIndex ? 'ring-2 ring-brand-500' : ''} ${isAns ? 'bg-brand-600 text-white' : 'bg-white'}`;
+            btn.className = `h-10 rounded-xl border text-xs flex items-center justify-center transition ${bgClass}`;
             btn.textContent = idx + 1;
             btn.onclick = () => { currentQIndex = idx; renderQuestion(); renderNav(); };
             grid.appendChild(btn);
@@ -299,31 +467,72 @@
     function nextQuestion() { if (currentQIndex < currentExamQuestions.length - 1) { currentQIndex++; renderQuestion(); renderNav(); } }
     function prevQuestion() { if (currentQIndex > 0) { currentQIndex--; renderQuestion(); renderNav(); } }
 
+    function toggleBookmark() {
+        if (bookmarkedQuestions.has(currentQIndex)) bookmarkedQuestions.delete(currentQIndex);
+        else bookmarkedQuestions.add(currentQIndex);
+        renderNav();
+    }
+
+    function confirmSubmitExam() {
+        if (confirm("Apakah Anda yakin ingin menyelesaikan ujian ini?")) {
+            finishExam();
+        }
+    }
+
+    function finishExam() {
+        let score = 0;
+        currentExamQuestions.forEach(q => {
+            if (studentAnswers[q.id] === q.correct) score += (q.weight || 3);
+        });
+
+        document.getElementById('cbt-screen').style.display = 'none';
+        document.getElementById('cbt-result-card').style.display = 'block';
+        document.getElementById('res-student-info').textContent = currentStudent.name;
+        document.getElementById('res-final-score').textContent = score;
+    }
+
     function renderBankTable() {
         const tbody = document.getElementById('bank-table-body');
         if (!tbody) return;
         const filterVal = document.getElementById('bank-filter-subtest').value;
         const filtered = filterVal === 'ALL' ? questionsData : questionsData.filter(q => q.category === filterVal);
-        document.getElementById('bank-total-count').textContent = filtered.length;
 
+        document.getElementById('bank-total-count').textContent = filtered.length;
         tbody.innerHTML = '';
+
         filtered.forEach((q, idx) => {
             const tr = document.createElement('tr');
+            tr.className = 'hover:bg-slate-50 border-b';
             tr.innerHTML = `
-                <td class="p-3 font-bold">${idx + 1}</td>
-                <td class="p-3">${q.category || '-'}</td>
-                <td class="p-3">${sanitizeText(q.question)}</td>
-                <td class="p-3 text-center font-bold text-emerald-600">${q.correct || '-'}</td>
+                <td class="p-3.5 text-center font-bold text-slate-500">${idx + 1}</td>
+                <td class="p-3.5 font-bold text-slate-700">${q.category}</td>
+                <td class="p-3.5 font-medium text-slate-800">${q.question}</td>
+                <td class="p-3.5 text-center font-bold text-emerald-600">${q.correct}</td>
             `;
             tbody.appendChild(tr);
         });
     }
 
+    function fetchQuestions() {
+        if (!googleSheetsUrl) return;
+        fetch(googleSheetsUrl)
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data) && data.length > 0) {
+                    questionsData = data;
+                    localStorage.setItem('tryout_bank_questions', JSON.stringify(data));
+                    renderBankTable();
+                }
+            })
+            .catch(() => {
+                const local = localStorage.getItem('tryout_bank_questions');
+                if (local) questionsData = JSON.parse(local);
+                renderBankTable();
+            });
+    }
+
     window.onload = function() {
-        const local = localStorage.getItem('tryout_bank_questions');
-        if (local) {
-            try { questionsData = JSON.parse(local); } catch(e) {}
-        }
+        fetchQuestions();
     };
 </script>
 </body>
