@@ -85,7 +85,7 @@
             </div>
 
             <nav class="hidden md:flex space-x-2 items-center">
-                <button id="nav-login-btn" onclick="openModal('modal-admin-auth')" class="px-4 py-2 rounded-lg text-sm font-semibold transition duration-200 bg-amber-500 hover:bg-amber-600 text-slate-900 border border-amber-400 flex items-center gap-2 shadow">
+                <button id="nav-login-btn" type="button" onclick="showAdminAuthModal()" class="px-4 py-2 rounded-lg text-sm font-semibold transition duration-200 bg-amber-500 hover:bg-amber-600 text-slate-900 border border-amber-400 flex items-center gap-2 shadow">
                     <i class="fa-solid fa-user-lock"></i> Mode Koordinator
                 </button>
 
@@ -111,7 +111,7 @@
     </div>
 
     <div id="mobile-menu" style="display: none;" class="md:hidden bg-brand-800 border-t border-brand-700 px-4 pt-2 pb-4 space-y-2">
-        <button id="mobile-login-btn" onclick="openModal('modal-admin-auth'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-md text-amber-300 bg-amber-500/20 font-medium flex items-center gap-2">
+        <button id="mobile-login-btn" type="button" onclick="showAdminAuthModal(); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-md text-amber-300 bg-amber-500/20 font-medium flex items-center gap-2">
             <i class="fa-solid fa-user-lock"></i> Mode Koordinator
         </button>
         <button id="mobile-nav-bank" onclick="switchTab('bank'); toggleMobileMenu();" style="display: none;" class="w-full text-left px-3 py-2 rounded-md text-white hover:bg-brand-700 flex items-center gap-2">
@@ -126,7 +126,7 @@
 <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
 
     <section id="tab-tryout" class="tab-content relative">
-        <!-- STUDENT LOGIN FORM -->
+        <!-- FORM LOGIN SISWA -->
         <div id="student-login-card" class="max-w-md mx-auto bg-white rounded-3xl shadow-xl border border-slate-200/80 p-6 sm:p-8 relative z-10 my-8">
             <div class="text-center mb-6">
                 <div class="inline-flex items-center justify-center p-3 bg-brand-50 border border-brand-100 rounded-2xl mb-3 shadow-xs">
@@ -172,7 +172,7 @@
             </form>
         </div>
 
-        <!-- STUDENT PREPARATION CARD -->
+        <!-- PERSIAPAN SISWA -->
         <div id="student-prep-card" style="display: none;" class="max-w-2xl mx-auto bg-white/95 backdrop-blur-md rounded-3xl shadow-xl border border-sky-100 p-6 sm:p-9 relative z-10 overflow-hidden edu-doodle-bg">
             <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-900 rounded-2xl p-4 mb-6 flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -261,7 +261,7 @@
             </form>
         </div>
 
-        <!-- CBT EXAM INTERFACE -->
+        <!-- LAYAR CBT SOAL -->
         <div id="cbt-screen" style="display: none;" class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden flex flex-col min-h-[600px]">
             <div class="bg-slate-900 text-white p-3.5 sm:p-5 flex flex-col sm:flex-row justify-between items-center gap-3 border-b border-slate-800 sticky top-0 z-30">
                 <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
@@ -388,7 +388,7 @@
             </div>
         </div>
 
-        <!-- EXAM RESULT SUMMARY CARD -->
+        <!-- REKAP HASIL SISWA -->
         <div id="cbt-result-card" style="display: none;" class="max-w-3xl mx-auto bg-white rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-9">
             <div class="text-center mb-6">
                 <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl shadow-inner">
@@ -440,7 +440,7 @@
         </div>
     </section>
 
-    <!-- QUESTION BANK SECTION -->
+    <!-- BANK SOAL KOORDINATOR -->
     <section id="tab-bank" class="tab-content hidden space-y-6">
         <div class="bg-gradient-to-r from-emerald-900 to-teal-900 text-white rounded-2xl p-5 shadow-lg border border-emerald-700">
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
@@ -559,7 +559,7 @@
         </div>
     </section>
 
-    <!-- RESULTS SECTION -->
+    <!-- HASIL UJIAN -->
     <section id="tab-results" class="tab-content hidden space-y-6">
         <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div>
@@ -665,7 +665,7 @@
     </div>
 </div>
 
-<!-- MODAL IMPORT -->
+<!-- MODAL IMPORT SOAL MASSAL -->
 <div id="modal-import-questions" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
     <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 p-6 sm:p-7 max-w-2xl w-full my-8 relative">
         <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
@@ -993,6 +993,23 @@
     const BANK_PER_PAGE = 50;
     let currentResultsPage = 1;
     const RESULTS_PER_PAGE = 50;
+
+    // FUNGSI KHUSUS UNTUK MEMBUKA MODAL MODE KOORDINATOR
+    function showAdminAuthModal() {
+        const modal = document.getElementById('modal-admin-auth');
+        if (modal) {
+            modal.style.display = 'flex';
+            const input = document.getElementById('admin-pin-input');
+            const errEl = document.getElementById('admin-pin-error');
+            if (input) {
+                input.value = '';
+                input.focus();
+            }
+            if (errEl) errEl.classList.add('hidden');
+        } else {
+            console.error('Modal admin-auth tidak ditemukan');
+        }
+    }
 
     function sanitizeMathFractionText(str) {
         if (!str || typeof str !== 'string') return str;
@@ -1859,7 +1876,7 @@
                             const ans = userAnswersObj[letter];
                             return `
                                 <tr>
-                                    <td class="p-3 font-semibold text-slate-700 ${optionFontSizeClass} option-text-target">${letter}.${optTextClean}</td>
+                                    <td class="p-3 font-semibold text-slate-700 ${optionFontSizeClass} option-text-target">${letter}. ${optTextClean}</td>
                                     <td class="p-3 text-center">
                                         <button type="button" onclick="setMatrixAnswer('${q.id}', '${letter}', 'B')" class="px-3 py-1.5 rounded-lg border font-bold text-xs transition ${ans === 'B' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white border-slate-300 text-slate-600 hover:bg-slate-100'}">${col1}</button>
                                     </td>
@@ -1947,3 +1964,983 @@
             renderQuestionGridNav();
         }
     }
+
+    function renderQuestionGridNav() {
+        const grid = document.getElementById('q-grid-nav');
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        currentExamQuestions.forEach((q, idx) => {
+            const isAnswered = studentAnswers[q.id] && studentAnswers[q.id] !== '{}';
+            const isBookmarked = bookmarkedQuestions.has(idx);
+            const isCurrent = idx === currentQIndex;
+
+            let bgClass = 'bg-white text-slate-700 border-slate-300';
+            if (isCurrent) bgClass += ' ring-2 ring-brand-500 font-extrabold';
+            if (isAnswered) bgClass = 'bg-brand-600 text-white border-brand-600 font-bold';
+            if (isBookmarked) bgClass = 'bg-amber-400 text-slate-900 border-amber-500 font-bold';
+
+            const btn = document.createElement('button');
+            btn.className = `h-10 rounded-xl border text-xs flex items-center justify-center transition shadow-xs ${bgClass}`;
+            btn.textContent = idx + 1;
+            btn.onclick = () => {
+                currentQIndex = idx;
+                saveActiveExamSession();
+                renderQuestion();
+                renderQuestionGridNav();
+            };
+            grid.appendChild(btn);
+        });
+    }
+
+    function confirmSubmitExam() {
+        showConfirm('Selesaikan Ujian', 'Apakah Anda yakin ingin menyelesaikan ujian dan mengumpulkan seluruh jawaban sekarang?', () => {
+            finishExam(false);
+        });
+    }
+
+    function finishExam(forced = false) {
+        isExamActive = false;
+        clearInterval(examTimerInterval);
+        window.onblur = null;
+        clearActiveExamSession();
+
+        let totalEarnedPoints = 0;
+        let totalMaxPoints = 0;
+
+        let perfectCount = 0;
+        let partialCount = 0;
+        let wrongCount = 0;
+        let emptyCount = 0;
+
+        const detailListEl = document.getElementById('res-detail-list');
+        if (detailListEl) detailListEl.innerHTML = '';
+
+        currentExamQuestions.forEach((q, idx) => {
+            const maxWeight = q.weight || 3;
+            totalMaxPoints += maxWeight;
+            let earned = 0;
+
+            if (q.type === 'pg') {
+                const userAns = studentAnswers[q.id];
+                if (!userAns) {
+                    emptyCount++;
+                } else if (userAns === q.correct) {
+                    earned = maxWeight;
+                    perfectCount++;
+                } else {
+                    wrongCount++;
+                }
+            } else if (q.type === 'pgk_checkbox') {
+                const userAns = studentAnswers[q.id] ? studentAnswers[q.id].split(',') : [];
+                const correctKeys = String(q.correct).split(',');
+
+                if (userAns.length === 0) {
+                    emptyCount++;
+                } else {
+                    let correctMatches = 0;
+                    userAns.forEach(k => {
+                        if (correctKeys.includes(k)) correctMatches++;
+                        else correctMatches = Math.max(0, correctMatches - 0.5);
+                    });
+                    earned = Math.max(0, (correctMatches / correctKeys.length) * maxWeight);
+
+                    if (earned === maxWeight) perfectCount++;
+                    else if (earned > 0) partialCount++;
+                    else wrongCount++;
+                }
+            } else if (q.type === 'pgk_matrix') {
+                const userObj = studentAnswers[q.id] ? JSON.parse(studentAnswers[q.id]) : {};
+                const keysArr = String(q.correct).split(',');
+                const letters = ['A', 'B', 'C', 'D', 'E'];
+                let numStatements = 0;
+                let numCorrectStatements = 0;
+
+                letters.forEach((lettr, lIdx) => {
+                    if (q.options && q.options[lettr]) {
+                        numStatements++;
+                        if (userObj[lettr] && userObj[lettr] === keysArr[lIdx]) {
+                            numCorrectStatements++;
+                        }
+                    }
+                });
+
+                if (Object.keys(userObj).length === 0) {
+                    emptyCount++;
+                } else {
+                    earned = (numCorrectStatements / numStatements) * maxWeight;
+                    if (earned === maxWeight) perfectCount++;
+                    else if (earned > 0) partialCount++;
+                    else wrongCount++;
+                }
+            }
+
+            totalEarnedPoints += earned;
+
+            if (detailListEl) {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200';
+                itemDiv.innerHTML = `
+                    <span><b>Soal No. ${idx + 1}</b> (${q.type === 'pg' ? 'PG Sederhana' : 'PG Kompleks'}):</span>
+                    <span class="font-bold ${earned === maxWeight ? 'text-emerald-600' : (earned > 0 ? 'text-amber-600' : 'text-rose-600')}">
+                        ${earned.toFixed(1)} / ${maxWeight} Poin
+                    </span>
+                `;
+                detailListEl.appendChild(itemDiv);
+            }
+        });
+
+        const finalScore100 = totalMaxPoints > 0 ? Math.round((totalEarnedPoints / totalMaxPoints) * 100) : 0;
+
+        document.getElementById('cbt-screen').style.display = 'none';
+        document.getElementById('cbt-result-card').style.display = 'block';
+        const globalFooter = document.getElementById('global-footer');
+        if (globalFooter) globalFooter.style.display = 'block';
+
+        document.getElementById('res-student-info').textContent = `${currentStudent.name} (${currentStudent.studentClass}) - ${currentStudent.major}`;
+        document.getElementById('res-date-info').textContent = `Waktu Selesai: ${new Date().toLocaleString('id-ID')}`;
+        document.getElementById('res-final-score').textContent = finalScore100;
+        document.getElementById('res-score-detail').textContent = `Poin Diperoleh: ${totalEarnedPoints.toFixed(1)} dari Maksimal ${totalMaxPoints} Poin`;
+
+        document.getElementById('res-correct-count').textContent = perfectCount;
+        document.getElementById('res-partial-count').textContent = partialCount;
+        document.getElementById('res-wrong-count').textContent = wrongCount;
+        document.getElementById('res-empty-count').textContent = emptyCount;
+
+        const resultObj = {
+            date: new Date().toISOString(),
+            studentName: currentStudent.name,
+            studentClass: currentStudent.studentClass,
+            studentMajor: currentStudent.major,
+            subtest: document.getElementById('exam-subtest-filter').value,
+            score: finalScore100,
+            correct: perfectCount,
+            wrong: wrongCount,
+            empty: emptyCount,
+            violations: violationCount
+        };
+
+        const existingResults = JSON.parse(localStorage.getItem('tryout_results') || '[]');
+        existingResults.unshift(resultObj);
+        localStorage.setItem('tryout_results', JSON.stringify(existingResults));
+
+        if (googleSheetsUrl) {
+            fetch(googleSheetsUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'SAVE_RESULT', result: resultObj })
+            }).catch(() => {});
+        }
+    }
+
+    function changeBankPage(direction) {
+        const filterVal = document.getElementById('bank-filter-subtest').value;
+        const filtered = filterVal === 'ALL' ? questionsData : questionsData.filter(q => q.category === filterVal);
+        const totalPages = Math.ceil(filtered.length / BANK_PER_PAGE) || 1;
+
+        bankCurrentPage += direction;
+        if (bankCurrentPage < 1) bankCurrentPage = 1;
+        if (bankCurrentPage > totalPages) bankCurrentPage = totalPages;
+        renderBankTable();
+    }
+
+    function renderBankTable() {
+        const tbody = document.getElementById('bank-table-body');
+        if (!tbody) return;
+
+        const filterVal = document.getElementById('bank-filter-subtest').value;
+        const filtered = filterVal === 'ALL' ? questionsData : questionsData.filter(q => q.category === filterVal);
+
+        const summaryContainer = document.getElementById('summary-badge-container');
+        if (summaryContainer) {
+            if (filterVal === 'ALL') {
+                summaryContainer.style.display = 'none';
+            } else {
+                summaryContainer.style.display = 'flex';
+                let totalWeight = 0;
+                filtered.forEach(q => totalWeight += (q.weight || 3));
+                document.getElementById('summary-total-q').textContent = filtered.length;
+                
+                const weightEl = document.getElementById('summary-total-weight');
+                if (weightEl) {
+                    weightEl.textContent = `${totalWeight} Poin`;
+
+                    if (totalWeight === 100) {
+                        summaryContainer.className = "px-3.5 py-2 bg-emerald-50 border border-emerald-300 text-emerald-900 rounded-xl text-xs font-bold flex items-center gap-2 self-end shadow-xs";
+                        weightEl.className = "text-emerald-700 font-extrabold";
+                    } else {
+                        summaryContainer.className = "px-3.5 py-2 bg-rose-50 border border-rose-300 text-rose-900 rounded-xl text-xs font-bold flex items-center gap-2 self-end shadow-xs";
+                        weightEl.className = "text-rose-700 font-extrabold";
+                    }
+                }
+            }
+        }
+
+        tbody.innerHTML = '';
+        if (filtered.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">Belum ada soal pada kategori ini.</td></tr>`;
+            updateBankPaginationControls(0);
+            return;
+        }
+
+        const totalItems = filtered.length;
+        const totalPages = Math.ceil(totalItems / BANK_PER_PAGE) || 1;
+
+        if (bankCurrentPage > totalPages) bankCurrentPage = totalPages;
+        if (bankCurrentPage < 1) bankCurrentPage = 1;
+
+        const startIndex = (bankCurrentPage - 1) * BANK_PER_PAGE;
+        const endIndex = Math.min(startIndex + BANK_PER_PAGE, totalItems);
+        const pageItems = filtered.slice(startIndex, endIndex);
+
+        pageItems.forEach((q, idx) => {
+            const globalNum = startIndex + idx + 1;
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
+
+            let typeStr = 'PG Sederhana';
+            let typeBadgeClass = 'bg-sky-100 text-sky-800 border-sky-200';
+            
+            if (q.type === 'pgk_checkbox') {
+                typeStr = 'PG Kompleks (MCMA)';
+                typeBadgeClass = 'bg-purple-100 text-purple-800 border-purple-200';
+            } else if (q.type === 'pgk_matrix') {
+                typeStr = 'PG Kompleks Kategori';
+                typeBadgeClass = 'bg-amber-100 text-amber-800 border-amber-200';
+            }
+
+            const cleanQText = sanitizeMathFractionText(q.question);
+
+            tr.innerHTML = `
+                <td class="p-3.5 text-center font-bold text-slate-500">${globalNum}</td>
+                <td class="p-3.5 font-bold text-slate-700">${q.category}</td>
+                <td class="p-3.5 text-center"><span class="px-2.5 py-1 rounded-lg font-bold text-[11px] border ${typeBadgeClass}">${typeStr}</span></td>
+                <td class="p-3.5 text-center font-bold text-amber-700">⭐ ${q.weight || 3} Poin</td>
+                <td class="p-3.5 font-medium text-slate-800 max-w-xs truncate">${cleanQText}</td>
+                <td class="p-3.5 text-center font-mono font-bold text-emerald-700">${q.correct}</td>
+                <td class="p-3.5 text-center space-x-1 whitespace-nowrap">
+                    <button onclick="previewQuestion('${q.id}')" title="Pratinjau Layar Siswa" class="px-2.5 py-1.5 bg-sky-100 hover:bg-sky-200 text-sky-900 rounded-lg font-semibold text-xs transition"><i class="fa-solid fa-eye"></i></button>
+                    <button onclick="editQuestion('${q.id}')" title="Edit Soal" class="px-2.5 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-lg font-semibold text-xs transition"><i class="fa-solid fa-pen"></i></button>
+                    <button onclick="deleteQuestion('${q.id}')" title="Hapus Soal" class="px-2.5 py-1.5 bg-rose-100 hover:bg-rose-200 text-rose-800 rounded-lg font-semibold text-xs transition"><i class="fa-solid fa-trash"></i></button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        updateBankPaginationControls(totalItems, startIndex + 1, endIndex, totalPages);
+    }
+
+    function updateBankPaginationControls(totalItems, rangeStart = 0, rangeEnd = 0, totalPages = 1) {
+        const totalCountEl = document.getElementById('bank-total-count');
+        if (totalCountEl) totalCountEl.textContent = totalItems;
+
+        const startEl = document.getElementById('bank-range-start');
+        if (startEl) startEl.textContent = totalItems > 0 ? rangeStart : 0;
+
+        const endEl = document.getElementById('bank-range-end');
+        if (endEl) endEl.textContent = totalItems > 0 ? rangeEnd : 0;
+
+        const indicatorEl = document.getElementById('bank-page-indicator');
+        if (indicatorEl) indicatorEl.textContent = `Halaman ${bankCurrentPage} / ${totalPages}`;
+
+        const prevBtn = document.getElementById('btn-bank-prev');
+        if (prevBtn) prevBtn.disabled = (bankCurrentPage <= 1);
+
+        const nextBtn = document.getElementById('btn-bank-next');
+        if (nextBtn) nextBtn.disabled = (bankCurrentPage >= totalPages || totalItems === 0);
+    }
+
+    function previewQuestion(qId) {
+        const q = questionsData.find(item => String(item.id) === String(qId));
+        if (!q) {
+            showAlert('Soal Tidak Ditemukan', 'Data soal dengan ID tersebut tidak ditemukan.', 'error');
+            return;
+        }
+
+        const metaEl = document.getElementById('prev-q-meta');
+        if (metaEl) metaEl.textContent = `Subtes: ${q.category || '-'} | ID: ${q.id}`;
+
+        const wEl = document.getElementById('prev-q-weight');
+        if (wEl) wEl.textContent = `${q.weight || 3} Poin`;
+
+        const badge = document.getElementById('prev-q-type-badge');
+        if (badge) {
+            if (q.type === 'pg') {
+                badge.textContent = 'Pilihan Ganda Sederhana';
+                badge.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-sky-100 text-sky-800 border border-sky-200';
+            } else if (q.type === 'pgk_checkbox') {
+                badge.textContent = 'Pilihan Ganda Kompleks (MCMA)';
+                badge.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-purple-100 text-purple-800 border border-purple-200';
+            } else {
+                badge.textContent = 'Pilihan Ganda Kompleks Kategori';
+                badge.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200';
+            }
+        }
+
+        const stimContainer = document.getElementById('prev-q-stimulus-container');
+        if (stimContainer) {
+            if (q.stimulus) {
+                const stimTxt = document.getElementById('prev-q-stimulus-text');
+                if (stimTxt) stimTxt.textContent = sanitizeMathFractionText(q.stimulus);
+                stimContainer.style.display = 'block';
+            } else {
+                stimContainer.style.display = 'none';
+            }
+        }
+
+        const imgContainer = document.getElementById('prev-q-image-container');
+        if (imgContainer) {
+            if (q.image) {
+                const prevImg = document.getElementById('prev-q-image');
+                if (prevImg) prevImg.src = formatGoogleDriveUrl(q.image);
+                imgContainer.style.display = 'block';
+            } else {
+                imgContainer.style.display = 'none';
+            }
+        }
+
+        const qTxt = document.getElementById('prev-q-text');
+        if (qTxt) qTxt.textContent = sanitizeMathFractionText(q.question);
+
+        const optContainer = document.getElementById('prev-q-options');
+        if (optContainer) {
+            optContainer.innerHTML = '';
+
+            if (q.type === 'pg') {
+                ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
+                    if (!q.options || !q.options[letter]) return;
+                    const isCorrect = q.correct === letter;
+                    const optTextClean = sanitizeMathFractionText(q.options[letter]);
+                    const div = document.createElement('div');
+                    div.className = `p-3.5 rounded-xl border flex items-center gap-3 text-xs ${isCorrect ? 'bg-emerald-50 border-emerald-400 font-bold text-emerald-950' : 'bg-white border-slate-200 text-slate-800'}`;
+                    div.innerHTML = `
+                        <span class="w-7 h-7 rounded-lg flex items-center justify-center font-bold ${isCorrect ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700'}">${letter}</span>
+                        <span class="flex-1">${optTextClean}</span>
+                        ${isCorrect ? '<span class="text-[10px] bg-emerald-200 text-emerald-800 font-bold px-2 py-0.5 rounded"><i class="fa-solid fa-check"></i> Kunci</span>' : ''}
+                    `;
+                    optContainer.appendChild(div);
+                });
+            } else if (q.type === 'pgk_checkbox') {
+                const keys = String(q.correct).split(',');
+                ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
+                    if (!q.options || !q.options[letter]) return;
+                    const isCorrect = keys.includes(letter);
+                    const optTextClean = sanitizeMathFractionText(q.options[letter]);
+                    const div = document.createElement('div');
+                    div.className = `p-3.5 rounded-xl border flex items-center gap-3 text-xs ${isCorrect ? 'bg-purple-50 border-purple-400 font-bold text-purple-950' : 'bg-white border-slate-200 text-slate-800'}`;
+                    div.innerHTML = `
+                        <span class="w-7 h-7 rounded-lg flex items-center justify-center font-bold ${isCorrect ? 'bg-purple-600 text-white' : 'bg-slate-100 text-slate-700'}">
+                            ${isCorrect ? '<i class="fa-solid fa-check"></i>' : letter}
+                        </span>
+                        <span class="flex-1">${optTextClean}</span>
+                        ${isCorrect ? '<span class="text-[10px] bg-purple-200 text-purple-800 font-bold px-2 py-0.5 rounded"><i class="fa-solid fa-check"></i> Kunci Benar</span>' : ''}
+                    `;
+                    optContainer.appendChild(div);
+                });
+            } else if (q.type === 'pgk_matrix') {
+                const { col1, col2 } = getMatrixLabels(q.matrixType || 'bs');
+                const keysArr = String(q.correct).split(',');
+
+                const table = document.createElement('table');
+                table.className = 'w-full text-left border-collapse border border-slate-200 text-xs rounded-xl overflow-hidden';
+                table.innerHTML = `
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-800 font-bold border-b border-slate-200">
+                            <th class="p-2.5">Pernyataan</th>
+                            <th class="p-2.5 w-24 text-center">${col1}</th>
+                            <th class="p-2.5 w-24 text-center">${col2}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        ${['A', 'B', 'C', 'D', 'E'].map((letter, idx) => {
+                            if (!q.options || !q.options[letter]) return '';
+                            const kVal = keysArr[idx] || 'B';
+                            const optTextClean = sanitizeMathFractionText(q.options[letter]);
+                            return `
+                                <tr>
+                                    <td class="p-2.5 font-semibold text-slate-700">${letter}.${optTextClean}</td>
+                                    <td class="p-2.5 text-center">
+                                        <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold ${kVal === 'B' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-400'}">${col1}</span>
+                                    </td>
+                                    <td class="p-2.5 text-center">
+                                        <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold ${kVal === 'S' ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-400'}">${col2}</span>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                `;
+                optContainer.appendChild(table);
+            }
+        }
+
+        const keyEl = document.getElementById('prev-q-key');
+        if (keyEl) keyEl.textContent = q.correct || '-';
+
+        const discEl = document.getElementById('prev-q-discussion');
+        if (discEl) discEl.textContent = q.discussion || 'Belum ada pembahasan.';
+
+        openModal('modal-preview-question');
+
+        if (window.renderMathInElement) {
+            const previewModal = document.getElementById('modal-preview-question');
+            if (previewModal) {
+                renderMathInElement(previewModal, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+    }
+
+    function syncFormOptionsWithKeyInputs() {
+        const valD = (document.getElementById('form-q-opt-D')?.value || '').trim();
+        const valE = (document.getElementById('form-q-opt-E')?.value || '').trim();
+
+        const pgOptD = document.getElementById('pg-opt-key-D');
+        const pgOptE = document.getElementById('pg-opt-key-E');
+        if (pgOptD) pgOptD.style.display = valD ? 'block' : 'none';
+        if (pgOptE) pgOptE.style.display = valE ? 'block' : 'none';
+
+        const cbLabelD = document.getElementById('cb-label-D');
+        const cbLabelE = document.getElementById('cb-label-E');
+        if (cbLabelD) cbLabelD.style.display = valD ? 'inline-flex' : 'none';
+        if (cbLabelE) cbLabelE.style.display = valE ? 'inline-flex' : 'none';
+
+        const matrixRowD = document.getElementById('matrix-row-D');
+        const matrixRowE = document.getElementById('matrix-row-E');
+        if (matrixRowD) matrixRowD.style.display = valD ? 'flex' : 'none';
+        if (matrixRowE) matrixRowE.style.display = valE ? 'flex' : 'none';
+    }
+
+    function toggleFormQuestionType() {
+        const type = document.getElementById('form-q-type').value;
+        const pgContainer = document.getElementById('key-input-pg');
+        const cbContainer = document.getElementById('key-input-checkbox');
+        const mxContainer = document.getElementById('key-input-matrix');
+
+        if (pgContainer) pgContainer.style.display = 'none';
+        if (cbContainer) cbContainer.style.display = 'none';
+        if (mxContainer) mxContainer.style.display = 'none';
+
+        if (type === 'pg' && pgContainer) pgContainer.style.display = 'block';
+        if (type === 'pgk_checkbox' && cbContainer) cbContainer.style.display = 'block';
+        if (type === 'pgk_matrix' && mxContainer) mxContainer.style.display = 'block';
+
+        syncFormOptionsWithKeyInputs();
+    }
+
+    function removeQuestionImage() {
+        const urlInput = document.getElementById('form-q-image-url');
+        const fileInput = document.getElementById('form-q-image-file');
+        const previewContainer = document.getElementById('image-upload-preview-container');
+        const previewImg = document.getElementById('image-upload-preview');
+
+        if (urlInput) urlInput.value = '';
+        if (fileInput) fileInput.value = '';
+        if (previewImg) previewImg.src = '';
+        if (previewContainer) previewContainer.style.display = 'none';
+    }
+
+    function showImagePreview(url) {
+        const previewContainer = document.getElementById('image-upload-preview-container');
+        const previewImg = document.getElementById('image-upload-preview');
+        if (previewImg) previewImg.src = url;
+        if (previewContainer) previewContainer.style.display = 'flex';
+    }
+
+    function handleUrlImagePreview() {
+        const urlInput = document.getElementById('form-q-image-url');
+        const val = urlInput ? urlInput.value.trim() : '';
+        if (val) {
+            showImagePreview(formatGoogleDriveUrl(val));
+        } else {
+            removeQuestionImage();
+        }
+    }
+
+    function handleImageFileUpload(event) {
+        const file = event.target ? event.target.files[0] : null;
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                const maxDim = 800;
+
+                if (width > maxDim || height > maxDim) {
+                    if (width > height) {
+                        height = Math.round((height * maxDim) / width);
+                        width = maxDim;
+                    } else {
+                        width = Math.round((width * maxDim) / height);
+                        height = maxDim;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                const urlInput = document.getElementById('form-q-image-url');
+                if (urlInput) urlInput.value = compressedBase64;
+                showImagePreview(compressedBase64);
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function updateMatrixKeyLabels() {
+        const typeSelect = document.getElementById('form-q-matrix-type');
+        if (!typeSelect) return;
+        const val = typeSelect.value;
+        const { col1, col2 } = getMatrixLabels(val);
+
+        ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
+            const sel = document.getElementById(`key_matrix_${letter}`);
+            if (sel) {
+                const currentVal = sel.value;
+                sel.innerHTML = `<option value="B">${col1}</option><option value="S">${col2}</option>`;
+                sel.value = currentVal || 'B';
+            }
+        });
+    }
+
+    function openQuestionModal(qId = null) {
+        const form = document.getElementById('question-form');
+        if (form) form.reset();
+        
+        const idInput = document.getElementById('form-q-id');
+        if (idInput) idInput.value = '';
+        
+        const modalTitle = document.getElementById('modal-q-title');
+        if (modalTitle) modalTitle.textContent = 'Tambah Soal TKA Baru';
+        
+        removeQuestionImage();
+        toggleFormQuestionType();
+
+        if (qId) {
+            const q = questionsData.find(item => String(item.id) === String(qId));
+            if (q) {
+                if (idInput) idInput.value = q.id;
+                
+                const catEl = document.getElementById('form-q-category');
+                if (catEl) catEl.value = q.category;
+                
+                const typeEl = document.getElementById('form-q-type');
+                if (typeEl) typeEl.value = q.type || 'pg';
+                
+                const weightEl = document.getElementById('form-q-weight');
+                if (weightEl) weightEl.value = q.weight || 3;
+                
+                const stimEl = document.getElementById('form-q-stimulus');
+                if (stimEl) stimEl.value = sanitizeMathFractionText(q.stimulus) || '';
+                
+                const textEl = document.getElementById('form-q-text');
+                if (textEl) textEl.value = sanitizeMathFractionText(q.question);
+                
+                if (q.image) {
+                    const imgUrl = formatGoogleDriveUrl(q.image);
+                    const urlInput = document.getElementById('form-q-image-url');
+                    if (urlInput) urlInput.value = q.image;
+                    showImagePreview(imgUrl);
+                }
+                
+                const optA = document.getElementById('form-q-opt-A'); if (optA) optA.value = q.options ? sanitizeMathFractionText(q.options.A || '') : '';
+                const optB = document.getElementById('form-q-opt-B'); if (optB) optB.value = q.options ? sanitizeMathFractionText(q.options.B || '') : '';
+                const optC = document.getElementById('form-q-opt-C'); if (optC) optC.value = q.options ? sanitizeMathFractionText(q.options.C || '') : '';
+                const optD = document.getElementById('form-q-opt-D'); if (optD) optD.value = q.options ? sanitizeMathFractionText(q.options.D || '') : '';
+                const optE = document.getElementById('form-q-opt-E'); if (optE) optE.value = q.options ? sanitizeMathFractionText(q.options.E || '') : '';
+
+                toggleFormQuestionType();
+
+                if (q.type === 'pg') {
+                    const corrPg = document.getElementById('form-q-correct-pg');
+                    if (corrPg) corrPg.value = q.correct || 'A';
+                } else if (q.type === 'pgk_checkbox') {
+                    const keys = String(q.correct).split(',');
+                    document.querySelectorAll('input[name="key_checkbox"]').forEach(cb => {
+                        cb.checked = keys.includes(cb.value);
+                    });
+                } else if (q.type === 'pgk_matrix') {
+                    const mxType = document.getElementById('form-q-matrix-type');
+                    if (mxType) mxType.value = q.matrixType || 'bs';
+                    updateMatrixKeyLabels();
+
+                    const keys = String(q.correct).split(',');
+                    if (keys[0] && document.getElementById('key_matrix_A')) document.getElementById('key_matrix_A').value = keys[0];
+                    if (keys[1] && document.getElementById('key_matrix_B')) document.getElementById('key_matrix_B').value = keys[1];
+                    if (keys[2] && document.getElementById('key_matrix_C')) document.getElementById('key_matrix_C').value = keys[2];
+                    if (keys[3] && document.getElementById('key_matrix_D')) document.getElementById('key_matrix_D').value = keys[3];
+                    if (keys[4] && document.getElementById('key_matrix_E')) document.getElementById('key_matrix_E').value = keys[4];
+                }
+
+                const discEl = document.getElementById('form-q-discussion');
+                if (discEl) discEl.value = q.discussion || '';
+                
+                if (modalTitle) modalTitle.textContent = 'Edit Soal TKA';
+            }
+        }
+
+        syncFormOptionsWithKeyInputs();
+        openModal('modal-question');
+    }
+
+    function saveQuestion(e) {
+        if (e) e.preventDefault();
+
+        const id = document.getElementById('form-q-id').value || 'q_' + Date.now();
+        const category = document.getElementById('form-q-category').value;
+        const type = document.getElementById('form-q-type').value;
+        const weight = parseInt(document.getElementById('form-q-weight').value) || 3;
+        const stimulus = document.getElementById('form-q-stimulus').value.trim() || null;
+        const question = document.getElementById('form-q-text').value.trim();
+        const rawImgUrl = document.getElementById('form-q-image-url').value.trim();
+        const image = formatImageUrl(rawImgUrl);
+
+        const options = {
+            A: document.getElementById('form-q-opt-A').value.trim(),
+            B: document.getElementById('form-q-opt-B').value.trim(),
+            C: document.getElementById('form-q-opt-C').value.trim(),
+            D: document.getElementById('form-q-opt-D').value.trim(),
+            E: document.getElementById('form-q-opt-E').value.trim(),
+        };
+
+        let correct = '';
+        let matrixType = 'bs';
+
+        if (type === 'pg') {
+            correct = document.getElementById('form-q-correct-pg').value;
+        } else if (type === 'pgk_checkbox') {
+            const checkedVals = [];
+            document.querySelectorAll('input[name="key_checkbox"]:checked').forEach(cb => checkedVals.push(cb.value));
+            correct = checkedVals.sort().join(',');
+        } else if (type === 'pgk_matrix') {
+            matrixType = document.getElementById('form-q-matrix-type').value || 'bs';
+            const a = document.getElementById('key_matrix_A').value;
+            const b = document.getElementById('key_matrix_B').value;
+            const c = document.getElementById('key_matrix_C').value;
+            const d = document.getElementById('key_matrix_D').value;
+            const eVal = document.getElementById('key_matrix_E').value;
+            correct = `${a},${b},${c},${d},${eVal}`;
+        }
+
+        const discussion = document.getElementById('form-q-discussion').value.trim();
+
+        const qObj = { id, category, type, matrixType, weight, stimulus, question, image, options, correct, discussion };
+
+        const existingIdx = questionsData.findIndex(item => String(item.id) === String(id));
+        if (existingIdx >= 0) {
+            questionsData[existingIdx] = qObj;
+        } else {
+            questionsData.push(qObj);
+        }
+
+        saveBankQuestions();
+        closeModal('modal-question');
+
+        if (googleSheetsUrl) {
+            fetch(googleSheetsUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'SAVE', question: qObj })
+            }).catch(() => {});
+        }
+    }
+
+    function editQuestion(id) {
+        openQuestionModal(id);
+    }
+
+    function deleteQuestion(id) {
+        showConfirm('Hapus Soal', 'Apakah Anda yakin ingin menghapus soal ini dari database?', () => {
+            questionsData = questionsData.filter(q => String(q.id) !== String(id));
+            saveBankQuestions();
+
+            if (googleSheetsUrl) {
+                fetch(googleSheetsUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'DELETE', id: id })
+                }).catch(() => {});
+            }
+        });
+    }
+
+    function openImportModal() {
+        document.getElementById('import-json-textarea').value = '';
+        openModal('modal-import-questions');
+    }
+
+    function processBulkImport() {
+        const rawJson = document.getElementById('import-json-textarea').value.trim();
+        const defaultCat = document.getElementById('import-default-category').value;
+
+        if (!rawJson) {
+            showAlert('Teks Kosong', 'Tempelkan format teks JSON soal terlebih dahulu!', 'error');
+            return;
+        }
+
+        try {
+            const parsedArr = JSON.parse(rawJson);
+            if (!Array.isArray(parsedArr)) {
+                showAlert('Format Salah', 'Format data harus berupa Array JSON [ {...}, {...} ]', 'error');
+                return;
+            }
+
+            let importedCount = 0;
+            parsedArr.forEach((qItem, idx) => {
+                if (qItem.question) {
+                    const newQ = {
+                        id: qItem.id || `q_imp_${Date.now()}_${idx}`,
+                        category: qItem.category || defaultCat,
+                        type: qItem.type || 'pg',
+                        weight: qItem.weight || 3,
+                        stimulus: qItem.stimulus || null,
+                        question: qItem.question,
+                        image: qItem.image || '',
+                        options: qItem.options || { A: 'Opsi A', B: 'Opsi B', C: 'Opsi C', D: 'Opsi D', E: 'Opsi E' },
+                        correct: qItem.correct || 'A',
+                        discussion: qItem.discussion || ''
+                    };
+                    questionsData.push(newQ);
+                    importedCount++;
+                }
+            });
+
+            saveBankQuestions();
+            closeModal('modal-import-questions');
+            showAlert('Import Berhasil', `Berhasil menambahkan ${importedCount} soal ke dalam bank soal!`, 'success');
+
+            if (googleSheetsUrl && importedCount > 0) {
+                fetch(googleSheetsUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'SYNC_ALL', questions: questionsData })
+                }).catch(() => {});
+            }
+        } catch(err) {
+            showAlert('Gagal Import', `Teks JSON tidak valid: ${err.message}`, 'error');
+        }
+    }
+
+    function connectAndAutoSyncSheets() {
+        const inputEl = document.getElementById('google-sheets-url');
+        const urlValue = inputEl ? inputEl.value.trim() : '';
+
+        if (!urlValue && !googleSheetsUrl) {
+            showAlert('URL Kosong', 'Masukkan URL Google Apps Script terlebih dahulu!', 'error');
+            return;
+        }
+
+        if (urlValue) {
+            googleSheetsUrl = urlValue;
+            localStorage.setItem('google_sheets_url', googleSheetsUrl);
+        }
+
+        const statusEl = document.getElementById('sheets-sync-status');
+        if (statusEl) {
+            statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-amber-300"></i> <span>Menghubungkan & Menarik Data dari Google Sheets...</span>`;
+        }
+
+        fetchCloudQuestions();
+        fetchCloudResults();
+    }
+
+    function fetchCloudQuestions() {
+        if (!googleSheetsUrl) return;
+        const cacheBusterUrl = googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
+        fetch(cacheBusterUrl)
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data) && data.length > 0) {
+                    questionsData = deduplicateQuestions(data);
+                    saveBankQuestions();
+                    const statusEl = document.getElementById('sheets-sync-status');
+                    if (statusEl) {
+                        statusEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-300"></i> <span>Tersambung ke Google Sheets (${questionsData.length} Soal Terisi)</span>`;
+                    }
+                }
+            })
+            .catch(err => console.log('Info: Menggunakan bank soal lokal', err));
+    }
+
+    function fetchCloudResults() {
+        if (!googleSheetsUrl) return;
+        const cacheBusterUrl = googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 'action=GET_RESULTS&t=' + Date.now();
+        
+        fetch(cacheBusterUrl)
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    resultsDataList = data;
+                    localStorage.setItem('tryout_results', JSON.stringify(data));
+                    updateResultsClassDropdown();
+                    currentResultsPage = 1;
+                    renderResultsTable();
+                }
+            })
+            .catch(err => {
+                console.log('Info: Menggunakan data rekap lokal', err);
+                resultsDataList = JSON.parse(localStorage.getItem('tryout_results') || '[]');
+                updateResultsClassDropdown();
+                renderResultsTable();
+            });
+    }
+
+    function updateResultsClassDropdown() {
+        const selectEl = document.getElementById('results-filter-class');
+        if (!selectEl) return;
+
+        const currentVal = selectEl.value;
+        const classesSet = new Set();
+        resultsDataList.forEach(r => {
+            if (r.studentClass) classesSet.add(r.studentClass);
+        });
+
+        selectEl.innerHTML = `<option value="ALL">Semua Kelas</option>`;
+        Array.from(classesSet).sort().forEach(cls => {
+            const opt = document.createElement('option');
+            opt.value = cls;
+            opt.textContent = cls;
+            selectEl.appendChild(opt);
+        });
+
+        selectEl.value = currentVal || 'ALL';
+    }
+
+    function renderResultsTable() {
+        const tbody = document.getElementById('results-table-body');
+        if (!tbody) return;
+
+        const classFilter = document.getElementById('results-filter-class')?.value || 'ALL';
+        const filteredResults = classFilter === 'ALL' 
+            ? resultsDataList 
+            : resultsDataList.filter(r => r.studentClass === classFilter);
+
+        if (filteredResults.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="9" class="p-6 text-center text-slate-400">Belum ada data rekap ujian. Klik "Sinkronkan Hasil Cloud" untuk menarik data dari Google Sheets.</td></tr>`;
+            updateResultsPaginationControls(0);
+            return;
+        }
+
+        const totalItems = filteredResults.length;
+        const totalPages = Math.ceil(totalItems / RESULTS_PER_PAGE) || 1;
+
+        if (currentResultsPage > totalPages) currentResultsPage = totalPages;
+        if (currentResultsPage < 1) currentResultsPage = 1;
+
+        const startIndex = (currentResultsPage - 1) * RESULTS_PER_PAGE;
+        const endIndex = Math.min(startIndex + RESULTS_PER_PAGE, totalItems);
+        const pageItems = filteredResults.slice(startIndex, endIndex);
+
+        tbody.innerHTML = '';
+
+        pageItems.forEach((res, idx) => {
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
+
+            const globalNum = startIndex + idx + 1;
+            const dateDisplay = res.date && res.date.includes('T') ? new Date(res.date).toLocaleString('id-ID') : (res.date || '-');
+
+            tr.innerHTML = `
+                <td class="p-3.5 text-center font-bold text-slate-500">${globalNum}</td>
+                <td class="p-3.5 text-slate-500">${dateDisplay}</td>
+                <td class="p-3.5 font-bold text-slate-800">${res.studentName || '-'}</td>
+                <td class="p-3.5 font-semibold text-brand-700">${res.studentClass || '-'}</td>
+                <td class="p-3.5 text-slate-600">${res.studentMajor || '-'}</td>
+                <td class="p-3.5 text-slate-600">${res.subtest || '-'}</td>
+                <td class="p-3.5 text-center"><strong class="text-brand-700 text-sm">${res.score || 0}</strong></td>
+                <td class="p-3.5 text-center"><span class="${(res.violations || 0) > 0 ? 'text-rose-600 font-bold' : 'text-slate-400'}">${res.violations || 0}</span></td>
+                <td class="p-3.5 text-center no-print">
+                    <button onclick="deleteSingleResult('${res.studentName}', '${res.subtest}')" title="Hapus Hasil Siswa Ini" class="px-2.5 py-1.5 bg-rose-100 hover:bg-rose-200 text-rose-800 rounded-lg font-semibold text-xs transition">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </td>
+            `;
+
+            tbody.appendChild(tr);
+        });
+
+        updateResultsPaginationControls(totalItems, startIndex + 1, endIndex, totalPages);
+    }
+
+    function updateResultsPaginationControls(totalItems, rangeStart = 0, rangeEnd = 0, totalPages = 1) {
+        document.getElementById('results-total-count').textContent = totalItems;
+        document.getElementById('results-range-start').textContent = totalItems > 0 ? rangeStart : 0;
+        document.getElementById('results-range-end').textContent = totalItems > 0 ? rangeEnd : 0;
+
+        document.getElementById('results-page-indicator').textContent = `Halaman ${currentResultsPage} / ${totalPages}`;
+
+        document.getElementById('btn-results-prev').disabled = (currentResultsPage <= 1);
+        document.getElementById('btn-results-next').disabled = (currentResultsPage >= totalPages || totalItems === 0);
+    }
+
+    function changeResultsPage(direction) {
+        const classFilter = document.getElementById('results-filter-class')?.value || 'ALL';
+        const filteredResults = classFilter === 'ALL' 
+            ? resultsDataList 
+            : resultsDataList.filter(r => r.studentClass === classFilter);
+
+        const totalPages = Math.ceil(filteredResults.length / RESULTS_PER_PAGE) || 1;
+        currentResultsPage += direction;
+        if (currentResultsPage < 1) currentResultsPage = 1;
+        if (currentResultsPage > totalPages) currentResultsPage = totalPages;
+        renderResultsTable();
+    }
+
+    function deleteSingleResult(studentName, subtest) {
+        showConfirm('Hapus Rekap', `Apakah Anda yakin ingin menghapus data rekap ujian dari "${studentName}" (${subtest})?`, () => {
+            resultsDataList = resultsDataList.filter(r => !(r.studentName === studentName && r.subtest === subtest));
+            localStorage.setItem('tryout_results', JSON.stringify(resultsDataList));
+            updateResultsClassDropdown();
+            renderResultsTable();
+
+            if (googleSheetsUrl) {
+                fetch(googleSheetsUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'DELETE_RESULT', studentName: studentName, subtest: subtest })
+                }).catch(err => console.warn('Gagal menghapus rekap di Google Sheets:', err));
+            }
+        });
+    }
+
+    function printResultsReport() {
+        window.print();
+    }
+
+    window.onload = function() {
+        loadBankQuestions();
+        updateExamDurationDisplay();
+        updateNavUI();
+
+        const inputEl = document.getElementById('google-sheets-url');
+        if (inputEl) {
+            inputEl.value = googleSheetsUrl || '';
+        }
+
+        loadSubtestSettingsToForm();
+
+        if (googleSheetsUrl) {
+            fetchCloudQuestions();
+        }
+    };
+</script>
+</body>
+</html>
