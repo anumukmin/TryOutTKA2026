@@ -62,14 +62,15 @@
             background: #94a3b8;
         }
 
-        /* BACKGROUND DOODLE TEMATIK 6 JURUSAN SMKN 1 BULAKAMBA */
+        /* BACKGROUND DOODLE TEMATIK 6 JURUSAN SMKN 1 BULAKAMBA (STATIS, PADAT, RAPI) */
         .edu-doodle-bg {
             background-color: #f0f9ff;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Cg fill='none' stroke='%230284c7' stroke-opacity='0.16' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3C!-- 1. Mobil TKR --%3E%3Cpath d='M15 38h28l8-12h25l8 12h13v16H15z'/%3E%3Ccircle cx='30' cy='54' r='6'/%3E%3Ccircle cx='70' cy='54' r='6'/%3E%3C!-- 2. Motor TSM --%3E%3Ccircle cx='140' cy='45' r='11'/%3E%3Ccircle cx='190' cy='45' r='11'/%3E%3Cpath d='M140 45l15-18h20l15 18M155 27l-8-8h-10'/%3E%3C!-- 3. Petir TITL --%3E%3Cpath d='M35 110l15-20h-12l10-18-20 22h12z' fill='%230284c7' fill-opacity='0.10'/%3E%3C!-- 4. Tanaman ATPH --%3E%3Cpath d='M100 130c0-20 20-20 20 0-20 0-20 0-20 0zM100 130c0-15-15-15-15 0 15 0 15 0 15 0zM100 130v15'/%3E%3C!-- 5. Jangkar NKPI --%3E%3Ccircle cx='175' cy='95' r='4'/%3E%3Cpath d='M175 99v30M165 107h20M158 118c0 14 34 14 34 0'/%3E%3C!-- 6. Radio TAV --%3E%3Crect x='20' y='170' width='36' height='24' rx='4'/%3E%3Cpath d='M28 170l-8-10M48 170l8-10'/%3E%3Ccircle cx='46' cy='182' r='4'/%3E%3C!-- 7. Topi Toga TKA --%3E%3Cpath d='M130 185l20-8 20 8-20 8zM130 185v10c0 4 9 7 20 7s20-3 20-7v-10'/%3E%3C/g%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='130' height='130' viewBox='0 0 130 130'%3E%3Cg fill='none' stroke='%230284c7' stroke-opacity='0.16' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3C!-- 1. TKR (Mobil) --%3E%3Cpath d='M10 24h18l5-8h16l5 8h10v14H10z'/%3E%3Ccircle cx='20' cy='38' r='4'/%3E%3Ccircle cx='48' cy='38' r='4'/%3E%3C!-- 2. TSM (Motor) --%3E%3Ccircle cx='80' cy='30' r='7'/%3E%3Ccircle cx='112' cy='30' r='7'/%3E%3Cpath d='M80 30l10-12h14l10 12M90 18l-5-5h-8'/%3E%3C!-- 3. TITL (Petir & Listrik) --%3E%3Cpath d='M25 65l10-14h-8l8-14-14 16h8z' fill='%230284c7' fill-opacity='0.12'/%3E%3C!-- 4. ATPH (Tanaman) --%3E%3Cpath d='M95 80c0-12 12-12 12 0-12 0-12 0-12 0zM95 80c0-10-10-10-10 0 10 0 10 0 10 0zM95 80v10'/%3E%3C!-- 5. TAV (Audio Radio) --%3E%3Crect x='12' y='96' width='24' height='16' rx='3'/%3E%3Cpath d='M18 96l-5-7M30 96l5-7'/%3E%3Ccircle cx='29' cy='104' r='3'/%3E%3C!-- 6. NKPI (Jangkar Kapal) --%3E%3Ccircle cx='98' cy='100' r='3'/%3E%3Cpath d='M98 103v18M92 108h12M86 115c0 8 24 8 24 0'/%3E%3C/g%3E%3C/svg%3E");
+            background-repeat: repeat;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between bg-slate-100">
+<body class="min-h-screen flex flex-col justify-between bg-slate-100 edu-doodle-bg">
 
 <header class="bg-brand-900 text-white shadow-lg sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -127,7 +128,7 @@
 
     <section id="tab-tryout" class="tab-content relative">
         <!-- 1A. STUDENT LOGIN FORM (SIMPLE & ELEGANT CENTERED CARD) -->
-        <div id="student-login-card" class="max-w-md mx-auto bg-white rounded-3xl shadow-xl border border-slate-200/80 p-6 sm:p-8 relative z-10">
+        <div id="student-login-card" class="max-w-md mx-auto bg-white rounded-3xl shadow-xl border border-slate-200/80 p-6 sm:p-8 relative z-10 my-8">
             <div class="text-center mb-6">
                 <div class="inline-flex items-center justify-center p-3 bg-brand-50 border border-brand-100 rounded-2xl mb-3 shadow-xs">
                     <img src="https://raw.githubusercontent.com/anumukmin/tryout2026/fa43cda08e3610ca170f63a90d1d8caa37dc6d71/logo_smkn_1_bulakamba-removebg-preview.png" alt="Logo SMKN 1 Bulakamba" class="w-16 h-16 object-contain" onerror="handleLogoError(this)">
