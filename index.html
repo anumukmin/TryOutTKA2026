@@ -972,8 +972,7 @@
 
 <script>
     // --- GLOBAL CONFIGURATION ---
-    const ADMIN_PIN = "505609";
-    let googleSheetsUrl = "https://script.google.com/macros/s/AKfycbwDVLDC6D9sjgtC-5xJ0yyL-QaiEVjZFR7dC5etL8OaPQoBhuN9QNSAlKu6GOv7N_vyNA/exec";
+    let googleSheetsUrl = "https://script.google.com/macros/s/AKfycbw7c-goODEFvRjHdilhSqkE8Ing81J_26MJ4_8V3aCXHw7-oyIgtFQvLPxgt2o2Hs2baQ/exec";
     let activeCbtToken = localStorage.getItem('cbt_active_token') || "TKA2026";
 
     // --- GLOBAL STATE VARIABLES ---
@@ -1066,23 +1065,48 @@
         e.preventDefault();
         const pinInput = document.getElementById('admin-pin-input');
         const errEl = document.getElementById('admin-pin-error');
+        const btn = document.getElementById('admin-pin-btn');
         if (!pinInput) return;
 
-        if (pinInput.value === ADMIN_PIN) {
-            isAdminLoggedIn = true;
-            closeModal('modal-admin-auth');
-            pinInput.value = '';
-            if (errEl) errEl.classList.add('hidden');
-            updateNavUI();
-            switchTab('bank');
-        } else {
+        const typedPin = pinInput.value.trim();
+
+        btn.disabled = true;
+        btn.textContent = "Memeriksa...";
+
+        fetch(googleSheetsUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'VERIFY_PIN', pin: typedPin })
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.disabled = false;
+            btn.textContent = "Buka Akses";
+
+            if (data.status === 'success') {
+                isAdminLoggedIn = true;
+                sessionStorage.setItem('coordinator_pin', typedPin); // Simpan sementara di session
+                closeModal('modal-admin-auth');
+                pinInput.value = '';
+                if (errEl) errEl.classList.add('hidden');
+                updateNavUI();
+                switchTab('bank');
+            } else {
+                if (errEl) {
+                    errEl.textContent = data.message || 'PIN Koordinator salah!';
+                    errEl.classList.remove('hidden');
+                }
+            }
+        })
+        .catch(err => {
+            btn.disabled = false;
+            btn.textContent = "Buka Akses";
             if (errEl) {
-                errEl.textContent = 'PIN Koordinator salah!';
+                errEl.textContent = 'Gagal terhubung ke server untuk verifikasi PIN.';
                 errEl.classList.remove('hidden');
             }
-        }
+        });
     }
-
     function formatGoogleDriveUrl(url) {
         if (!url) return '';
         if (url.includes('drive.google.com') && url.includes('/d/')) {
@@ -1960,93 +1984,65 @@ if (window.renderMathInElement) {
         }
     }
 
-  function finishExam(forced = false) {
+ function finishExam(forced = false) {
         isExamActive = false;
         clearInterval(examTimerInterval);
         window.onblur = null;
         clearActiveExamSession();
 
-        let totalEarnedPoints = 0;
-        let totalMaxPoints = 0;
-
-        let perfectCount = 0;
-        let partialCount = 0;
-        let wrongCount = 0;
-        let emptyCount = 0;
-
-        currentExamQuestions.forEach((q, idx) => {
-            const maxWeight = q.weight || 3;
-            totalMaxPoints += maxWeight;
-            let earned = 0;
-
-            if (q.type === 'pg') {
-                const userAns = studentAnswers[q.id];
-                if (!userAns) {
-                    emptyCount++;
-                } else if (userAns === q.correct) {
-                    earned = maxWeight;
-                    perfectCount++;
-                } else {
-                    wrongCount++;
-                }
-            } else if (q.type === 'pgk_checkbox') {
-                const userAns = studentAnswers[q.id] ? studentAnswers[q.id].split(',') : [];
-                const correctKeys = String(q.correct).split(',');
-
-                if (userAns.length === 0) {
-                    emptyCount++;
-                } else {
-                    let correctMatches = 0;
-                    userAns.forEach(k => {
-                        if (correctKeys.includes(k)) correctMatches++;
-                        else correctMatches = Math.max(0, correctMatches - 0.5);
-                    });
-                    earned = Math.max(0, (correctMatches / correctKeys.length) * maxWeight);
-
-                    if (earned === maxWeight) perfectCount++;
-                    else if (earned > 0) partialCount++;
-                    else wrongCount++;
-                }
-            } else if (q.type === 'pgk_matrix') {
-                const userObj = studentAnswers[q.id] ? JSON.parse(studentAnswers[q.id]) : {};
-                const keysArr = String(q.correct).split(',');
-                const letters = ['A', 'B', 'C', 'D', 'E'];
-                let numStatements = 0;
-                let numCorrectStatements = 0;
-
-                letters.forEach((lettr, lIdx) => {
-                    if (q.options && q.options[lettr]) {
-                        numStatements++;
-                        if (userObj[lettr] && userObj[lettr] === keysArr[lIdx]) {
-                            numCorrectStatements++;
-                        }
-                    }
-                });
-
-                if (Object.keys(userObj).length === 0) {
-                    emptyCount++;
-                } else {
-                    earned = (numCorrectStatements / numStatements) * maxWeight;
-                    if (earned === maxWeight) perfectCount++;
-                    else if (earned > 0) partialCount++;
-                    else wrongCount++;
-                }
-            }
-
-            totalEarnedPoints += earned;
-        });
-
-        const finalScore100 = totalMaxPoints > 0 ? Math.round((totalEarnedPoints / totalMaxPoints) * 100) : 0;
-
+        // Tampilkan indikator loading / proses penilaian di server
         document.getElementById('cbt-screen').style.display = 'none';
+        
+        const subtestVal = document.getElementById('exam-subtest-filter').value;
+
+        // Payload jawaban siswa yang dikirim ke server Apps Script
+        const submitPayload = {
+            action: 'SUBMIT_EXAM',
+            username: currentStudent.username,
+            studentName: currentStudent.name,
+            studentClass: currentStudent.studentClass,
+            studentMajor: currentStudent.major,
+            subtest: subtestVal,
+            answers: studentAnswers,
+            violations: violationCount
+        };
+
+        if (googleSheetsUrl) {
+            // Gunakan fetch biasa dengan membaca response JSON (Bukan no-cors)
+            fetch(googleSheetsUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(submitPayload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Tampilkan nilai akhir yang dihitung langsung oleh server
+                    showResultCardUI(data.score);
+                } else {
+                    showAlert('Gagal Submit', data.message || 'Gagal menyimpan hasil ke server.', 'error');
+                }
+            })
+            .catch(err => {
+                console.error('Error Submit:', err);
+                showAlert('Gangguan Koneksi', 'Gagal terhubung ke server. Silakan hubungi pengawas ruang!', 'error');
+            });
+        } else {
+            // Fallback offline jika URL Apps Script belum terpasang
+            showResultCardUI(0);
+        }
+    }
+
+    // Helper untuk menampilkan kartu nilai akhir
+    function showResultCardUI(score) {
         document.getElementById('cbt-result-card').style.display = 'block';
         const globalFooter = document.getElementById('global-footer');
         if (globalFooter) globalFooter.style.display = 'block';
 
         document.getElementById('res-student-info').textContent = `${currentStudent.name} (${currentStudent.studentClass}) - ${currentStudent.major}`;
         document.getElementById('res-date-info').textContent = `Waktu Selesai: ${new Date().toLocaleString('id-ID')}`;
-        document.getElementById('res-final-score').textContent = finalScore100;
-
+        document.getElementById('res-final-score').textContent = score;
+    }
         const resultObj = {
             date: new Date().toISOString(),
             studentName: currentStudent.name,
@@ -2665,7 +2661,7 @@ if (window.renderMathInElement) {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'SYNC_ALL', pin: ADMIN_PIN, questions: questionsData })
+        body: JSON.stringify({ action: 'SYNC_ALL', pin: sessionStorage.getItem('coordinator_pin') || '', questions: questionsData })
     }).catch(() => {});
 }
         } catch(err) {
@@ -2877,7 +2873,7 @@ if (window.renderMathInElement) {
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({ 
                         action: 'DELETE_RESULT', 
-                        pin: ADMIN_PIN, 
+                        pin: sessionStorage.getItem('coordinator_pin') || '', 
                         studentName: studentName, 
                         subtest: subtest 
                     })
