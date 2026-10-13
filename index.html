@@ -2687,14 +2687,14 @@ if (window.renderMathInElement) {
             closeModal('modal-import-questions');
             showAlert('Import Berhasil', `Berhasil menambahkan ${importedCount} soal ke dalam bank soal!`, 'success');
 
-            if (googleSheetsUrl && importedCount > 0) {
-                fetch(googleSheetsUrl, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: 'SYNC_ALL', questions: questionsData })
-                }).catch(() => {});
-            }
+           if (googleSheetsUrl && importedCount > 0) {
+    fetch(googleSheetsUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'SYNC_ALL', pin: ADMIN_PIN, questions: questionsData })
+    }).catch(() => {});
+}
         } catch(err) {
             showAlert('Gagal Import', `Teks JSON tidak valid: ${err.message}`, 'error');
         }
@@ -2723,23 +2723,29 @@ if (window.renderMathInElement) {
         fetchCloudResults();
     }
 
-    function fetchCloudQuestions() {
-        if (!googleSheetsUrl) return;
-        const cacheBusterUrl = googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
-        fetch(cacheBusterUrl)
-            .then(res => res.json())
-            .then(data => {
-                if (Array.isArray(data) && data.length > 0) {
-                    questionsData = deduplicateQuestions(data);
-                    saveBankQuestions();
-                    const statusEl = document.getElementById('sheets-sync-status');
-                    if (statusEl) {
-                        statusEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-300"></i> <span>Tersambung ke Google Sheets (${questionsData.length} Soal Terisi)</span>`;
-                    }
-                }
-            })
-            .catch(err => console.log('Info: Menggunakan bank soal lokal', err));
+   function fetchCloudQuestions() {
+    if (!googleSheetsUrl) return;
+    
+    // Tambahkan admin_pin jika Koordinator sedang login
+    let requestUrl = googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
+    if (isAdminLoggedIn) {
+        requestUrl += '&admin_pin=' + ADMIN_PIN;
     }
+
+    fetch(requestUrl)
+        .then(res => res.json())
+        .then(data => {
+            if (Array.isArray(data) && data.length > 0) {
+                questionsData = deduplicateQuestions(data);
+                saveBankQuestions();
+                const statusEl = document.getElementById('sheets-sync-status');
+                if (statusEl) {
+                    statusEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-300"></i> <span>Tersambung ke Google Sheets (${questionsData.length} Soal Terisi)</span>`;
+                }
+            }
+        })
+        .catch(err => console.log('Info: Menggunakan bank soal lokal', err));
+}f
 
     function fetchCloudResults() {
         if (!googleSheetsUrl) return;
