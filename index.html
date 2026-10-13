@@ -1061,52 +1061,78 @@
         }
     }
 
-    function submitAdminAuth(e) {
-        e.preventDefault();
-        const pinInput = document.getElementById('admin-pin-input');
-        const errEl = document.getElementById('admin-pin-error');
-        const btn = document.getElementById('admin-pin-btn');
-        if (!pinInput) return;
+   function submitAdminAuth(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    
+    const pinInput = document.getElementById('admin-pin-input');
+    const errEl = document.getElementById('admin-pin-error');
+    const btn = document.getElementById('admin-pin-btn');
+    if (!pinInput) return;
 
-        const typedPin = pinInput.value.trim();
+    const typedPin = pinInput.value.trim();
+    if (!typedPin) {
+        if (errEl) {
+            errEl.textContent = 'Masukkan PIN terlebih dahulu!';
+            errEl.classList.remove('hidden');
+        }
+        return;
+    }
 
+    if (btn) {
         btn.disabled = true;
         btn.textContent = "Memeriksa...";
+    }
 
-        fetch(googleSheetsUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ action: 'VERIFY_PIN', pin: typedPin })
-        })
-        .then(res => res.json())
-        .then(data => {
+    if (!googleSheetsUrl) {
+        if (btn) {
             btn.disabled = false;
             btn.textContent = "Buka Akses";
+        }
+        if (errEl) {
+            errEl.textContent = 'URL Google Sheets belum terpasang!';
+            errEl.classList.remove('hidden');
+        }
+        return;
+    }
 
-            if (data.status === 'success') {
-                isAdminLoggedIn = true;
-                sessionStorage.setItem('coordinator_pin', typedPin); // Simpan sementara di session
-                closeModal('modal-admin-auth');
-                pinInput.value = '';
-                if (errEl) errEl.classList.add('hidden');
-                updateNavUI();
-                switchTab('bank');
-            } else {
-                if (errEl) {
-                    errEl.textContent = data.message || 'PIN Koordinator salah!';
-                    errEl.classList.remove('hidden');
-                }
-            }
-        })
-        .catch(err => {
+    fetch(googleSheetsUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'VERIFY_PIN', pin: typedPin })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (btn) {
             btn.disabled = false;
             btn.textContent = "Buka Akses";
+        }
+
+        if (data.status === 'success') {
+            isAdminLoggedIn = true;
+            sessionStorage.setItem('coordinator_pin', typedPin);
+            closeModal('modal-admin-auth');
+            pinInput.value = '';
+            if (errEl) errEl.classList.add('hidden');
+            updateNavUI();
+            switchTab('bank');
+        } else {
             if (errEl) {
-                errEl.textContent = 'Gagal terhubung ke server untuk verifikasi PIN.';
+                errEl.textContent = data.message || 'PIN Koordinator salah!';
                 errEl.classList.remove('hidden');
             }
-        });
-    }
+        }
+    })
+    .catch(err => {
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = "Buka Akses";
+        }
+        if (errEl) {
+            errEl.textContent = 'Gagal terhubung ke server untuk verifikasi PIN.';
+            errEl.classList.remove('hidden');
+        }
+    });
+}
     function formatGoogleDriveUrl(url) {
         if (!url) return '';
         if (url.includes('drive.google.com') && url.includes('/d/')) {
