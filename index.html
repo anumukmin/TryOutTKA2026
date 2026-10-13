@@ -1934,10 +1934,30 @@ if (window.renderMathInElement) {
         });
     }
 
-    function confirmSubmitExam() {
-        showConfirm('Selesaikan Ujian', 'Apakah Anda yakin ingin menyelesaikan ujian dan mengumpulkan seluruh jawaban sekarang?', () => {
-            finishExam(false);
+   function confirmSubmitExam() {
+        let unansweredNums = [];
+
+        // Cek soal mana saja yang belum ada jawabannya
+        currentExamQuestions.forEach((q, idx) => {
+            const ans = studentAnswers[q.id];
+            if (!ans || ans === '' || ans === '{}') {
+                unansweredNums.push(idx + 1);
+            }
         });
+
+        // Tampilkan peringatan jika ada soal yang belum diisi
+        if (unansweredNums.length > 0) {
+            const listStr = unansweredNums.join(', ');
+            const msg = `Masih ada ${unansweredNums.length} soal yang BELUM dijawab (No. ${listStr}). Apakah Anda yakin ingin menyelesaikan ujian sekarang?`;
+            
+            showConfirm('Peringatan: Soal Belum Lengkap!', msg, () => {
+                finishExam(false);
+            });
+        } else {
+            showConfirm('Selesaikan Ujian', 'Semua soal telah dijawab dengan lengkap. Apakah Anda yakin ingin mengumpulkan jawaban sekarang?', () => {
+                finishExam(false);
+            });
+        }
     }
 
   function finishExam(forced = false) {
@@ -2879,6 +2899,14 @@ if (window.renderMathInElement) {
         if (googleSheetsUrl) {
             fetchCloudQuestions();
         }
+        // Auto-refresh rekap hasil ujian setiap 20 detik secara otomatis
+setInterval(() => {
+    const resultsTab = document.getElementById('tab-results');
+    // Hanya tarik data dari Google Sheets jika Koordinator sedang membuka tab Hasil Ujian
+    if (resultsTab && !resultsTab.classList.contains('hidden') && googleSheetsUrl) {
+        fetchCloudResults();
+    }
+}, 20000); // 20000 ms = 20 detik
     };
 </script>
 </body>
