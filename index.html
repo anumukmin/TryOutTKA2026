@@ -1125,18 +1125,19 @@
     }
 
     function deduplicateQuestions(data) {
-        const seen = new Set();
-        const result = [];
-        data.forEach(q => {
-            if (!q || !q.question) return;
-            const key = (q.category || '').toLowerCase() + '___' + q.question.trim().toLowerCase();
-            if (!seen.has(key)) {
-                seen.add(key);
-                result.push(q);
-            }
-        });
-        return result;
-    }
+    const seen = new Set();
+    const result = [];
+    data.forEach((q, idx) => {
+        if (!q || !q.question) return;
+        // Gunakan ID unik soal agar soal dengan pertanyaan mirip tidak terhapus
+        const key = q.id ? String(q.id).trim() : (q.category + '___' + idx);
+        if (!seen.has(key)) {
+            seen.add(key);
+            result.push(q);
+        }
+    });
+    return result;
+}
 
     function getSubtestSettingsMap() {
         try {
