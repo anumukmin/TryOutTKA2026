@@ -2726,7 +2726,12 @@ if (window.renderMathInElement) {
    function fetchCloudQuestions() {
     if (!googleSheetsUrl) return;
     
-    // Tambahkan admin_pin jika Koordinator sedang login
+    const statusEl = document.getElementById('sheets-sync-status');
+    if (statusEl) {
+        statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-amber-300"></i> <span>Menarik ${isAdminLoggedIn ? 'seluruh data soal' : 'soal'} dari Google Sheets...</span>`;
+    }
+
+    // Paksa browser tidak memakai cache dengan timestamp (?t=...)
     let requestUrl = googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
     if (isAdminLoggedIn) {
         requestUrl += '&admin_pin=' + ADMIN_PIN;
@@ -2736,16 +2741,29 @@ if (window.renderMathInElement) {
         .then(res => res.json())
         .then(data => {
             if (Array.isArray(data) && data.length > 0) {
+                // PAKSA TIMPA DATA LOKAL DENGAN DATA DARI SHEET
                 questionsData = deduplicateQuestions(data);
-                saveBankQuestions();
-                const statusEl = document.getElementById('sheets-sync-status');
+                localStorage.setItem('tryout_bank_questions', JSON.stringify(questionsData));
+                
+                bankCurrentPage = 1;
+                renderBankTable();
+
                 if (statusEl) {
-                    statusEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-300"></i> <span>Tersambung ke Google Sheets (${questionsData.length} Soal Terisi)</span>`;
+                    statusEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-300"></i> <span>Tersambung ke Google Sheets (${questionsData.length} Soal Berhasil Dimuat)</span>`;
+                }
+            } else {
+                if (statusEl) {
+                    statusEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-300"></i> <span>Data dari Sheets kosong atau format tidak sesuai.</span>`;
                 }
             }
         })
-        .catch(err => console.log('Info: Menggunakan bank soal lokal', err));
-}f
+        .catch(err => {
+            console.error('Gagal narik data cloud:', err);
+            if (statusEl) {
+                statusEl.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-300"></i> <span>Gagal terhubung ke Google Sheets.</span>`;
+            }
+        });
+}
 
     function fetchCloudResults() {
         if (!googleSheetsUrl) return;
