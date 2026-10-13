@@ -973,7 +973,7 @@
 <script>
     // --- GLOBAL CONFIGURATION ---
     const ADMIN_PIN = "505609";
-    let googleSheetsUrl = "https://script.google.com/macros/s/AKfycbwb9HLf2nKRp1sKmwvXD1PSEnu_FoSxOQpvnlnCyVYpC3EfylmfixPA6By4aqG1V2Hi3Q/exec";
+    let googleSheetsUrl = "https://script.google.com/macros/s/AKfycbwDVLDC6D9sjgtC-5xJ0yyL-QaiEVjZFR7dC5etL8OaPQoBhuN9QNSAlKu6GOv7N_vyNA/exec";
     let activeCbtToken = localStorage.getItem('cbt_active_token') || "TKA2026";
 
     // --- GLOBAL STATE VARIABLES ---
@@ -2864,22 +2864,32 @@ if (window.renderMathInElement) {
 
     function deleteSingleResult(studentName, subtest) {
         showConfirm('Hapus Rekap', `Apakah Anda yakin ingin menghapus data rekap ujian dari "${studentName}" (${subtest})?`, () => {
+            // 1. Hapus langsung dari daftar lokal di tampilan web
             resultsDataList = resultsDataList.filter(r => !(r.studentName === studentName && r.subtest === subtest));
             localStorage.setItem('tryout_results', JSON.stringify(resultsDataList));
             updateResultsClassDropdown();
             renderResultsTable();
 
+            // 2. Kirim perintah hapus ke Google Sheets
             if (googleSheetsUrl) {
                 fetch(googleSheetsUrl, {
                     method: 'POST',
-                    mode: 'no-cors',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: 'DELETE_RESULT', studentName: studentName, subtest: subtest })
-                }).catch(err => console.warn('Gagal menghapus rekap di Google Sheets:', err));
+                    body: JSON.stringify({ 
+                        action: 'DELETE_RESULT', 
+                        pin: ADMIN_PIN, 
+                        studentName: studentName, 
+                        subtest: subtest 
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    console.log('Respon hapus dari Google Sheets:', data);
+                })
+                .catch(err => console.warn('Gagal menghapus rekap di Google Sheets:', err));
             }
         });
     }
-
     function printResultsReport() {
         window.print();
     }
