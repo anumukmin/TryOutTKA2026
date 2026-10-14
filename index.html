@@ -2862,9 +2862,13 @@ if (window.renderMathInElement) {
 
     let requestUrl = googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
     
-    // Jika Koordinator login, sertakan PIN untuk membuka Kunci & Pembahasan
-    if (isAdminLoggedIn && window.activeAdminPin) {
-        requestUrl += '&admin_pin=' + encodeURIComponent(window.activeAdminPin);
+    // Ambil PIN Koordinator dari memori aktif atau sessionStorage agar tidak hilang saat refresh
+    const adminPin = window.activeAdminPin || sessionStorage.getItem('cbt_admin_pin') || ADMIN_PIN;
+    const isAdmin = isAdminLoggedIn || sessionStorage.getItem('cbt_is_admin') === 'true';
+
+    // Jika status Koordinator aktif, sertakan admin_pin agar Kunci & Pembahasan selalu terbawa
+    if (isAdmin && adminPin) {
+        requestUrl += '&admin_pin=' + encodeURIComponent(adminPin);
     }
 
     fetch(requestUrl)
@@ -2872,6 +2876,8 @@ if (window.renderMathInElement) {
         .then(data => {
             if (Array.isArray(data) && data.length > 0) {
                 questionsData = deduplicateQuestions(data);
+                
+                // SIMPAN LANGSUNG DATA TERBARU DENGAN KUNCI KE LOCALSTORAGE
                 localStorage.setItem('tryout_bank_questions', JSON.stringify(questionsData));
                 
                 bankCurrentPage = 1;
@@ -3055,13 +3061,13 @@ if (window.renderMathInElement) {
     }
 
    window.onload = function() {
-    // 1. Cek status login koordinator
+    // 1. Ambil & Kunci Status Admin/Koordinator dari sessionStorage
     if (sessionStorage.getItem('cbt_is_admin') === 'true') {
         isAdminLoggedIn = true;
         window.activeAdminPin = sessionStorage.getItem('cbt_admin_pin') || ADMIN_PIN;
     }
 
-    // 2. Pastikan URL selalu menggunakan yang terbaru
+    // 2. Pastikan URL Google Sheets selalu mengambil data terbaru dari localStorage
     const savedUrl = localStorage.getItem('google_sheets_url');
     if (savedUrl) {
         googleSheetsUrl = savedUrl;
@@ -3072,14 +3078,15 @@ if (window.renderMathInElement) {
         inputEl.value = googleSheetsUrl || '';
     }
 
-    // 3. Muat data bank soal dan lakukan sinkronisasi otomatis dari cloud
+    // 3. Tampilkan UI & Muat Soal Lokal Terlebih Dahulu
     loadBankQuestions();
     updateExamDurationDisplay();
     updateNavUI();
     loadSubtestSettingsToForm();
 
+    // 4. Sinkronkan Otomatis dari Cloud (Tarik Kunci Jawaban Lengkap)
     if (googleSheetsUrl) {
-        fetchCloudQuestions();
+        fetchCloudQuestions(); // Memanggil data fresh dari Google Sheets menggunakan PIN Koordinator
         fetchCloudSettings();
     }
 };
