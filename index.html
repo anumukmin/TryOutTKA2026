@@ -999,7 +999,7 @@
 <script>
     // --- GLOBAL CONFIGURATION ---
     const ADMIN_PIN = "505609";
-    let googleSheetsUrl = "https://script.google.com/macros/s/AKfycbw5fuyt-G_ePF2CfDjLeqOkNOJWES1p_37X3GKH-kkGSHpmpdLCcZ6WHPWvkl0lAH8e1A/exec";
+    let googleSheetsUrl = "https://script.google.com/macros/s/AKfycbyzGa229XNECNfRsOrEnS3vfgToOH9xazWCPcvRShSox5Y8KuFZFo4sMh1h2bkURPfVoA/exec";
     let activeCbtToken = localStorage.getItem('cbt_active_token') || "TKA2026";
 
     // --- GLOBAL STATE VARIABLES ---
@@ -2670,7 +2670,7 @@ if (window.renderMathInElement) {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({ 
-                        action: 'SAVE', 
+                        action: 'SAVE_QUESTION', // <-- SESUAIKAN DENGAN CODE.GS
                         pin: window.activeAdminPin || ADMIN_PIN,
                         question: qObj 
                     })
