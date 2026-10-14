@@ -1172,13 +1172,15 @@
 
    function getSubtestConfig(subtest) {
         const map = getSubtestSettingsMap();
-        // Jika mapel ini sudah punya token khusus di map, pakai token itu
+        
+        // Jika mapel/pilihan ini sudah punya pengaturan khusus di map, gunakan itu
         if (map[subtest] && map[subtest].token) {
             return map[subtest];
         }
-        // Jika belum ada, berikan token default khusus tanpa menimpa mapel lain
+        
+        // Default fallback untuk masing-masing opsi
         return {
-            token: "TKA2026",
+            token: subtest === 'ALL' ? 'TKA2026' : (map['ALL']?.token || 'TKA2026'),
             shuffleQ: true,
             shuffleOpt: true
         };
@@ -1231,7 +1233,7 @@
 
         const tokenInput = document.getElementById('setting-cbt-token');
         if (tokenInput) {
-            tokenInput.value = config.token || activeCbtToken;
+            tokenInput.value = config.token || "TKA2026";
         }
 
         const shuffleQInput = document.getElementById('setting-cbt-shuffle-q');
@@ -1244,7 +1246,6 @@
             shuffleOptInput.checked = config.shuffleOpt !== false;
         }
     }
-
     function onBankFilterSubtestChange() {
     bankCurrentPage = 1;
     renderBankTable();
