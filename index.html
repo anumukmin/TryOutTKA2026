@@ -2930,61 +2930,46 @@ if (window.renderMathInElement) {
         fetchCloudResults();
     }
 
-  function fetchCloudQuestions() {
+ // 1. FUNGSI AMBIL BANK SOAL (UNTUK KOORDINATOR & SISWA)
+function fetchCloudQuestions() {
     if (!googleSheetsUrl) return;
-    
-    const statusEl = document.getElementById('sheets-sync-status');
-    if (statusEl) {
-        statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-amber-300"></i> <span>Menarik data soal dari Google Sheets...</span>`;
-    }
 
+    // Otomatis cek PIN jika user berada di mode Koordinator
+    const adminPin = window.activeAdminPin || sessionStorage.getItem('cbt_admin_pin') || ADMIN_PIN;
     let requestUrl = googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
     
-    // Ambil PIN Koordinator dari memori aktif atau sessionStorage
-    const adminPin = window.activeAdminPin || sessionStorage.getItem('cbt_admin_pin') || ADMIN_PIN;
-    const isAdmin = isAdminLoggedIn || sessionStorage.getItem('cbt_is_admin') === 'true';
-
-    // Sertakan parameter PIN agar Apps Script mengirimkan Kunci Jawaban
-    if (isAdmin && adminPin) {
+    // Jika ada PIN Koordinator, kirim ke server agar Kunci Jawaban DIBUKA
+    if (adminPin) {
         requestUrl += '&admin_pin=' + encodeURIComponent(adminPin) + '&pin=' + encodeURIComponent(adminPin);
     }
+
+    const statusEl = document.getElementById('sheet-status-indicator');
 
     fetch(requestUrl)
         .then(res => res.json())
         .then(data => {
             if (Array.isArray(data) && data.length > 0) {
-                const newQuestions = deduplicateQuestions(data);
+                questionsData = deduplicateQuestions(data);
+                localStorage.setItem('tryout_bank_questions', JSON.stringify(questionsData));
                 
-               // KODE BARU (TERIMA SOAL UNTUK SISWA & KOORDINATOR):
-questionsData = newQuestions;
-localStorage.setItem('tryout_bank_questions', JSON.stringify(questionsData));
                 bankCurrentPage = 1;
                 renderBankTable();
 
                 if (statusEl) {
                     statusEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-300"></i> <span>Tersambung ke Google Sheets (${questionsData.length} Soal Dimuat)</span>`;
                 }
-            } else {
-                if (statusEl) {
-                    statusEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-300"></i> <span>Data soal dari Sheets kosong / belum sesuai.</span>`;
-                }
             }
         })
-        .catch(err => {
-            console.error('Gagal narik data cloud:', err);
-            if (statusEl) {
-                statusEl.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-300"></i> <span>Gagal terhubung ke Google Sheets.</span>`;
-            }
-        });
+        .catch(err => console.error('Gagal memuat soal cloud:', err));
 }
-    function fetchCloudResults() {
+
+// 2. FUNGSI AMBIL REKAP HASIL UJIAN
+function fetchCloudResults() {
     if (!googleSheetsUrl) return;
 
-    // AMBIL PIN KOORDINATOR DARI MEMORI AKTIF ATAU SESSION
     const adminPin = window.activeAdminPin || sessionStorage.getItem('cbt_admin_pin') || ADMIN_PIN;
     let cacheBusterUrl = googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 'action=GET_RESULTS&t=' + Date.now();
     
-    // KIRIM PARAMETER PIN AGAR APPS SCRIPT MENGIZINKAN PENARIKAN REKAP HASIL
     if (adminPin) {
         cacheBusterUrl += '&admin_pin=' + encodeURIComponent(adminPin) + '&pin=' + encodeURIComponent(adminPin);
     }
@@ -2998,12 +2983,9 @@ localStorage.setItem('tryout_bank_questions', JSON.stringify(questionsData));
                 updateResultsClassDropdown();
                 currentResultsPage = 1;
                 renderResultsTable();
-            } else if (data && data.status === 'error') {
-                console.warn('Gagal ambil rekap cloud:', data.message);
             }
         })
         .catch(err => {
-            console.log('Info: Menggunakan data rekap lokal', err);
             resultsDataList = JSON.parse(localStorage.getItem('tryout_results') || '[]');
             updateResultsClassDropdown();
             renderResultsTable();
