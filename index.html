@@ -2862,13 +2862,13 @@ if (window.renderMathInElement) {
 
     let requestUrl = googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
     
-    // Ambil PIN Koordinator dari memori aktif atau sessionStorage agar tidak hilang saat refresh
+    // Ambil PIN Koordinator dari memori aktif atau sessionStorage
     const adminPin = window.activeAdminPin || sessionStorage.getItem('cbt_admin_pin') || ADMIN_PIN;
     const isAdmin = isAdminLoggedIn || sessionStorage.getItem('cbt_is_admin') === 'true';
 
-    // Jika status Koordinator aktif, sertakan admin_pin agar Kunci & Pembahasan selalu terbawa
+    // Sertakan parameter 'admin_pin' DAN 'pin' agar kompatibel dengan seluruh versi Code.gs
     if (isAdmin && adminPin) {
-        requestUrl += '&admin_pin=' + encodeURIComponent(adminPin);
+        requestUrl += '&admin_pin=' + encodeURIComponent(adminPin) + '&pin=' + encodeURIComponent(adminPin);
     }
 
     fetch(requestUrl)
