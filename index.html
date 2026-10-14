@@ -2056,9 +2056,43 @@ if (window.renderMathInElement) {
     }
 
     function confirmSubmitExam() {
-        showConfirm('Selesaikan Ujian', 'Apakah Anda yakin ingin menyelesaikan ujian dan mengumpulkan seluruh jawaban sekarang?', () => {
-            finishExam(false);
+        // Hitung total soal dan berapa soal yang sudah diisi
+        const totalQuestions = currentExamQuestions.length;
+        let answeredCount = 0;
+        let unansweredIndices = [];
+
+        currentExamQuestions.forEach((q, idx) => {
+            const userAns = studentAnswers[q.id];
+            // Pengecekan apakah soal sudah dijawab (PG, Checkbox, atau Matrix)
+            if (userAns && userAns !== '{}' && userAns !== '') {
+                answeredCount++;
+            } else {
+                unansweredIndices.push(idx + 1); // Simpan nomor soal yang belum diisi
+            }
         });
+
+        // JIKA MASIH ADA SOAL YANG BELUM DIJAWAB
+        if (answeredCount < totalQuestions) {
+            const missingText = unansweredIndices.length <= 5 
+                ? `Nomor soal yang belum dijawab: ${unansweredIndices.join(', ')}.` 
+                : `Masih ada ${unansweredIndices.length} soal yang belum dijawab.`;
+
+            showAlert(
+                'Belum Boleh Mengumpulkan!', 
+                `Anda baru menjawab ${answeredCount} dari ${totalQuestions} soal. Silakan lengkapi semua jawaban terlebih dahulu sebelum mengakhiri ujian.\n\n${missingText}`, 
+                'error'
+            );
+            return; // Hentikan proses submit
+        }
+
+        // JIKA SEMUA SOAL SUDAH TERISI
+        showConfirm(
+            'Selesaikan Ujian', 
+            'Semua soal telah dijawab dengan lengkap. Apakah Anda yakin ingin menyelesaikan dan mengumpulkan ujian sekarang?', 
+            () => {
+                finishExam(false);
+            }
+        );
     }
 
     function finishExam(forced = false) {
