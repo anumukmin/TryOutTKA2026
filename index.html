@@ -1170,61 +1170,60 @@
         }
     }
 
-    function getSubtestConfig(subtest) {
+   function getSubtestConfig(subtest) {
         const map = getSubtestSettingsMap();
-        if (map[subtest]) {
+        // Jika mapel ini sudah punya token khusus di map, pakai token itu
+        if (map[subtest] && map[subtest].token) {
             return map[subtest];
         }
+        // Jika belum ada, berikan token default khusus tanpa menimpa mapel lain
         return {
-            token: activeCbtToken || "TKA2026",
+            token: "TKA2026",
             shuffleQ: true,
             shuffleOpt: true
         };
     }
+  function saveActiveTokenSetting() {
+        const subtestSelect = document.getElementById('bank-filter-subtest');
+        const selectedSubtest = subtestSelect ? subtestSelect.value : 'ALL';
+        const tokenVal = (document.getElementById('setting-cbt-token')?.value || 'TKA2026').trim().toUpperCase();
+        const shuffleQVal = document.getElementById('setting-cbt-shuffle-q')?.checked !== false;
+        const shuffleOptVal = document.getElementById('setting-cbt-shuffle-opt')?.checked !== false;
 
-   function saveActiveTokenSetting() {
-    const subtestSelect = document.getElementById('bank-filter-subtest');
-    const selectedSubtest = subtestSelect ? subtestSelect.value : 'ALL';
-    const tokenVal = (document.getElementById('setting-cbt-token')?.value || 'TKA2026').trim().toUpperCase();
-    const shuffleQVal = document.getElementById('setting-cbt-shuffle-q')?.checked !== false;
-    const shuffleOptVal = document.getElementById('setting-cbt-shuffle-opt')?.checked !== false;
+        // 1. Simpan ke LocalStorage khusus untuk subtest yang sedang dipilih
+        const map = getSubtestSettingsMap();
+        map[selectedSubtest] = {
+            token: tokenVal,
+            shuffleQ: shuffleQVal,
+            shuffleOpt: shuffleOptVal
+        };
+        localStorage.setItem('cbt_subtest_settings_map', JSON.stringify(map));
 
-    // 1. Simpan ke LocalStorage perangkat
-    const map = getSubtestSettingsMap();
-    map[selectedSubtest] = {
-        token: tokenVal,
-        shuffleQ: shuffleQVal,
-        shuffleOpt: shuffleOptVal
-    };
-    localStorage.setItem('cbt_subtest_settings_map', JSON.stringify(map));
-    activeCbtToken = tokenVal;
-    localStorage.setItem('cbt_active_token', activeCbtToken);
-
-    // 2. Kirim dan Simpan Terpusat ke Sheet "Pengaturan" di Cloud
-    if (googleSheetsUrl) {
-        fetch(googleSheetsUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({
-                action: 'SAVE_SETTINGS',
-                pin: window.activeAdminPin || ADMIN_PIN,
-                subtest: selectedSubtest,
-                token: tokenVal,
-                shuffleQ: shuffleQVal,
-                shuffleOpt: shuffleOptVal
+        // 2. Kirim dan Simpan Terpusat ke Sheet "Pengaturan" di Cloud
+        if (googleSheetsUrl) {
+            fetch(googleSheetsUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    action: 'SAVE_SETTINGS',
+                    pin: window.activeAdminPin || ADMIN_PIN,
+                    subtest: selectedSubtest,
+                    token: tokenVal,
+                    shuffleQ: shuffleQVal,
+                    shuffleOpt: shuffleOptVal
+                })
             })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'success') {
-                showAlert('Tersimpan di Cloud', `Token (${tokenVal}) & Pengaturan Acak untuk subtes "${selectedSubtest}" berhasil disimpan ke Google Sheets!`, 'success');
-            }
-        })
-        .catch(err => console.warn("Gagal simpan ke cloud:", err));
-    } else {
-        showAlert('Pengaturan Tersimpan', `Pengaturan Token tersimpan di browser lokal.`, 'success');
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showAlert('Tersimpan di Cloud', `Token (${tokenVal}) & Pengaturan Acak untuk subtes "${selectedSubtest}" berhasil disimpan ke Google Sheets!`, 'success');
+                }
+            })
+            .catch(err => console.warn("Gagal simpan ke cloud:", err));
+        } else {
+            showAlert('Pengaturan Tersimpan', `Pengaturan Token tersimpan di browser lokal.`, 'success');
+        }
     }
-}
     function loadSubtestSettingsToForm() {
         const subtestSelect = document.getElementById('bank-filter-subtest');
         const selectedSubtest = subtestSelect ? subtestSelect.value : 'ALL';
