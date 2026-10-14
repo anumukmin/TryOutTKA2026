@@ -1570,17 +1570,18 @@
         }
     }
 
-    async function handleStartExam(e) {
+   async function handleStartExam(e) {
         e.preventDefault();
 
         const selectedSubtest = document.getElementById('exam-subtest-filter').value;
         const studentUsername = (currentStudent.username || '').toLowerCase();
 
-        // 1. CEK RIWAYAT LOKAL: JIKA SUDAH PERNAH SUBMIT MAPEL INI, TOLAK
+        // 1. CEK RIWAYAT LOKAL: JIKA SUDAH PERNAH SUBMIT MAPEL INI DAN SUDAH SYNC KE CLOUD, TOLAK
         const localResults = JSON.parse(localStorage.getItem('tryout_results') || '[]');
         const alreadyTaken = localResults.some(r => 
             String(r.username || r.studentName).toLowerCase() === studentUsername && 
-            String(r.subtest).toLowerCase() === selectedSubtest.toLowerCase()
+            String(r.subtest).toLowerCase() === selectedSubtest.toLowerCase() &&
+            r.syncedWithCloud === true // Hanya tolak jika data benar-benar sudah sukses terkirim
         );
 
         if (alreadyTaken) {
@@ -1591,7 +1592,6 @@
             );
             return;
         }
-
         // 2. CEK TOKEN UJIAN
         const subtestConfig = getSubtestConfig(selectedSubtest);
         const inputToken = document.getElementById('exam-token-input').value.trim().toUpperCase();
@@ -2196,7 +2196,7 @@ if (window.renderMathInElement) {
             iconEl.className = "fa-solid fa-trophy";
         }
 
-       const resultObj = {
+     const resultObj = {
             date: new Date().toLocaleString('id-ID'),
             studentName: currentStudent.name || '-',
             studentClass: currentStudent.studentClass || '-',
@@ -2207,7 +2207,8 @@ if (window.renderMathInElement) {
             wrong: wrongCount,
             empty: emptyCount,
             violations: violationCount,
-            username: (currentStudent.username || '-').toLowerCase()
+            username: (currentStudent.username || '-').toLowerCase(),
+            syncedWithCloud: false // Default false sebelum sukses terkirim ke Sheets
         };
 
         const existingResults = JSON.parse(localStorage.getItem('tryout_results') || '[]');
@@ -2235,6 +2236,11 @@ if (window.renderMathInElement) {
             .then(data => {
                 if (data.status === 'success') {
                     console.log('✅ Hasil ujian berhasil masuk ke Google Sheets Hasil_Ujian!');
+                    
+                    // Tandai bahwa data sudah sukses terkirim ke Sheets
+                    resultObj.syncedWithCloud = true;
+                    localStorage.setItem('tryout_results', JSON.stringify(existingResults));
+
                     if (typeof fetchCloudResults === 'function' && window.activeAdminPin) {
                         fetchCloudResults();
                     }
