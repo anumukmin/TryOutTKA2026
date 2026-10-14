@@ -2955,17 +2955,9 @@ if (window.renderMathInElement) {
             if (Array.isArray(data) && data.length > 0) {
                 const newQuestions = deduplicateQuestions(data);
                 
-                // CEK APAKAH DATA CLOUD MEMBAWA KUNCI JAWABAN
-                const hasKeys = newQuestions.some(q => q.correct !== undefined && q.correct !== null && q.correct !== "");
-
-                // Hanya timpa data lokal & localStorage jika membawa kunci ATAU jika lokal masih kosong
-                if (isAdmin || hasKeys || questionsData.length === 0) {
-                    questionsData = newQuestions;
-                    if (hasKeys) {
-                        localStorage.setItem('tryout_bank_questions', JSON.stringify(questionsData));
-                    }
-                }
-                
+               // KODE BARU (TERIMA SOAL UNTUK SISWA & KOORDINATOR):
+questionsData = newQuestions;
+localStorage.setItem('tryout_bank_questions', JSON.stringify(questionsData));
                 bankCurrentPage = 1;
                 renderBankTable();
 
