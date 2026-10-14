@@ -975,7 +975,7 @@
 <script>
     // --- GLOBAL CONFIGURATION ---
     const ADMIN_PIN = "505609";
-    let googleSheetsUrl = "https://script.google.com/macros/s/AKfycbyLJ5JV1g_W8HWjmsRR6s8aIVMuZ3zgp5RcGs4LRSOTXETek0xeO1niPsSUYkJAd_IeHw/exec";
+    let googleSheetsUrl = "https://script.google.com/macros/s/AKfycbzL6ly5-08AygK-R4owTRbbMlUtt-e7AIEOj2iWNNPLapL-N-hMAT4PVHm3xyg_-wtrzw/exec";
     let activeCbtToken = localStorage.getItem('cbt_active_token') || "TKA2026";
 
     // --- GLOBAL STATE VARIABLES ---
@@ -1574,14 +1574,31 @@
         e.preventDefault();
 
         const selectedSubtest = document.getElementById('exam-subtest-filter').value;
-        const subtestConfig = getSubtestConfig(selectedSubtest);
+        const studentUsername = (currentStudent.username || '').toLowerCase();
 
+        // 1. CEK RIWAYAT LOKAL: JIKA SUDAH PERNAH SUBMIT MAPEL INI, TOLAK
+        const localResults = JSON.parse(localStorage.getItem('tryout_results') || '[]');
+        const alreadyTaken = localResults.some(r => 
+            String(r.username || r.studentName).toLowerCase() === studentUsername && 
+            String(r.subtest).toLowerCase() === selectedSubtest.toLowerCase()
+        );
+
+        if (alreadyTaken) {
+            showAlert(
+                'Ujian Sudah Dikerjakan!', 
+                `Anda sudah pernah menyelesaikan dan mengumpulkan ujian untuk mata pelajaran (${selectedSubtest}). Anda tidak dapat mengerjakannya kembali.`, 
+                'error'
+            );
+            return;
+        }
+
+        // 2. CEK TOKEN UJIAN
+        const subtestConfig = getSubtestConfig(selectedSubtest);
         const inputToken = document.getElementById('exam-token-input').value.trim().toUpperCase();
         if (inputToken !== subtestConfig.token) {
             showAlert('Token Salah', `Token Ujian untuk mata pelajaran (${selectedSubtest}) yang Anda masukkan salah / tidak aktif. Silakan tanyakan ke pengawas.`, 'error');
             return;
         }
-
         if (googleSheetsUrl) {
             try {
                 await fetchCloudQuestions();
@@ -2179,24 +2196,31 @@ if (window.renderMathInElement) {
             iconEl.className = "fa-solid fa-trophy";
         }
 
-        const resultObj = {
-            date: new Date().toISOString(),
-            studentName: currentStudent.name,
-            studentClass: currentStudent.studentClass,
-            studentMajor: currentStudent.major,
+       const resultObj = {
+            date: new Date().toLocaleString('id-ID'),
+            studentName: currentStudent.name || '-',
+            studentClass: currentStudent.studentClass || '-',
+            studentMajor: currentStudent.major || '-',
             subtest: subtestVal,
             score: finalScore100,
             correct: perfectCount,
             wrong: wrongCount,
             empty: emptyCount,
-            violations: violationCount
+            violations: violationCount,
+            username: (currentStudent.username || '-').toLowerCase()
         };
 
         const existingResults = JSON.parse(localStorage.getItem('tryout_results') || '[]');
         existingResults.unshift(resultObj);
         localStorage.setItem('tryout_results', JSON.stringify(existingResults));
 
-        // --- PENGIRIMAN PERBAIKAN DENGAN REDIRECT FOLLOW ---
+        // OTOMATIS RENDER KE TABEL REKAP WEB SEKETIKA
+        resultsDataList = existingResults;
+        if (typeof renderResultsTable === 'function') {
+            renderResultsTable();
+        }
+
+        // PENGIRIMAN KE GOOGLE SHEETS CLOUD (ACTION: SAVE_RESULT)
         if (googleSheetsUrl) {
             fetch(googleSheetsUrl, {
                 method: 'POST',
@@ -2211,6 +2235,9 @@ if (window.renderMathInElement) {
             .then(data => {
                 if (data.status === 'success') {
                     console.log('✅ Hasil ujian berhasil masuk ke Google Sheets Hasil_Ujian!');
+                    if (typeof fetchCloudResults === 'function' && window.activeAdminPin) {
+                        fetchCloudResults();
+                    }
                 } else {
                     console.warn('⚠️ Server merespon tapi gagal simpan:', data.message);
                 }
