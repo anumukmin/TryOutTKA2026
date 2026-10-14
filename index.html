@@ -2978,27 +2978,37 @@ localStorage.setItem('tryout_bank_questions', JSON.stringify(questionsData));
         });
 }
     function fetchCloudResults() {
-        if (!googleSheetsUrl) return;
-        const cacheBusterUrl = googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 'action=GET_RESULTS&t=' + Date.now();
-        
-        fetch(cacheBusterUrl)
-            .then(res => res.json())
-            .then(data => {
-                if (Array.isArray(data)) {
-                    resultsDataList = data;
-                    localStorage.setItem('tryout_results', JSON.stringify(data));
-                    updateResultsClassDropdown();
-                    currentResultsPage = 1;
-                    renderResultsTable();
-                }
-            })
-            .catch(err => {
-                console.log('Info: Menggunakan data rekap lokal', err);
-                resultsDataList = JSON.parse(localStorage.getItem('tryout_results') || '[]');
-                updateResultsClassDropdown();
-                renderResultsTable();
-            });
+    if (!googleSheetsUrl) return;
+
+    // AMBIL PIN KOORDINATOR DARI MEMORI AKTIF ATAU SESSION
+    const adminPin = window.activeAdminPin || sessionStorage.getItem('cbt_admin_pin') || ADMIN_PIN;
+    let cacheBusterUrl = googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 'action=GET_RESULTS&t=' + Date.now();
+    
+    // KIRIM PARAMETER PIN AGAR APPS SCRIPT MENGIZINKAN PENARIKAN REKAP HASIL
+    if (adminPin) {
+        cacheBusterUrl += '&admin_pin=' + encodeURIComponent(adminPin) + '&pin=' + encodeURIComponent(adminPin);
     }
+
+    fetch(cacheBusterUrl)
+        .then(res => res.json())
+        .then(data => {
+            if (Array.isArray(data)) {
+                resultsDataList = data;
+                localStorage.setItem('tryout_results', JSON.stringify(data));
+                updateResultsClassDropdown();
+                currentResultsPage = 1;
+                renderResultsTable();
+            } else if (data && data.status === 'error') {
+                console.warn('Gagal ambil rekap cloud:', data.message);
+            }
+        })
+        .catch(err => {
+            console.log('Info: Menggunakan data rekap lokal', err);
+            resultsDataList = JSON.parse(localStorage.getItem('tryout_results') || '[]');
+            updateResultsClassDropdown();
+            renderResultsTable();
+        });
+}
    function fetchCloudSettings() {
         if (!googleSheetsUrl) return;
         
