@@ -2621,7 +2621,7 @@ if (window.renderMathInElement) {
         openModal('modal-question');
     }
 
-    function saveQuestion(e) {
+    async function saveQuestion(e) {
         if (e) e.preventDefault();
 
         const id = document.getElementById('form-q-id').value || 'q_' + Date.now();
@@ -2661,40 +2661,52 @@ if (window.renderMathInElement) {
         }
 
         const discussion = document.getElementById('form-q-discussion').value.trim();
-
         const qObj = { id, category, type, matrixType, weight, stimulus, question, image, options, correct, discussion };
 
-        const existingIdx = questionsData.findIndex(item => String(item.id) === String(id));
-        if (existingIdx >= 0) {
-            questionsData[existingIdx] = qObj;
-        } else {
-            questionsData.push(qObj);
-        }
-
-        saveBankQuestions();
-        closeModal('modal-question');
-
-        // KIRIM SOAL BARU/EDIT SECARA REAL-TIME KE GOOGLE SHEETS
+        // Jika tersambung ke Google Sheets, tunggu proses simpan di Sheets selesai lebih dahulu
         if (googleSheetsUrl) {
-            fetch(googleSheetsUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ 
-                    action: 'SAVE', 
-                    pin: window.activeAdminPin || ADMIN_PIN,
-                    question: qObj 
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
+            try {
+                const res = await fetch(googleSheetsUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ 
+                        action: 'SAVE', 
+                        pin: window.activeAdminPin || ADMIN_PIN,
+                        question: qObj 
+                    })
+                });
+                const data = await res.json();
+                
                 if (data.status === 'success') {
-                    showAlert('Tersimpan Cloud', 'Soal baru berhasil disimpan ke Google Sheets!', 'success');
+                    // Update data lokal setelah terkonfirmasi tersimpan di Sheets
+                    const existingIdx = questionsData.findIndex(item => String(item.id) === String(id));
+                    if (existingIdx >= 0) {
+                        questionsData[existingIdx] = qObj;
+                    } else {
+                        questionsData.push(qObj);
+                    }
+                    saveBankQuestions();
+                    closeModal('modal-question');
+                    showAlert('Tersimpan Cloud', 'Soal baru berhasil disimpan permanen ke Google Sheets!', 'success');
+                } else {
+                    showAlert('Gagal Simpan', 'Gagal menyimpan ke Google Sheets: ' + (data.message || 'Error tidak diketahui'), 'error');
                 }
-            })
-            .catch(err => console.warn("Gagal simpan soal ke cloud:", err));
-        }
+            } catch (err) {
+                console.error(err);
+                showAlert('Koneksi Terputus', 'Gagal terhubung ke Google Sheets. Pastikan koneksi internet lancar.', 'error');
             }
-
+        } else {
+            // Jika tanpa URL Cloud, simpan ke browser saja
+            const existingIdx = questionsData.findIndex(item => String(item.id) === String(id));
+            if (existingIdx >= 0) {
+                questionsData[existingIdx] = qObj;
+            } else {
+                questionsData.push(qObj);
+            }
+            saveBankQuestions();
+            closeModal('modal-question');
+        }
+    }
     function editQuestion(id) {
         openQuestionModal(id);
     }
