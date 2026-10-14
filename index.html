@@ -1192,38 +1192,72 @@
         const shuffleQVal = document.getElementById('setting-cbt-shuffle-q')?.checked !== false;
         const shuffleOptVal = document.getElementById('setting-cbt-shuffle-opt')?.checked !== false;
 
-        // Simpan khusus untuk kunci subtes yang sedang dipilih
         const map = getSubtestSettingsMap();
-        map[selectedSubtest] = {
-            token: tokenVal,
-            shuffleQ: shuffleQVal,
-            shuffleOpt: shuffleOptVal
-        };
-        localStorage.setItem('cbt_subtest_settings_map', JSON.stringify(map));
 
-        // Kirim ke Cloud jika terhubung
-        if (googleSheetsUrl) {
-            fetch(googleSheetsUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({
-                    action: 'SAVE_SETTINGS',
-                    pin: window.activeAdminPin || ADMIN_PIN,
-                    subtest: selectedSubtest,
-                    token: tokenVal,
-                    shuffleQ: shuffleQVal,
-                    shuffleOpt: shuffleOptVal
+        if (selectedSubtest === 'ALL') {
+            // 1. Jika ALL (Semua Mata Pelajaran), Terapkan Massal ke Seluruh Subtes
+            map['ALL'] = { token: tokenVal, shuffleQ: shuffleQVal, shuffleOpt: shuffleOptVal };
+
+            // Ambil seluruh opsi subtes yang ada di dropdown filter
+            if (subtestSelect) {
+                Array.from(subtestSelect.options).forEach(opt => {
+                    if (opt.value) {
+                        map[opt.value] = { token: tokenVal, shuffleQ: shuffleQVal, shuffleOpt: shuffleOptVal };
+                    }
+                });
+            }
+            
+            localStorage.setItem('cbt_subtest_settings_map', JSON.stringify(map));
+
+            // Kirim perubahan massal ke Google Sheets
+            if (googleSheetsUrl) {
+                fetch(googleSheetsUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({
+                        action: 'SAVE_SETTINGS',
+                        pin: window.activeAdminPin || ADMIN_PIN,
+                        subtest: 'ALL',
+                        token: tokenVal,
+                        shuffleQ: shuffleQVal,
+                        shuffleOpt: shuffleOptVal
+                    })
                 })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    showAlert('Tersimpan di Cloud', `Token (${tokenVal}) & Pengaturan untuk subtes "${selectedSubtest}" berhasil disimpan!`, 'success');
-                }
-            })
-            .catch(err => console.warn("Gagal simpan ke cloud:", err));
+                .then(res => res.json())
+                .then(data => {
+                    showAlert('Tersimpan Global', `Token (${tokenVal}) & Pengaturan Acak berhasil diterapkan serentak ke SELURUH mata pelajaran!`, 'success');
+                })
+                .catch(err => console.warn("Gagal simpan ke cloud:", err));
+            } else {
+                showAlert('Tersimpan Global', `Pengaturan berhasil diterapkan ke SELURUH mata pelajaran!`, 'success');
+            }
+
         } else {
-            showAlert('Pengaturan Tersimpan', `Pengaturan Token tersimpan di browser lokal.`, 'success');
+            // 2. Jika Memilih Subtes Tertentu (Misal: Bahasa Indonesia), Simpan Khusus Subtes Ini Saja
+            map[selectedSubtest] = { token: tokenVal, shuffleQ: shuffleQVal, shuffleOpt: shuffleOptVal };
+            localStorage.setItem('cbt_subtest_settings_map', JSON.stringify(map));
+
+            if (googleSheetsUrl) {
+                fetch(googleSheetsUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({
+                        action: 'SAVE_SETTINGS',
+                        pin: window.activeAdminPin || ADMIN_PIN,
+                        subtest: selectedSubtest,
+                        token: tokenVal,
+                        shuffleQ: shuffleQVal,
+                        shuffleOpt: shuffleOptVal
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    showAlert('Tersimpan Khusus', `Token (${tokenVal}) & Pengaturan Acak khusus subtes "${selectedSubtest}" berhasil disimpan!`, 'success');
+                })
+                .catch(err => console.warn("Gagal simpan ke cloud:", err));
+            } else {
+                showAlert('Tersimpan Khusus', `Pengaturan khusus subtes "${selectedSubtest}" tersimpan!`, 'success');
+            }
         }
     }
    function loadSubtestSettingsToForm() {
