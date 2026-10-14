@@ -2674,15 +2674,25 @@ if (window.renderMathInElement) {
         saveBankQuestions();
         closeModal('modal-question');
 
+        // KIRIM SOAL BARU/EDIT SECARA REAL-TIME KE GOOGLE SHEETS
         if (googleSheetsUrl) {
             fetch(googleSheetsUrl, {
                 method: 'POST',
-                mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: 'SAVE', question: qObj })
-            }).catch(() => {});
+                body: JSON.stringify({ 
+                    action: 'SAVE', 
+                    pin: window.activeAdminPin || ADMIN_PIN,
+                    question: qObj 
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showAlert('Tersimpan Cloud', 'Soal baru berhasil disimpan ke Google Sheets!', 'success');
+                }
+            })
+            .catch(err => console.warn("Gagal simpan soal ke cloud:", err));
         }
-    }
 
     function editQuestion(id) {
         openQuestionModal(id);
