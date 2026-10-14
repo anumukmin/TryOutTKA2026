@@ -1260,35 +1260,35 @@
             }
         }
     }
-   function loadSubtestSettingsToForm() {
-        const subtestSelect = document.getElementById('bank-filter-subtest');
-        const selectedSubtest = subtestSelect ? subtestSelect.value : 'ALL';
-        
-        // Ambil map pengaturan terbaru dari localStorage
-        const map = getSubtestSettingsMap();
-        
-        // Ambil pengaturan khusus subtes ini jika ada, jika tidak ada gunakan default 'TKA2026'
-        const currentConfig = map[selectedSubtest] || {
-            token: "TKA2026",
-            shuffleQ: true,
-            shuffleOpt: true
-        };
+ function loadSubtestSettingsToForm() {
+    const subtestSelect = document.getElementById('bank-filter-subtest');
+    const selectedSubtest = subtestSelect ? subtestSelect.value : 'ALL';
+    
+    // Ambil map pengaturan terbaru dari localStorage
+    const map = getSubtestSettingsMap();
+    
+    // HIERARKI PENGECEKAN: Pengaturan Spesifik Subtes -> Pengaturan Global (ALL) -> Default TKA2026
+    const currentConfig = map[selectedSubtest] || map['ALL'] || {
+        token: "TKA2026",
+        shuffleQ: true,
+        shuffleOpt: true
+    };
 
-        const tokenInput = document.getElementById('setting-cbt-token');
-        if (tokenInput) {
-            tokenInput.value = currentConfig.token || "TKA2026";
-        }
-
-        const shuffleQInput = document.getElementById('setting-cbt-shuffle-q');
-        if (shuffleQInput) {
-            shuffleQInput.checked = currentConfig.shuffleQ !== false;
-        }
-
-        const shuffleOptInput = document.getElementById('setting-cbt-shuffle-opt');
-        if (shuffleOptInput) {
-            shuffleOptInput.checked = currentConfig.shuffleOpt !== false;
-        }
+    const tokenInput = document.getElementById('setting-cbt-token');
+    if (tokenInput) {
+        tokenInput.value = currentConfig.token || "TKA2026";
     }
+
+    const shuffleQInput = document.getElementById('setting-cbt-shuffle-q');
+    if (shuffleQInput) {
+        shuffleQInput.checked = currentConfig.shuffleQ !== false;
+    }
+
+    const shuffleOptInput = document.getElementById('setting-cbt-shuffle-opt');
+    if (shuffleOptInput) {
+        shuffleOptInput.checked = currentConfig.shuffleOpt !== false;
+    }
+}
     function onBankFilterSubtestChange() {
     bankCurrentPage = 1;
     renderBankTable();
@@ -2936,21 +2936,22 @@ if (window.renderMathInElement) {
                 renderResultsTable();
             });
     }
-    function fetchCloudSettings() {
-    if (!googleSheetsUrl) return;
-    
-    // Minta data dari sheet Pengaturan
-    fetch(googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 'action=GET_SETTINGS&t=' + Date.now())
-        .then(res => res.json())
-        .then(data => {
-            if (data && typeof data === 'object' && Object.keys(data).length > 0) {
-                // Simpan token terbaru dari Google Sheets ke browser
-                localStorage.setItem('cbt_subtest_settings_map', JSON.stringify(data));
-                loadSubtestSettingsToForm();
-            }
-        })
-        .catch(err => console.warn("Gagal mengambil pengaturan dari cloud:", err));
-}
+   function fetchCloudSettings() {
+        if (!googleSheetsUrl) return;
+        
+        fetch(googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 'action=GET_SETTINGS&t=' + Date.now())
+            .then(res => res.json())
+            .then(data => {
+                if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+                    const localMap = getSubtestSettingsMap();
+                    // Gabungkan data cloud dengan data lokal yang ada
+                    const mergedMap = { ...localMap, ...data };
+                    localStorage.setItem('cbt_subtest_settings_map', JSON.stringify(mergedMap));
+                    loadSubtestSettingsToForm();
+                }
+            })
+            .catch(err => console.warn("Gagal mengambil pengaturan dari cloud:", err));
+    }
 
     function updateResultsClassDropdown() {
         const selectEl = document.getElementById('results-filter-class');
