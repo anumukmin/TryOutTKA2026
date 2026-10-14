@@ -415,55 +415,34 @@
             </div>
         </div>
 
-        <!-- 1D. EXAM RESULT SUMMARY CARD -->
-        <div id="cbt-result-card" style="display: none;" class="max-w-3xl mx-auto bg-white rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-9">
-            <div class="text-center mb-6">
-                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl shadow-inner">
-                    <i class="fa-solid fa-trophy"></i>
+        <!-- 1D. EXAM RESULT SUMMARY CARD (BERSIH & WARNA DINAMIS) -->
+        <div id="cbt-result-card" style="display: none;" class="max-w-md mx-auto bg-white rounded-3xl shadow-2xl border border-slate-200/80 p-6 sm:p-8 text-center relative overflow-hidden my-6">
+            <div class="mb-5">
+                <div id="res-badge-icon" class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-3 text-3xl shadow-md transition-all duration-300">
+                    <i id="res-icon" class="fa-solid fa-trophy"></i>
                 </div>
-                <h3 class="text-2xl font-extrabold text-slate-800">Hasil Try Out TKA</h3>
-                <p id="res-student-info" class="text-slate-600 font-medium text-sm mt-1">Nama Siswa - Kelas - Jurusan</p>
-                <p id="res-date-info" class="text-xs text-slate-400 mt-0.5">Waktu Selesai: -</p>
+                <h3 class="text-2xl font-black text-slate-800 tracking-tight">Ujian Telah Selesai</h3>
+                <p id="res-student-info" class="text-slate-600 font-bold text-sm mt-1">Nama Siswa - Kelas</p>
+                <span id="res-subtest-info" class="inline-block mt-2 px-3 py-1 bg-brand-50 text-brand-700 border border-brand-200 rounded-full font-extrabold text-xs">
+                    Mata Pelajaran: -
+                </span>
+                <p id="res-date-info" class="text-[11px] text-slate-400 mt-2 flex items-center justify-center gap-1">
+                    <i class="fa-regular fa-clock"></i> Selesai: -
+                </p>
             </div>
 
-            <div class="bg-gradient-to-br from-brand-900 to-brand-700 text-white rounded-2xl p-6 text-center shadow-lg mb-6">
-                <span class="text-xs font-semibold uppercase tracking-widest text-brand-100">Nilai Akhir Ujian (Skala 100)</span>
-                <div class="text-5xl font-black my-2 tracking-tight" id="res-final-score">0</div>
-                <p class="text-xs text-brand-100" id="res-score-detail">Poin Diperoleh: 0 dari Maksimal 0 Poin</p>
-            </div>
-
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 text-center text-xs">
-                <div class="bg-emerald-50 border border-emerald-100 p-3 rounded-xl">
-                    <span class="text-slate-500 block">Sempurna</span>
-                    <strong id="res-correct-count" class="text-emerald-700 text-lg font-bold">0</strong>
-                </div>
-                <div class="bg-amber-50 border border-amber-100 p-3 rounded-xl">
-                    <span class="text-slate-500 block">Parsial (Sebagian)</span>
-                    <strong id="res-partial-count" class="text-amber-700 text-lg font-bold">0</strong>
-                </div>
-                <div class="bg-rose-50 border border-rose-100 p-3 rounded-xl">
-                    <span class="text-slate-500 block">Salah Total</span>
-                    <strong id="res-wrong-count" class="text-rose-700 text-lg font-bold">0</strong>
-                </div>
-                <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl">
-                    <span class="text-slate-500 block">Kosong</span>
-                    <strong id="res-empty-count" class="text-slate-700 text-lg font-bold">0</strong>
+            <!-- KARTU NILAI DINAMIS (MERAH / HIJAU) -->
+            <div id="res-score-card" class="rounded-2xl p-6 text-center shadow-lg mb-6 transition-all duration-300 border">
+                <span class="text-xs font-bold uppercase tracking-widest block opacity-90">NILAI AKHIR UJIAN</span>
+                <div class="text-6xl font-black my-2 tracking-tight drop-shadow-sm" id="res-final-score">0</div>
+                <div id="res-status-text" class="text-xs font-bold px-3 py-1 rounded-full inline-block mt-1 bg-white/20 backdrop-blur-xs">
+                    Status Ujian
                 </div>
             </div>
 
-            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-6">
-                <h4 class="font-bold text-slate-800 text-xs mb-3 flex items-center gap-1.5">
-                    <i class="fa-solid fa-list-check text-brand-600"></i> Rincian Perolehan Poin Per Soal (Penskoran Parsial):
-                </h4>
-                <div id="res-detail-list" class="space-y-2 max-h-52 overflow-y-auto custom-scrollbar pr-1 text-xs">
-                </div>
-            </div>
-
-            <div class="flex flex-col sm:flex-row gap-3">
-                <button onclick="location.reload()" class="flex-1 bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-4 rounded-xl transition text-center text-sm flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-rotate-right"></i> Selesai & Kembali ke Depan
-                </button>
-            </div>
+            <button onclick="location.reload()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 px-5 rounded-xl transition-all duration-200 text-sm flex items-center justify-center gap-2 shadow-lg active:scale-[0.98]">
+                <i class="fa-solid fa-house"></i> Selesai & Kembali ke Depan
+            </button>
         </div>
     </section>
 
@@ -2109,9 +2088,6 @@ if (window.renderMathInElement) {
         let wrongCount = 0;
         let emptyCount = 0;
 
-        const detailListEl = document.getElementById('res-detail-list');
-        if (detailListEl) detailListEl.innerHTML = '';
-
         currentExamQuestions.forEach((q, idx) => {
             const maxWeight = q.weight || 3;
             totalMaxPoints += maxWeight;
@@ -2172,43 +2148,49 @@ if (window.renderMathInElement) {
             }
 
             totalEarnedPoints += earned;
-
-            if (detailListEl) {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-200';
-                itemDiv.innerHTML = `
-                    <span><b>Soal No. ${idx + 1}</b> (${q.type === 'pg' ? 'PG Sederhana' : 'PG Kompleks'}):</span>
-                    <span class="font-bold ${earned === maxWeight ? 'text-emerald-600' : (earned > 0 ? 'text-amber-600' : 'text-rose-600')}">
-                        ${earned.toFixed(1)} / ${maxWeight} Poin
-                    </span>
-                `;
-                detailListEl.appendChild(itemDiv);
-            }
         });
 
         const finalScore100 = totalMaxPoints > 0 ? Math.round((totalEarnedPoints / totalMaxPoints) * 100) : 0;
 
+        // --- TAMPILAN AKHIR SISWA DENGAN INDIKATOR WARNA DINAMIS ---
         document.getElementById('cbt-screen').style.display = 'none';
         document.getElementById('cbt-result-card').style.display = 'block';
         const globalFooter = document.getElementById('global-footer');
         if (globalFooter) globalFooter.style.display = 'block';
 
-        document.getElementById('res-student-info').textContent = `${currentStudent.name} (${currentStudent.studentClass}) - ${currentStudent.major}`;
-        document.getElementById('res-date-info').textContent = `Waktu Selesai: ${new Date().toLocaleString('id-ID')}`;
-        document.getElementById('res-final-score').textContent = finalScore100;
-        document.getElementById('res-score-detail').textContent = `Poin Diperoleh: ${totalEarnedPoints.toFixed(1)} dari Maksimal ${totalMaxPoints} Poin`;
+        const subtestVal = document.getElementById('exam-subtest-filter')?.value || '-';
+        document.getElementById('res-student-info').textContent = `${currentStudent.name} (${currentStudent.studentClass || '-'})`;
+        document.getElementById('res-subtest-info').textContent = `Mata Pelajaran: ${subtestVal}`;
+        document.getElementById('res-date-info').innerHTML = `<i class="fa-regular fa-clock"></i> Selesai: ${new Date().toLocaleString('id-ID')}`;
+        
+        // Elemen Nilai & Kustomisasi Warna
+        const scoreEl = document.getElementById('res-final-score');
+        const scoreCard = document.getElementById('res-score-card');
+        const badgeIcon = document.getElementById('res-badge-icon');
+        const iconEl = document.getElementById('res-icon');
+        const statusText = document.getElementById('res-status-text');
 
-        document.getElementById('res-correct-count').textContent = perfectCount;
-        document.getElementById('res-partial-count').textContent = partialCount;
-        document.getElementById('res-wrong-count').textContent = wrongCount;
-        document.getElementById('res-empty-count').textContent = emptyCount;
+        scoreEl.textContent = finalScore100;
+
+        // PENGONDISIAN WARNA DINAMIS (< 60 = Merah, >= 60 = Hijau)
+        if (finalScore100 < 60) {
+            scoreCard.className = "bg-gradient-to-br from-rose-600 to-rose-800 text-white rounded-2xl p-6 text-center shadow-lg mb-6 border border-rose-500";
+            badgeIcon.className = "w-16 h-16 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-3xl shadow-md border border-rose-200";
+            iconEl.className = "fa-solid fa-circle-exclamation";
+            statusText.textContent = "Nilai di bawah kriteria ketuntasan (< 60)";
+        } else {
+            scoreCard.className = "bg-gradient-to-br from-emerald-600 to-teal-800 text-white rounded-2xl p-6 text-center shadow-lg mb-6 border border-emerald-500";
+            badgeIcon.className = "w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-3xl shadow-md border border-emerald-200";
+            iconEl.className = "fa-solid fa-trophy";
+            statusText.textContent = "Selamat! Nilai tuntas (≥ 60)";
+        }
 
         const resultObj = {
             date: new Date().toISOString(),
             studentName: currentStudent.name,
             studentClass: currentStudent.studentClass,
             studentMajor: currentStudent.major,
-            subtest: document.getElementById('exam-subtest-filter').value,
+            subtest: subtestVal,
             score: finalScore100,
             correct: perfectCount,
             wrong: wrongCount,
@@ -2220,7 +2202,7 @@ if (window.renderMathInElement) {
         existingResults.unshift(resultObj);
         localStorage.setItem('tryout_results', JSON.stringify(existingResults));
 
-       if (googleSheetsUrl) {
+        if (googleSheetsUrl) {
             fetch(googleSheetsUrl, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -2246,7 +2228,7 @@ if (window.renderMathInElement) {
                 }
             });
         }
-}
+    }
     function changeBankPage(direction) {
         const filterVal = document.getElementById('bank-filter-subtest').value;
         const filtered = filterVal === 'ALL' ? questionsData : questionsData.filter(q => q.category === filterVal);
