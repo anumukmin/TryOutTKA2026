@@ -2071,7 +2071,7 @@ if (window.renderMathInElement) {
         );
     }
 
-    function finishExam(forced = false) {
+  function finishExam(forced = false) {
         isExamActive = false;
         clearInterval(examTimerInterval);
         window.onblur = null;
@@ -2160,7 +2160,7 @@ if (window.renderMathInElement) {
         document.getElementById('res-subtest-info').textContent = `Mata Pelajaran: ${subtestVal}`;
         document.getElementById('res-date-info').innerHTML = `<i class="fa-regular fa-clock"></i> Selesai: ${new Date().toLocaleString('id-ID')}`;
         
-       // Elemen Nilai & Warna Dinamis
+        // Elemen Nilai & Warna Dinamis
         const scoreEl = document.getElementById('res-final-score');
         const scoreCard = document.getElementById('res-score-card');
         const badgeIcon = document.getElementById('res-badge-icon');
@@ -2196,15 +2196,27 @@ if (window.renderMathInElement) {
         existingResults.unshift(resultObj);
         localStorage.setItem('tryout_results', JSON.stringify(existingResults));
 
+        // --- PENGIRIMAN PERBAIKAN DENGAN REDIRECT FOLLOW ---
         if (googleSheetsUrl) {
             fetch(googleSheetsUrl, {
                 method: 'POST',
-                mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: 'SAVE_RESULT', result: resultObj })
+                body: JSON.stringify({ 
+                    action: 'SAVE_RESULT', 
+                    result: resultObj 
+                }),
+                redirect: 'follow'
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    console.log('✅ Hasil ujian berhasil masuk ke Google Sheets Hasil_Ujian!');
+                } else {
+                    console.warn('⚠️ Server merespon tapi gagal simpan:', data.message);
+                }
             })
             .catch(err => {
-                console.warn("Gagal kirim ke server cloud, menyiapkan tombol backup.", err);
+                console.error("Gagal kirim ke server cloud, menyiapkan tombol backup.", err);
                 const btnCard = document.getElementById('cbt-result-card');
                 if (btnCard && !document.getElementById('btn-download-backup')) {
                     const backupBtn = document.createElement('button');
