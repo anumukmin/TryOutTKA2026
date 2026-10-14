@@ -3055,15 +3055,27 @@ if (window.renderMathInElement) {
     }
 
    window.onload = function() {
-    loadBankQuestions();
-    updateExamDurationDisplay();
-    updateNavUI();
+    // 1. Cek status login koordinator
+    if (sessionStorage.getItem('cbt_is_admin') === 'true') {
+        isAdminLoggedIn = true;
+        window.activeAdminPin = sessionStorage.getItem('cbt_admin_pin') || ADMIN_PIN;
+    }
+
+    // 2. Pastikan URL selalu menggunakan yang terbaru
+    const savedUrl = localStorage.getItem('google_sheets_url');
+    if (savedUrl) {
+        googleSheetsUrl = savedUrl;
+    }
 
     const inputEl = document.getElementById('google-sheets-url');
     if (inputEl) {
         inputEl.value = googleSheetsUrl || '';
     }
 
+    // 3. Muat data bank soal dan lakukan sinkronisasi otomatis dari cloud
+    loadBankQuestions();
+    updateExamDurationDisplay();
+    updateNavUI();
     loadSubtestSettingsToForm();
 
     if (googleSheetsUrl) {
