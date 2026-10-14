@@ -1321,16 +1321,23 @@
         const local = localStorage.getItem('tryout_bank_questions');
         if (local) {
             try {
-                questionsData = JSON.parse(local);
+                const parsed = JSON.parse(local);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    questionsData = parsed;
+                } else {
+                    questionsData = getInitialDefaultQuestions();
+                }
             } catch(e) {
                 questionsData = getInitialDefaultQuestions();
             }
         } else {
             questionsData = getInitialDefaultQuestions();
         }
+        
         if (!Array.isArray(questionsData) || questionsData.length === 0) {
             questionsData = getInitialDefaultQuestions();
         }
+        
         renderBankTable();
     }
 
@@ -2866,7 +2873,7 @@ if (window.renderMathInElement) {
     const adminPin = window.activeAdminPin || sessionStorage.getItem('cbt_admin_pin') || ADMIN_PIN;
     const isAdmin = isAdminLoggedIn || sessionStorage.getItem('cbt_is_admin') === 'true';
 
-    // Sertakan parameter 'admin_pin' DAN 'pin' agar kompatibel dengan seluruh versi Code.gs
+    // Sertakan parameter PIN agar Apps Script mengirimkan Kunci Jawaban
     if (isAdmin && adminPin) {
         requestUrl += '&admin_pin=' + encodeURIComponent(adminPin) + '&pin=' + encodeURIComponent(adminPin);
     }
@@ -2875,10 +2882,18 @@ if (window.renderMathInElement) {
         .then(res => res.json())
         .then(data => {
             if (Array.isArray(data) && data.length > 0) {
-                questionsData = deduplicateQuestions(data);
+                const newQuestions = deduplicateQuestions(data);
                 
-                // SIMPAN LANGSUNG DATA TERBARU DENGAN KUNCI KE LOCALSTORAGE
-                localStorage.setItem('tryout_bank_questions', JSON.stringify(questionsData));
+                // CEK APAKAH DATA CLOUD MEMBAWA KUNCI JAWABAN
+                const hasKeys = newQuestions.some(q => q.correct !== undefined && q.correct !== null && q.correct !== "");
+
+                // Hanya timpa data lokal & localStorage jika membawa kunci ATAU jika lokal masih kosong
+                if (isAdmin || hasKeys || questionsData.length === 0) {
+                    questionsData = newQuestions;
+                    if (hasKeys) {
+                        localStorage.setItem('tryout_bank_questions', JSON.stringify(questionsData));
+                    }
+                }
                 
                 bankCurrentPage = 1;
                 renderBankTable();
