@@ -435,9 +435,6 @@
             <div id="res-score-card" class="rounded-2xl p-6 text-center shadow-lg mb-6 transition-all duration-300 border">
                 <span class="text-xs font-bold uppercase tracking-widest block opacity-90">NILAI AKHIR UJIAN</span>
                 <div class="text-6xl font-black my-2 tracking-tight drop-shadow-sm" id="res-final-score">0</div>
-                <div id="res-status-text" class="text-xs font-bold px-3 py-1 rounded-full inline-block mt-1 bg-white/20 backdrop-blur-xs">
-                    Status Ujian
-                </div>
             </div>
 
             <button onclick="location.reload()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 px-5 rounded-xl transition-all duration-200 text-sm flex items-center justify-center gap-2 shadow-lg active:scale-[0.98]">
@@ -2163,26 +2160,23 @@ if (window.renderMathInElement) {
         document.getElementById('res-subtest-info').textContent = `Mata Pelajaran: ${subtestVal}`;
         document.getElementById('res-date-info').innerHTML = `<i class="fa-regular fa-clock"></i> Selesai: ${new Date().toLocaleString('id-ID')}`;
         
-        // Elemen Nilai & Kustomisasi Warna
+       // Elemen Nilai & Warna Dinamis
         const scoreEl = document.getElementById('res-final-score');
         const scoreCard = document.getElementById('res-score-card');
         const badgeIcon = document.getElementById('res-badge-icon');
         const iconEl = document.getElementById('res-icon');
-        const statusText = document.getElementById('res-status-text');
 
         scoreEl.textContent = finalScore100;
 
-        // PENGONDISIAN WARNA DINAMIS (< 60 = Merah, >= 60 = Hijau)
+        // PENGONDISIAN WARNA (< 60 = Merah, >= 60 = Hijau)
         if (finalScore100 < 60) {
-            scoreCard.className = "bg-gradient-to-br from-rose-600 to-rose-800 text-white rounded-2xl p-6 text-center shadow-lg mb-6 border border-rose-500";
+            scoreCard.className = "bg-gradient-to-br from-rose-600 to-rose-800 text-white rounded-2xl p-8 text-center shadow-lg mb-6 border border-rose-500";
             badgeIcon.className = "w-16 h-16 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-3xl shadow-md border border-rose-200";
             iconEl.className = "fa-solid fa-circle-exclamation";
-            statusText.textContent = "Nilai di bawah kriteria ketuntasan (< 60)";
         } else {
-            scoreCard.className = "bg-gradient-to-br from-emerald-600 to-teal-800 text-white rounded-2xl p-6 text-center shadow-lg mb-6 border border-emerald-500";
+            scoreCard.className = "bg-gradient-to-br from-emerald-600 to-teal-800 text-white rounded-2xl p-8 text-center shadow-lg mb-6 border border-emerald-500";
             badgeIcon.className = "w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-3xl shadow-md border border-emerald-200";
             iconEl.className = "fa-solid fa-trophy";
-            statusText.textContent = "Selamat! Nilai tuntas (≥ 60)";
         }
 
         const resultObj = {
