@@ -1247,10 +1247,10 @@
     }
 
     function onBankFilterSubtestChange() {
-        bankCurrentPage = 1;
-        renderBankTable();
-        loadSubtestSettingsToForm();
-    }
+    bankCurrentPage = 1;
+    renderBankTable();
+    loadSubtestSettingsToForm(); // <-- Memastikan form token & acak diperbarui sesuai subtes yang dipilih
+}
 
     function getInitialDefaultQuestions() {
         return [
@@ -2136,15 +2136,32 @@ if (window.renderMathInElement) {
         existingResults.unshift(resultObj);
         localStorage.setItem('tryout_results', JSON.stringify(existingResults));
 
-        if (googleSheetsUrl) {
+       if (googleSheetsUrl) {
             fetch(googleSheetsUrl, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: 'SAVE_RESULT', result: resultObj })
-            }).catch(() => {});
+            })
+            .catch(err => {
+                console.warn("Gagal kirim ke server cloud, menyiapkan tombol backup.", err);
+                const btnCard = document.getElementById('cbt-result-card');
+                if (btnCard && !document.getElementById('btn-download-backup')) {
+                    const backupBtn = document.createElement('button');
+                    backupBtn.id = 'btn-download-backup';
+                    backupBtn.className = 'w-full mt-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-4 rounded-xl transition text-sm flex items-center justify-center gap-2 shadow';
+                    backupBtn.innerHTML = `<i class="fa-solid fa-download"></i> Unduh Backup Hasil Ujian (Server Sibuk)`;
+                    backupBtn.onclick = function() {
+                        const blob = new Blob([JSON.stringify(resultObj, null, 2)], { type: 'application/json' });
+                        const a = document.createElement('a');
+                        a.href = URL.createObjectURL(blob);
+                        a.download = `Hasil_${currentStudent.name.replace(/\s+/g, '_')}_${resultObj.subtest}.json`;
+                        a.click();
+                    };
+                    btnCard.appendChild(backupBtn);
+                }
+            });
         }
-    }
 
     function changeBankPage(direction) {
         const filterVal = document.getElementById('bank-filter-subtest').value;
