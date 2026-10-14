@@ -975,7 +975,7 @@
 <script>
     // --- GLOBAL CONFIGURATION ---
     const ADMIN_PIN = "505609";
-    let googleSheetsUrl = "https://script.google.com/macros/s/AKfycbxShQwL9bgx_EcOLN_KSEVd81pgCaT-kNiFcIYFCjnfsCxfzO1jFcOiQZaa_4kwjew7Ag/exec";
+    let googleSheetsUrl = "https://script.google.com/macros/s/AKfycbxN9bCMLues9O4lYQU_md1b2DnHmyZlUQj-ATVXzdinSrMyWHkK5e14HelHxzcXp9cYug/exec";
     let activeCbtToken = localStorage.getItem('cbt_active_token') || "TKA2026";
 
     // --- GLOBAL STATE VARIABLES ---
@@ -2221,15 +2221,17 @@ if (window.renderMathInElement) {
             renderResultsTable();
         }
 
-        // PENGIRIMAN KE GOOGLE SHEETS CLOUD (ACTION: SAVE_RESULT)
+       // PENGIRIMAN KE GOOGLE SHEETS CLOUD (ACTION: SAVE_RESULT)
         if (googleSheetsUrl) {
+            const payload = JSON.stringify({ 
+                action: 'SAVE_RESULT', 
+                result: resultObj 
+            });
+
             fetch(googleSheetsUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ 
-                    action: 'SAVE_RESULT', 
-                    result: resultObj 
-                }),
+                body: payload,
                 redirect: 'follow'
             })
             .then(res => res.json())
@@ -2249,22 +2251,36 @@ if (window.renderMathInElement) {
                 }
             })
             .catch(err => {
-                console.error("Gagal kirim ke server cloud, menyiapkan tombol backup.", err);
-                const btnCard = document.getElementById('cbt-result-card');
-                if (btnCard && !document.getElementById('btn-download-backup')) {
-                    const backupBtn = document.createElement('button');
-                    backupBtn.id = 'btn-download-backup';
-                    backupBtn.className = 'w-full mt-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-4 rounded-xl transition text-sm flex items-center justify-center gap-2 shadow';
-                    backupBtn.innerHTML = `<i class="fa-solid fa-download"></i> Unduh Backup Hasil Ujian (Server Sibuk)`;
-                    backupBtn.onclick = function() {
-                        const blob = new Blob([JSON.stringify(resultObj, null, 2)], { type: 'application/json' });
-                        const a = document.createElement('a');
-                        a.href = URL.createObjectURL(blob);
-                        a.download = `Hasil_${currentStudent.name.replace(/\s+/g, '_')}_${resultObj.subtest}.json`;
-                        a.click();
-                    };
-                    btnCard.appendChild(backupBtn);
-                }
+                console.warn("Mencoba pengiriman cadangan (no-cors)...", err);
+                
+                // Jalur cadangan tanpa terhalang blokir CORS browser
+                fetch(googleSheetsUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: payload
+                }).then(() => {
+                    resultObj.syncedWithCloud = true;
+                    localStorage.setItem('tryout_results', JSON.stringify(existingResults));
+                    console.log('✅ Terkirim via jalur no-cors!');
+                }).catch(err2 => {
+                    console.error("Semua jalur gagal, menyiapkan tombol backup.", err2);
+                    const btnCard = document.getElementById('cbt-result-card');
+                    if (btnCard && !document.getElementById('btn-download-backup')) {
+                        const backupBtn = document.createElement('button');
+                        backupBtn.id = 'btn-download-backup';
+                        backupBtn.className = 'w-full mt-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-4 rounded-xl transition text-sm flex items-center justify-center gap-2 shadow';
+                        backupBtn.innerHTML = `<i class="fa-solid fa-download"></i> Unduh Backup Hasil Ujian (Server Sibuk)`;
+                        backupBtn.onclick = function() {
+                            const blob = new Blob([JSON.stringify(resultObj, null, 2)], { type: 'application/json' });
+                            const a = document.createElement('a');
+                            a.href = URL.createObjectURL(blob);
+                            a.download = `Hasil_${currentStudent.name.replace(/\s+/g, '_')}_${resultObj.subtest}.json`;
+                            a.click();
+                        };
+                        btnCard.appendChild(backupBtn);
+                    }
+                });
             });
         }
     }
