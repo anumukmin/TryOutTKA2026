@@ -999,7 +999,7 @@
 <script>
     // --- GLOBAL CONFIGURATION ---
     const ADMIN_PIN = "505609";
-    let googleSheetsUrl = "https://script.google.com/macros/s/AKfycbztV478iHE106FjtH-XlsWDT1D4RsdxeYK_byogYAyxHJeFu7mOWgIPK0fHj-woOv6caQ/exec";
+    let googleSheetsUrl = "https://script.google.com/macros/s/AKfycbw5fuyt-G_ePF2CfDjLeqOkNOJWES1p_37X3GKH-kkGSHpmpdLCcZ6WHPWvkl0lAH8e1A/exec";
     let activeCbtToken = localStorage.getItem('cbt_active_token') || "TKA2026";
 
     // --- GLOBAL STATE VARIABLES ---
@@ -1182,27 +1182,49 @@
         };
     }
 
-    function saveActiveTokenSetting() {
-        const subtestSelect = document.getElementById('bank-filter-subtest');
-        const selectedSubtest = subtestSelect ? subtestSelect.value : 'ALL';
-        const tokenVal = (document.getElementById('setting-cbt-token')?.value || 'TKA2026').trim().toUpperCase();
-        const shuffleQVal = document.getElementById('setting-cbt-shuffle-q')?.checked !== false;
-        const shuffleOptVal = document.getElementById('setting-cbt-shuffle-opt')?.checked !== false;
+   function saveActiveTokenSetting() {
+    const subtestSelect = document.getElementById('bank-filter-subtest');
+    const selectedSubtest = subtestSelect ? subtestSelect.value : 'ALL';
+    const tokenVal = (document.getElementById('setting-cbt-token')?.value || 'TKA2026').trim().toUpperCase();
+    const shuffleQVal = document.getElementById('setting-cbt-shuffle-q')?.checked !== false;
+    const shuffleOptVal = document.getElementById('setting-cbt-shuffle-opt')?.checked !== false;
 
-        const map = getSubtestSettingsMap();
-        map[selectedSubtest] = {
-            token: tokenVal,
-            shuffleQ: shuffleQVal,
-            shuffleOpt: shuffleOptVal
-        };
+    // 1. Simpan ke LocalStorage perangkat
+    const map = getSubtestSettingsMap();
+    map[selectedSubtest] = {
+        token: tokenVal,
+        shuffleQ: shuffleQVal,
+        shuffleOpt: shuffleOptVal
+    };
+    localStorage.setItem('cbt_subtest_settings_map', JSON.stringify(map));
+    activeCbtToken = tokenVal;
+    localStorage.setItem('cbt_active_token', activeCbtToken);
 
-        localStorage.setItem('cbt_subtest_settings_map', JSON.stringify(map));
-        activeCbtToken = tokenVal;
-        localStorage.setItem('cbt_active_token', activeCbtToken);
-
-        showAlert('Pengaturan Tersimpan', `Pengaturan Token (${tokenVal}), Acak Soal, dan Acak Opsi untuk subtes "${selectedSubtest}" berhasil disimpan!`, 'success');
+    // 2. Kirim dan Simpan Terpusat ke Sheet "Pengaturan" di Cloud
+    if (googleSheetsUrl) {
+        fetch(googleSheetsUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+                action: 'SAVE_SETTINGS',
+                pin: window.activeAdminPin || ADMIN_PIN,
+                subtest: selectedSubtest,
+                token: tokenVal,
+                shuffleQ: shuffleQVal,
+                shuffleOpt: shuffleOptVal
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showAlert('Tersimpan di Cloud', `Token (${tokenVal}) & Pengaturan Acak untuk subtes "${selectedSubtest}" berhasil disimpan ke Google Sheets!`, 'success');
+            }
+        })
+        .catch(err => console.warn("Gagal simpan ke cloud:", err));
+    } else {
+        showAlert('Pengaturan Tersimpan', `Pengaturan Token tersimpan di browser lokal.`, 'success');
     }
-
+}
     function loadSubtestSettingsToForm() {
         const subtestSelect = document.getElementById('bank-filter-subtest');
         const selectedSubtest = subtestSelect ? subtestSelect.value : 'ALL';
@@ -2810,6 +2832,21 @@ if (window.renderMathInElement) {
                 renderResultsTable();
             });
     }
+    function fetchCloudSettings() {
+    if (!googleSheetsUrl) return;
+    
+    // Minta data dari sheet Pengaturan
+    fetch(googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 'action=GET_SETTINGS&t=' + Date.now())
+        .then(res => res.json())
+        .then(data => {
+            if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+                // Simpan token terbaru dari Google Sheets ke browser
+                localStorage.setItem('cbt_subtest_settings_map', JSON.stringify(data));
+                loadSubtestSettingsToForm();
+            }
+        })
+        .catch(err => console.warn("Gagal mengambil pengaturan dari cloud:", err));
+}
 
     function updateResultsClassDropdown() {
         const selectEl = document.getElementById('results-filter-class');
@@ -2934,22 +2971,23 @@ if (window.renderMathInElement) {
         window.print();
     }
 
-    window.onload = function() {
-        loadBankQuestions();
-        updateExamDurationDisplay();
-        updateNavUI();
+   window.onload = function() {
+    loadBankQuestions();
+    updateExamDurationDisplay();
+    updateNavUI();
 
-        const inputEl = document.getElementById('google-sheets-url');
-        if (inputEl) {
-            inputEl.value = googleSheetsUrl || '';
-        }
+    const inputEl = document.getElementById('google-sheets-url');
+    if (inputEl) {
+        inputEl.value = googleSheetsUrl || '';
+    }
 
-        loadSubtestSettingsToForm();
+    loadSubtestSettingsToForm();
 
-        if (googleSheetsUrl) {
-            fetchCloudQuestions();
-        }
-    };
+    if (googleSheetsUrl) {
+        fetchCloudQuestions();
+        fetchCloudSettings();
+    }
+};
 </script>
 </body>
 </html>
