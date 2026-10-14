@@ -1185,14 +1185,14 @@
             shuffleOpt: true
         };
     }
-  function saveActiveTokenSetting() {
+ function saveActiveTokenSetting() {
         const subtestSelect = document.getElementById('bank-filter-subtest');
         const selectedSubtest = subtestSelect ? subtestSelect.value : 'ALL';
         const tokenVal = (document.getElementById('setting-cbt-token')?.value || 'TKA2026').trim().toUpperCase();
         const shuffleQVal = document.getElementById('setting-cbt-shuffle-q')?.checked !== false;
         const shuffleOptVal = document.getElementById('setting-cbt-shuffle-opt')?.checked !== false;
 
-        // 1. Simpan ke LocalStorage khusus untuk subtest yang sedang dipilih
+        // Simpan khusus untuk kunci subtes yang sedang dipilih
         const map = getSubtestSettingsMap();
         map[selectedSubtest] = {
             token: tokenVal,
@@ -1201,7 +1201,7 @@
         };
         localStorage.setItem('cbt_subtest_settings_map', JSON.stringify(map));
 
-        // 2. Kirim dan Simpan Terpusat ke Sheet "Pengaturan" di Cloud
+        // Kirim ke Cloud jika terhubung
         if (googleSheetsUrl) {
             fetch(googleSheetsUrl, {
                 method: 'POST',
@@ -1218,7 +1218,7 @@
             .then(res => res.json())
             .then(data => {
                 if (data.status === 'success') {
-                    showAlert('Tersimpan di Cloud', `Token (${tokenVal}) & Pengaturan Acak untuk subtes "${selectedSubtest}" berhasil disimpan ke Google Sheets!`, 'success');
+                    showAlert('Tersimpan di Cloud', `Token (${tokenVal}) & Pengaturan untuk subtes "${selectedSubtest}" berhasil disimpan!`, 'success');
                 }
             })
             .catch(err => console.warn("Gagal simpan ke cloud:", err));
@@ -1226,24 +1226,33 @@
             showAlert('Pengaturan Tersimpan', `Pengaturan Token tersimpan di browser lokal.`, 'success');
         }
     }
-    function loadSubtestSettingsToForm() {
+   function loadSubtestSettingsToForm() {
         const subtestSelect = document.getElementById('bank-filter-subtest');
         const selectedSubtest = subtestSelect ? subtestSelect.value : 'ALL';
-        const config = getSubtestConfig(selectedSubtest);
+        
+        // Ambil map pengaturan terbaru dari localStorage
+        const map = getSubtestSettingsMap();
+        
+        // Ambil pengaturan khusus subtes ini jika ada, jika tidak ada gunakan default 'TKA2026'
+        const currentConfig = map[selectedSubtest] || {
+            token: "TKA2026",
+            shuffleQ: true,
+            shuffleOpt: true
+        };
 
         const tokenInput = document.getElementById('setting-cbt-token');
         if (tokenInput) {
-            tokenInput.value = config.token || "TKA2026";
+            tokenInput.value = currentConfig.token || "TKA2026";
         }
 
         const shuffleQInput = document.getElementById('setting-cbt-shuffle-q');
         if (shuffleQInput) {
-            shuffleQInput.checked = config.shuffleQ !== false;
+            shuffleQInput.checked = currentConfig.shuffleQ !== false;
         }
 
         const shuffleOptInput = document.getElementById('setting-cbt-shuffle-opt');
         if (shuffleOptInput) {
-            shuffleOptInput.checked = config.shuffleOpt !== false;
+            shuffleOptInput.checked = currentConfig.shuffleOpt !== false;
         }
     }
     function onBankFilterSubtestChange() {
