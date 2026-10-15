@@ -1112,16 +1112,18 @@
         };
     }
 
-    function saveActiveTokenSetting() {
+ function saveActiveTokenSetting() {
         const subtestSelect = document.getElementById('bank-filter-subtest');
         const selectedSubtest = subtestSelect ? subtestSelect.value : 'ALL';
         const tokenVal = (document.getElementById('setting-cbt-token')?.value || 'TKA2026').trim().toUpperCase();
-        const shuffleQVal = document.getElementById('setting-cbt-shuffle-q')?.checked !== false;
-        const shuffleOptVal = document.getElementById('setting-cbt-shuffle-opt')?.checked !== false;
+        
+        // Membaca murni nilai centang checkbox (true / false)
+        const shuffleQVal = document.getElementById('setting-cbt-shuffle-q')?.checked === true;
+        const shuffleOptVal = document.getElementById('setting-cbt-shuffle-opt')?.checked === true;
 
-        const map = getSubtestSettingsMap();
+        let map = getSubtestSettingsMap();
 
-        if (selectedSubtest === 'ALL') {
+        if (selectedSubtest === 'ALL' || selectedSubtest === '' || !selectedSubtest) {
             map['ALL'] = { token: tokenVal, shuffleQ: shuffleQVal, shuffleOpt: shuffleOptVal };
 
             if (subtestSelect) {
@@ -1131,57 +1133,56 @@
                     }
                 });
             }
-            
-            localStorage.setItem('cbt_subtest_settings_map', JSON.stringify(map));
-
-            if (googleSheetsUrl) {
-                fetch(googleSheetsUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({
-                        action: 'SAVE_SETTINGS',
-                        pin: window.activeAdminPin || ADMIN_PIN,
-                        subtest: 'ALL',
-                        token: tokenVal,
-                        shuffleQ: shuffleQVal,
-                        shuffleOpt: shuffleOptVal
-                    })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    showAlert('Tersimpan Global', `Token (${tokenVal}) & Pengaturan Acak berhasil diterapkan serentak ke SELURUH mata pelajaran!`, 'success');
-                })
-                .catch(err => console.warn("Gagal simpan ke cloud:", err));
-            } else {
-                showAlert('Tersimpan Global', `Pengaturan berhasil diterapkan ke SELURUH mata pelajaran!`, 'success');
-            }
-
         } else {
             map[selectedSubtest] = { token: tokenVal, shuffleQ: shuffleQVal, shuffleOpt: shuffleOptVal };
-            localStorage.setItem('cbt_subtest_settings_map', JSON.stringify(map));
-
-            if (googleSheetsUrl) {
-                fetch(googleSheetsUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({
-                        action: 'SAVE_SETTINGS',
-                        pin: window.activeAdminPin || ADMIN_PIN,
-                        subtest: selectedSubtest,
-                        token: tokenVal,
-                        shuffleQ: shuffleQVal,
-                        shuffleOpt: shuffleOptVal
-                    })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    showAlert('Tersimpan Khusus', `Token (${tokenVal}) & Pengaturan Acak khusus subtes "${selectedSubtest}" berhasil disimpan!`, 'success');
-                })
-                .catch(err => console.warn("Gagal simpan ke cloud:", err));
-            } else {
-                showAlert('Tersimpan Khusus', `Pengaturan khusus subtes "${selectedSubtest}" tersimpan!`, 'success');
-            }
         }
+
+        // 1. Simpan Utama ke LocalStorage
+        localStorage.setItem('cbt_subtest_settings_map', JSON.stringify(map));
+        localStorage.setItem('cbt_active_token', tokenVal);
+
+        // 2. Kirim Sinkronisasi ke Google Sheets
+        if (googleSheetsUrl) {
+            fetch(googleSheetsUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    action: 'SAVE_SETTINGS',
+                    pin: window.activeAdminPin || ADMIN_PIN,
+                    subtest: selectedSubtest,
+                    token: tokenVal,
+                    shuffleQ: shuffleQVal,
+                    shuffleOpt: shuffleOptVal
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                showAlert('Tersimpan Global', `Token (${tokenVal}) & Pengaturan Acak berhasil disimpan!`, 'success');
+            })
+            .catch(err => {
+                console.warn("Gagal simpan cloud, tersimpan di lokal:", err);
+                showAlert('Tersimpan Lokal', `Pengaturan token (${tokenVal}) tersimpan di browser!`, 'success');
+            });
+        } else {
+            showAlert('Tersimpan Lokal', `Pengaturan berhasil diterapkan di browser!`, 'success');
+        }
+    }
+
+    function fetchCloudSettings() {
+        if (!googleSheetsUrl) return;
+        
+        fetch(googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 'action=GET_SETTINGS&t=' + Date.now())
+            .then(res => res.json())
+            .then(data => {
+                if (data && typeof data === 'object' && Object.keys(data).length > 0) {
+                    const localMap = getSubtestSettingsMap();
+                    // SOLUSI UTAMA: Dibalik ({ ...data, ...localMap }), agar localMap (yang baru diubah admin) MENIMPA data cloud lama!
+                    const mergedMap = { ...data, ...localMap };
+                    localStorage.setItem('cbt_subtest_settings_map', JSON.stringify(mergedMap));
+                    loadSubtestSettingsToForm();
+                }
+            })
+            .catch(err => console.warn("Gagal mengambil pengaturan cloud:", err));
     }
 
     function loadSubtestSettingsToForm() {
@@ -1199,12 +1200,11 @@
         if (tokenInput) tokenInput.value = currentConfig.token || "TKA2026";
 
         const shuffleQInput = document.getElementById('setting-cbt-shuffle-q');
-        if (shuffleQInput) shuffleQInput.checked = currentConfig.shuffleQ !== false;
+        if (shuffleQInput) shuffleQInput.checked = (currentConfig.shuffleQ !== false);
 
         const shuffleOptInput = document.getElementById('setting-cbt-shuffle-opt');
-        if (shuffleOptInput) shuffleOptInput.checked = currentConfig.shuffleOpt !== false;
+        if (shuffleOptInput) shuffleOptInput.checked = (currentConfig.shuffleOpt !== false);
     }
-
     function onBankFilterSubtestChange() {
         bankCurrentPage = 1;
         renderBankTable();
@@ -1363,7 +1363,6 @@
             return q;
         });
     }
-
     function switchTab(tabName) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
         document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-brand-700', 'font-bold'));
@@ -1511,7 +1510,7 @@
     }
 
     // --- FUNGSI MULAI UJIAN + CEK RIWAYAT REAL-TIME KELUARAN GOOGLE SHEETS ---
-  async function handleStartExam(e) {
+ async function handleStartExam(e) {
         e.preventDefault();
 
         const btnStart = e.target.querySelector('button[type="submit"]');
@@ -1525,14 +1524,13 @@
 
             const selectedSubtest = document.getElementById('exam-subtest-filter').value;
 
-            // Helper pembersih string: hapus semua spasi & simbol, ubah ke lowercase
             function cleanStr(str) {
                 return String(str || '').toLowerCase().replace(/[^a-z0-9]/g, '');
             }
 
-            const cleanStudentUser = cleanStr(currentStudent.username); // "nebula26088"
-            const cleanStudentName = cleanStr(currentStudent.name);     // "muhammaddimassetiadi"
-            const cleanSelectedSubtest = cleanStr(selectedSubtest);     // "bahasaindonesia"
+            const cleanStudentUser = cleanStr(currentStudent.username);
+            const cleanStudentName = cleanStr(currentStudent.name);
+            const cleanSelectedSubtest = cleanStr(selectedSubtest);
 
             // 1. TARIK REKAP HASIL UJIAN TERBARU DARI GOOGLE SHEETS
             let fetchedCloudData = [];
@@ -1553,24 +1551,19 @@
             const localResults = JSON.parse(localStorage.getItem('tryout_results') || '[]');
             const combinedResults = [...localResults, ...fetchedCloudData, ...(resultsDataList || [])];
 
-            // 3. PENGECEKAN SUPER KETAT & FLEKSIBEL
+            // 3. PENGECEKAN SPESIFIK & AKURAT
             const alreadyTaken = combinedResults.some(r => {
                 if (!r) return false;
 
-                // Ambil seluruh nilai (values) yang ada pada objek row tersebut
-                const rowValues = Object.values(r).map(val => cleanStr(val));
-                const rowJsonStr = JSON.stringify(r).toLowerCase();
+                const rowUser = cleanStr(r.username);
+                const rowName = cleanStr(r.studentName);
+                const rowSubtest = cleanStr(r.subtest);
 
-                // A. Cek apakah Username ("nebula26088") atau Nama ("muhammaddimassetiadi") ada di dalam baris data tersebut
-                const hasUser = cleanStudentUser.length > 2 && rowValues.some(v => v === cleanStudentUser);
-                const hasName = cleanStudentName.length > 2 && rowValues.some(v => v.includes(cleanStudentName) || cleanStudentName.includes(v));
-                
-                const isStudentMatch = hasUser || hasName;
+                const isUserMatch = cleanStudentUser && (rowUser === cleanStudentUser);
+                const isNameMatch = cleanStudentName && (rowName === cleanStudentName);
+                const isSubtestMatch = cleanSelectedSubtest && (rowSubtest === cleanSelectedSubtest);
 
-                // B. Cek apakah Mata Pelajaran ("bahasaindonesia") ada di dalam baris data tersebut
-                const isSubtestMatch = cleanSelectedSubtest.length > 2 && rowValues.some(v => v.includes(cleanSelectedSubtest) || cleanSelectedSubtest.includes(v));
-
-                return isStudentMatch && isSubtestMatch;
+                return (isUserMatch || isNameMatch) && isSubtestMatch;
             });
 
             if (alreadyTaken) {
