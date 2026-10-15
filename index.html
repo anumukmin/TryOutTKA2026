@@ -1466,6 +1466,10 @@ function switchTab(tabName) {
 
                 if (data.status === 'success' && data.student) {
                     currentStudent = data.student;
+                    
+                    // TAMBAHKAN BARIS INI: Narik data hasil dari Google Sheets saat login sukses
+                    if (typeof fetchCloudResults === 'function') fetchCloudResults();
+                    
                     showStudentPrepCard();
                     checkActiveExamSession();
                 } else {
@@ -1529,33 +1533,150 @@ function switchTab(tabName) {
         }
     }
 
-   async function handleStartExam(e) {
+  async function handleStartExam(e) {
         e.preventDefault();
 
-        const selectedSubtest = document.getElementById('exam-subtest-filter').value;
-        const studentUsername = (currentStudent.username || '').toLowerCase();
+        const btnStart = e.target.querySelector('button[type="submit"]');
+        const originalBtnHtml = btnStart ? btnStart.innerHTML : '';
 
-      // 1. CEK RIWAYAT (LOKAL & CLOUD): JIKA SUDAH PERNAH KERJAKAN MAPEL INI, TOLAK
-        const localResults = JSON.parse(localStorage.getItem('tryout_results') || '[]');
-        
-        // Gabungkan riwayat lokal dan riwayat dari Cloud (Google Sheets)
-        const combinedResults = [...localResults, ...resultsDataList];
+        try {
+            if (btnStart) {
+                btnStart.disabled = true;
+                btnStart.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memeriksa Riwayat Ujian...`;
+            }
 
-        const alreadyTaken = combinedResults.some(r => {
-            const rUser = String(r.username || r.studentName || '').trim().toLowerCase();
-            const rSubtest = String(r.subtest || '').trim().toLowerCase();
-            return (rUser === studentUsername || rUser === (currentStudent.name || '').toLowerCase()) && 
-                   rSubtest === selectedSubtest.toLowerCase();
-        });
+            const selectedSubtest = document.getElementById('exam-subtest-filter').value;
+            const studentUsername = String(currentStudent.username || '').trim().toLowerCase();
+            const studentName = String(currentStudent.name || '').trim().toLowerCase();
 
-        if (alreadyTaken) {
-            showAlert(
-                'Ujian Sudah Dikerjakan!', 
-                `Siswa atas nama (${currentStudent.name}) sudah pernah menyelesaikan ujian untuk mata pelajaran (${selectedSubtest}). Ujian tidak dapat diulang.`, 
-                'error'
-            );
-            return;
+            // 1. TARIK DATA TERBARU DARI GOOGLE SHEETS DULU SEBELUM IJINKAN MASUK
+            if (googleSheetsUrl) {
+                try {
+                    const res = await fetch(googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 'action=GET_RESULTS&t=' + Date.now());
+                    const cloudData = await res.json();
+                    if (Array.isArray(cloudData)) {
+                        resultsDataList = cloudData;
+                    }
+                } catch (err) {
+                    console.warn("Gagal cek cloud, memakai data lokal fallback:", err);
+                }
+            }
+
+            // 2. GABUNGKAN RIWAYAT LOKAL & CLOUD TERBARU
+            const localResults = JSON.parse(localStorage.getItem('tryout_results') || '[]');
+            const combinedResults = [...localResults, ...(resultsDataList || [])];
+
+            const alreadyTaken = combinedResults.some(r => {
+                const rUser = String(r.username || '').trim().toLowerCase();
+                const rName = String(r.studentName || '').trim().toLowerCase();
+                const rSubtest = String(r.subtest || '').trim().toLowerCase();
+
+                const isSameStudent = (rUser && rUser === studentUsername) || (rName && rName === studentName);
+                const isSameSubtest = rSubtest === selectedSubtest.toLowerCase();
+
+                return isSameStudent && isSameSubtest;
+            });
+
+            if (alreadyTaken) {
+                if (btnStart) {
+                    btnStart.disabled = false;
+                    btnStart.innerHTML = originalBtnHtml;
+                }
+                showAlert(
+                    'Ujian Sudah Dikerjakan!', 
+                    `Siswa atas nama (${currentStudent.name}) sudah pernah menyelesaikan ujian untuk mata pelajaran (${selectedSubtest}). Ujian tidak dapat diulang.`, 
+                    'error'
+                );
+                return;
+            }
+
+            // RESTO KODE MULAI UJIAN (Lanjut jika belum pernah ujian)
+            if (btnStart) {
+                btnStart.disabled = false;
+                btnStart.innerHTML = originalBtnHtml;
+            }
+
+            const subtestConfig = getSubtestConfig(selectedSubtest);
+            const inputToken = document.getElementById('exam-token-input').value.trim().toUpperCase();
+            if (inputToken !== subtestConfig.token) {
+                showAlert('Token Salah', `Token Ujian untuk mata pelajaran (${selectedSubtest}) yang Anda masukkan salah / tidak aktif. Silakan tanyakan ke pengawas.`, 'error');
+                return;
+            }
+
+            if (googleSheetsUrl) {
+                try {
+                    await fetchCloudQuestions();
+                } catch(err) {
+                    console.warn("Menggunakan data lokal:", err);
+                }
+            }
+
+            const classStr = (currentStudent.studentClass || '').toUpperCase();
+            const majorStr = (currentStudent.major || '').toUpperCase();
+
+            function matchMajorCategory(qCategory) {
+                const catUpper = (qCategory || '').toUpperCase();
+                if (classStr.includes('TAV') || majorStr.includes('AUDIO') || majorStr.includes('TAV')) return catUpper.includes('AUDIO') || catUpper.includes('TAV');
+                if (classStr.includes('TKR') || majorStr.includes('KENDARAAN') || majorStr.includes('TKR')) return catUpper.includes('KENDARAAN') || catUpper.includes('TKR');
+                if (classStr.includes('TSM') || classStr.includes('TBSM') || majorStr.includes('MOTOR') || majorStr.includes('TSM')) return catUpper.includes('MOTOR') || catUpper.includes('TSM');
+                if (classStr.includes('TITL') || majorStr.includes('LISTRIK') || majorStr.includes('TITL')) return catUpper.includes('LISTRIK') || catUpper.includes('TITL');
+                if (classStr.includes('ATPH') || majorStr.includes('AGRIBISNIS') || majorStr.includes('HORTI') || majorStr.includes('ATPH')) return catUpper.includes('AGRIBISNIS') || catUpper.includes('HORTI') || catUpper.includes('ATPH');
+                if (classStr.includes('NKPI') || majorStr.includes('NAUTIKA') || majorStr.includes('KAPAL') || majorStr.includes('NKPI')) return catUpper.includes('NAUTIKA') || catUpper.includes('KAPAL') || catUpper.includes('NKPI');
+                return catUpper.includes(majorStr) || majorStr.includes(catUpper.replace('SMK - ', ''));
+            }
+
+            if (selectedSubtest === 'Program Keahlian' || selectedSubtest.toLowerCase().includes('keahlian')) {
+                currentExamQuestions = questionsData.filter(q => matchMajorCategory(q.category));
+            } else {
+                currentExamQuestions = questionsData.filter(q => q.category === selectedSubtest || q.category.includes(selectedSubtest));
+            }
+
+            if (currentExamQuestions.length === 0) {
+                showAlert('Soal Belum Ada', `Belum ada soal tersedia di bank soal untuk subtes/jurusan (${selectedSubtest})!`, 'error');
+                return;
+            }
+
+            if (subtestConfig.shuffleQ) {
+                currentExamQuestions = shuffleArray(currentExamQuestions);
+            }
+
+            if (subtestConfig.shuffleOpt) {
+                currentExamQuestions = applyOptionShuffle(currentExamQuestions);
+            }
+
+            studentAnswers = {};
+            bookmarkedQuestions.clear();
+            currentQIndex = 0;
+            violationCount = 0;
+            isExamActive = true;
+
+            document.getElementById('student-prep-card').style.display = 'none';
+            document.getElementById('cbt-screen').style.display = 'flex';
+            const globalFooter = document.getElementById('global-footer');
+            if (globalFooter) globalFooter.style.display = 'none';
+
+            document.getElementById('cbt-student-display').textContent = currentStudent.name || currentStudent.username;
+            document.getElementById('cbt-class-display').textContent = currentStudent.studentClass || 'Peserta';
+            document.getElementById('cbt-subtest-display').textContent = `Subtes: ${selectedSubtest}`;
+            document.getElementById('violation-count-display').textContent = '0';
+
+            const durationMinutes = (selectedSubtest === 'Bahasa Indonesia' || selectedSubtest === 'Matematika' || selectedSubtest === 'Bahasa Inggris') ? 75 : 60;
+            remainingTimeSeconds = durationMinutes * 60;
+
+            startExamTimer();
+            setupAntiCheatListeners();
+            renderQuestion();
+            renderQuestionGridNav();
+            saveActiveExamSession();
+
+        } catch (error) {
+            if (btnStart) {
+                btnStart.disabled = false;
+                btnStart.innerHTML = originalBtnHtml;
+            }
+            console.error("Error pada handleStartExam:", error);
         }
+    }
         // 2. CEK TOKEN UJIAN
         const subtestConfig = getSubtestConfig(selectedSubtest);
         const inputToken = document.getElementById('exam-token-input').value.trim().toUpperCase();
