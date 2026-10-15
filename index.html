@@ -62,13 +62,12 @@
             background: #94a3b8;
         }
 
-        /* BACKGROUND DOODLE TEMATIK 6 JURUSAN SMKN 1 BULAKAMBA (STATIS, PADAT, RAPI) */
         .edu-doodle-bg {
             background-color: #f0f9ff;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='130' height='130' viewBox='0 0 130 130'%3E%3Cg fill='none' stroke='%230284c7' stroke-opacity='0.16' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3C!-- 1. TKR (Mobil) --%3E%3Cpath d='M10 24h18l5-8h16l5 8h10v14H10z'/%3E%3Ccircle cx='20' cy='38' r='4'/%3E%3Ccircle cx='48' cy='38' r='4'/%3E%3C!-- 2. TSM (Motor) --%3E%3Ccircle cx='80' cy='30' r='7'/%3E%3Ccircle cx='112' cy='30' r='7'/%3E%3Cpath d='M80 30l10-12h14l10 12M90 18l-5-5h-8'/%3E%3C!-- 3. TITL (Petir & Listrik) --%3E%3Cpath d='M25 65l10-14h-8l8-14-14 16h8z' fill='%230284c7' fill-opacity='0.12'/%3E%3C!-- 4. ATPH (Tanaman) --%3E%3Cpath d='M95 80c0-12 12-12 12 0-12 0-12 0-12 0zM95 80c0-10-10-10-10 0 10 0 10 0 10 0zM95 80v10'/%3E%3C!-- 5. TAV (Audio Radio) --%3E%3Crect x='12' y='96' width='24' height='16' rx='3'/%3E%3Cpath d='M18 96l-5-7M30 96l5-7'/%3E%3Ccircle cx='29' cy='104' r='3'/%3E%3C!-- 6. NKPI (Jangkar Kapal) --%3E%3Ccircle cx='98' cy='100' r='3'/%3E%3Cpath d='M98 103v18M92 108h12M86 115c0 8 24 8 24 0'/%3E%3C/g%3E%3C/svg%3E");
             background-repeat: repeat;
         }
-@media print {
+        @media print {
             header, footer, .no-print, #student-login-card, #student-prep-card, #tab-bank {
                 display: none !important;
             }
@@ -415,7 +414,7 @@
             </div>
         </div>
 
-        <!-- 1D. EXAM RESULT SUMMARY CARD (BERSIH & WARNA DINAMIS) -->
+        <!-- 1D. EXAM RESULT SUMMARY CARD -->
         <div id="cbt-result-card" style="display: none;" class="max-w-md mx-auto bg-white rounded-3xl shadow-2xl border border-slate-200/80 p-6 sm:p-8 text-center relative overflow-hidden my-6">
             <div class="mb-5">
                 <div id="res-badge-icon" class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-3 text-3xl shadow-md transition-all duration-300">
@@ -431,7 +430,6 @@
                 </p>
             </div>
 
-            <!-- KARTU NILAI DINAMIS (MERAH / HIJAU) -->
             <div id="res-score-card" class="rounded-2xl p-6 text-center shadow-lg mb-6 transition-all duration-300 border">
                 <span class="text-xs font-bold uppercase tracking-widest block opacity-90">NILAI AKHIR UJIAN</span>
                 <div class="text-6xl font-black my-2 tracking-tight drop-shadow-sm" id="res-final-score">0</div>
@@ -468,7 +466,6 @@
             </div>
         </div>
 
-        <!-- TOOLBAR: FILTER SUBTES + PENGATURAN TOKEN & ACAK SOAL/OPSI SEJAJAR -->
         <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-200 flex flex-col xl:flex-row justify-between items-stretch xl:items-center gap-4">
             <div class="flex flex-wrap items-center gap-3.5">
                 <div>
@@ -651,7 +648,7 @@
     </div>
 </div>
 
-<<!-- CUSTOM MODAL CONFIRM DIALOG -->
+<!-- CUSTOM MODAL CONFIRM DIALOG -->
 <div id="modal-custom-confirm" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
     <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 p-6 sm:p-7 max-w-sm w-full text-center relative">
         <div id="custom-confirm-icon-box" class="w-12 h-12 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl">
@@ -688,6 +685,7 @@
         </form>
     </div>
 </div>
+
 <!-- Modal Violation Warning -->
 <div id="modal-violation" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-rose-950/80 backdrop-blur-md">
     <div class="bg-white rounded-3xl shadow-2xl border border-rose-200 p-6 sm:p-8 max-w-md w-full text-center relative">
@@ -777,10 +775,10 @@
                 <span class="font-bold text-slate-700 block mb-1">Pilihan Jawaban (A - E):</span>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <input type="text" id="form-q-opt-A" oninput="syncFormOptionsWithKeyInputs()" placeholder="Pilihan A" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required class="p-2 rounded-xl border border-slate-300 bg-white">
-<input type="text" id="form-q-opt-B" oninput="syncFormOptionsWithKeyInputs()" placeholder="Pilihan B" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required class="p-2 rounded-xl border border-slate-300 bg-white">
-<input type="text" id="form-q-opt-C" oninput="syncFormOptionsWithKeyInputs()" placeholder="Pilihan C" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required class="p-2 rounded-xl border border-slate-300 bg-white">
-<input type="text" id="form-q-opt-D" oninput="syncFormOptionsWithKeyInputs()" placeholder="Pilihan D (Kosongkan jika hanya 3 opsi)" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="p-2 rounded-xl border border-slate-300 bg-white">
-<input type="text" id="form-q-opt-E" oninput="syncFormOptionsWithKeyInputs()" placeholder="Pilihan E (Kosongkan jika hanya 3 opsi)" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="p-2 rounded-xl border border-slate-300 bg-white sm:col-span-2">
+                    <input type="text" id="form-q-opt-B" oninput="syncFormOptionsWithKeyInputs()" placeholder="Pilihan B" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required class="p-2 rounded-xl border border-slate-300 bg-white">
+                    <input type="text" id="form-q-opt-C" oninput="syncFormOptionsWithKeyInputs()" placeholder="Pilihan C" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required class="p-2 rounded-xl border border-slate-300 bg-white">
+                    <input type="text" id="form-q-opt-D" oninput="syncFormOptionsWithKeyInputs()" placeholder="Pilihan D (Kosongkan jika hanya 3 opsi)" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="p-2 rounded-xl border border-slate-300 bg-white">
+                    <input type="text" id="form-q-opt-E" oninput="syncFormOptionsWithKeyInputs()" placeholder="Pilihan E (Kosongkan jika hanya 3 opsi)" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="p-2 rounded-xl border border-slate-300 bg-white sm:col-span-2">
                 </div>
             </div>
 
@@ -855,7 +853,7 @@
     </div>
 </div>
 
-<!-- Modal Pratinjau Soal (Simulasi Layar Siswa CBT) -->
+<!-- Modal Pratinjau Soal -->
 <div id="modal-preview-question" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-xs overflow-y-auto">
     <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 p-6 sm:p-8 max-w-3xl w-full my-6 relative">
         <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-200">
@@ -1018,53 +1016,53 @@
         }
     }
 
-   function submitAdminAuth(e) {
-    e.preventDefault();
-    const pinInput = document.getElementById('admin-pin-input').value.trim();
-    const errEl = document.getElementById('admin-pin-error');
-    const btn = document.getElementById('admin-pin-btn');
+    function submitAdminAuth(e) {
+        e.preventDefault();
+        const pinInput = document.getElementById('admin-pin-input').value.trim();
+        const errEl = document.getElementById('admin-pin-error');
+        const btn = document.getElementById('admin-pin-btn');
 
-    if (!pinInput) return;
+        if (!pinInput) return;
 
-    btn.disabled = true;
-    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memeriksa...`;
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memeriksa...`;
 
-    fetch(googleSheetsUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'VERIFY_PIN', pin: pinInput })
-    })
-    .then(res => res.json())
-    .then(data => {
-        btn.disabled = false;
-        btn.innerHTML = `Buka Akses`;
-        
-        if (data.status === 'success') {
-            isAdminLoggedIn = true;
-            window.activeAdminPin = pinInput; 
+        fetch(googleSheetsUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'VERIFY_PIN', pin: pinInput })
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.disabled = false;
+            btn.innerHTML = `Buka Akses`;
             
-            // SIMPAN SESI KOORDINATOR DI TAB BROWSER
-            sessionStorage.setItem('cbt_is_admin', 'true');
-            sessionStorage.setItem('cbt_admin_pin', pinInput);
+            if (data.status === 'success') {
+                isAdminLoggedIn = true;
+                window.activeAdminPin = pinInput; 
+                
+                sessionStorage.setItem('cbt_is_admin', 'true');
+                sessionStorage.setItem('cbt_admin_pin', pinInput);
 
-            closeModal('modal-admin-auth');
-            document.getElementById('admin-pin-input').value = '';
-            if (errEl) errEl.classList.add('hidden');
-            updateNavUI();
-            switchTab('bank');
-        } else {
-            if (errEl) {
-                errEl.textContent = data.message || 'PIN Koordinator salah!';
-                errEl.classList.remove('hidden');
+                closeModal('modal-admin-auth');
+                document.getElementById('admin-pin-input').value = '';
+                if (errEl) errEl.classList.add('hidden');
+                updateNavUI();
+                switchTab('bank');
+            } else {
+                if (errEl) {
+                    errEl.textContent = data.message || 'PIN Koordinator salah!';
+                    errEl.classList.remove('hidden');
+                }
             }
-        }
-    })
-    .catch(err => {
-        btn.disabled = false;
-        btn.innerHTML = `Buka Akses`;
-        showAlert('Error', 'Gagal terhubung ke server Google Apps Script.', 'error');
-    });
-}
+        })
+        .catch(err => {
+            btn.disabled = false;
+            btn.innerHTML = `Buka Akses`;
+            showAlert('Error', 'Gagal terhubung ke server Google Apps Script.', 'error');
+        });
+    }
+
     function formatGoogleDriveUrl(url) {
         if (!url) return '';
         if (url.includes('drive.google.com') && url.includes('/d/')) {
@@ -1081,19 +1079,18 @@
     }
 
     function deduplicateQuestions(data) {
-    const seen = new Set();
-    const result = [];
-    data.forEach((q, idx) => {
-        if (!q || !q.question) return;
-        // Gunakan ID unik soal agar soal dengan pertanyaan mirip tidak terhapus
-        const key = q.id ? String(q.id).trim() : (q.category + '___' + idx);
-        if (!seen.has(key)) {
-            seen.add(key);
-            result.push(q);
-        }
-    });
-    return result;
-}
+        const seen = new Set();
+        const result = [];
+        data.forEach((q, idx) => {
+            if (!q || !q.question) return;
+            const key = q.id ? String(q.id).trim() : (q.category + '___' + idx);
+            if (!seen.has(key)) {
+                seen.add(key);
+                result.push(q);
+            }
+        });
+        return result;
+    }
 
     function getSubtestSettingsMap() {
         try {
@@ -1103,22 +1100,19 @@
         }
     }
 
-   function getSubtestConfig(subtest) {
+    function getSubtestConfig(subtest) {
         const map = getSubtestSettingsMap();
-        
-        // Jika mapel/pilihan ini sudah punya pengaturan khusus di map, gunakan itu
         if (map[subtest] && map[subtest].token) {
             return map[subtest];
         }
-        
-        // Default fallback untuk masing-masing opsi
         return {
             token: subtest === 'ALL' ? 'TKA2026' : (map['ALL']?.token || 'TKA2026'),
             shuffleQ: true,
             shuffleOpt: true
         };
     }
- function saveActiveTokenSetting() {
+
+    function saveActiveTokenSetting() {
         const subtestSelect = document.getElementById('bank-filter-subtest');
         const selectedSubtest = subtestSelect ? subtestSelect.value : 'ALL';
         const tokenVal = (document.getElementById('setting-cbt-token')?.value || 'TKA2026').trim().toUpperCase();
@@ -1128,10 +1122,8 @@
         const map = getSubtestSettingsMap();
 
         if (selectedSubtest === 'ALL') {
-            // 1. Jika ALL (Semua Mata Pelajaran), Terapkan Massal ke Seluruh Subtes
             map['ALL'] = { token: tokenVal, shuffleQ: shuffleQVal, shuffleOpt: shuffleOptVal };
 
-            // Ambil seluruh opsi subtes yang ada di dropdown filter
             if (subtestSelect) {
                 Array.from(subtestSelect.options).forEach(opt => {
                     if (opt.value) {
@@ -1142,7 +1134,6 @@
             
             localStorage.setItem('cbt_subtest_settings_map', JSON.stringify(map));
 
-            // Kirim perubahan massal ke Google Sheets
             if (googleSheetsUrl) {
                 fetch(googleSheetsUrl, {
                     method: 'POST',
@@ -1166,7 +1157,6 @@
             }
 
         } else {
-            // 2. Jika Memilih Subtes Tertentu (Misal: Bahasa Indonesia), Simpan Khusus Subtes Ini Saja
             map[selectedSubtest] = { token: tokenVal, shuffleQ: shuffleQVal, shuffleOpt: shuffleOptVal };
             localStorage.setItem('cbt_subtest_settings_map', JSON.stringify(map));
 
@@ -1193,40 +1183,33 @@
             }
         }
     }
- function loadSubtestSettingsToForm() {
-    const subtestSelect = document.getElementById('bank-filter-subtest');
-    const selectedSubtest = subtestSelect ? subtestSelect.value : 'ALL';
-    
-    // Ambil map pengaturan terbaru dari localStorage
-    const map = getSubtestSettingsMap();
-    
-    // HIERARKI PENGECEKAN: Pengaturan Spesifik Subtes -> Pengaturan Global (ALL) -> Default TKA2026
-    const currentConfig = map[selectedSubtest] || map['ALL'] || {
-        token: "TKA2026",
-        shuffleQ: true,
-        shuffleOpt: true
-    };
 
-    const tokenInput = document.getElementById('setting-cbt-token');
-    if (tokenInput) {
-        tokenInput.value = currentConfig.token || "TKA2026";
+    function loadSubtestSettingsToForm() {
+        const subtestSelect = document.getElementById('bank-filter-subtest');
+        const selectedSubtest = subtestSelect ? subtestSelect.value : 'ALL';
+        const map = getSubtestSettingsMap();
+        
+        const currentConfig = map[selectedSubtest] || map['ALL'] || {
+            token: "TKA2026",
+            shuffleQ: true,
+            shuffleOpt: true
+        };
+
+        const tokenInput = document.getElementById('setting-cbt-token');
+        if (tokenInput) tokenInput.value = currentConfig.token || "TKA2026";
+
+        const shuffleQInput = document.getElementById('setting-cbt-shuffle-q');
+        if (shuffleQInput) shuffleQInput.checked = currentConfig.shuffleQ !== false;
+
+        const shuffleOptInput = document.getElementById('setting-cbt-shuffle-opt');
+        if (shuffleOptInput) shuffleOptInput.checked = currentConfig.shuffleOpt !== false;
     }
 
-    const shuffleQInput = document.getElementById('setting-cbt-shuffle-q');
-    if (shuffleQInput) {
-        shuffleQInput.checked = currentConfig.shuffleQ !== false;
-    }
-
-    const shuffleOptInput = document.getElementById('setting-cbt-shuffle-opt');
-    if (shuffleOptInput) {
-        shuffleOptInput.checked = currentConfig.shuffleOpt !== false;
-    }
-}
     function onBankFilterSubtestChange() {
-    bankCurrentPage = 1;
-    renderBankTable();
-    loadSubtestSettingsToForm(); // <-- Memastikan form token & acak diperbarui sesuai subtes yang dipilih
-}
+        bankCurrentPage = 1;
+        renderBankTable();
+        loadSubtestSettingsToForm();
+    }
 
     function getInitialDefaultQuestions() {
         return [
@@ -1279,7 +1262,6 @@
         renderBankTable();
     }
 
-    // --- HELPER UNTUK KATEGORI MATRIX (PG KOMPLEKS MATRIX) ---
     function getMatrixLabels(matrixType) {
         let col1 = 'Benar (B)';
         let col2 = 'Salah (S)';
@@ -1299,7 +1281,6 @@
         return { col1, col2 };
     }
 
-    // --- SHUFFLE UTILITIES ---
     function shuffleArray(array) {
         const arr = [...array];
         for (let i = arr.length - 1; i > 0; i--) {
@@ -1382,7 +1363,8 @@
             return q;
         });
     }
-function switchTab(tabName) {
+
+    function switchTab(tabName) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
         document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-brand-700', 'font-bold'));
 
@@ -1392,7 +1374,6 @@ function switchTab(tabName) {
         const navBtn = document.getElementById('nav-' + tabName);
         if (navBtn) navBtn.classList.add('bg-brand-700', 'font-bold');
 
-        // SIMPAN TAB TERAKHIR YANG DIBUKA
         sessionStorage.setItem('cbt_active_tab', tabName);
 
         if (tabName === 'bank') renderBankTable();
@@ -1439,6 +1420,7 @@ function switchTab(tabName) {
         }
     }
 
+    // --- FUNGSI LOGIN SISWA DENGAN FALLBACK AMAN ---
     function handleStudentLogin(e) {
         e.preventDefault();
         const username = document.getElementById('login-username').value.trim();
@@ -1450,56 +1432,51 @@ function switchTab(tabName) {
 
         btn.disabled = true;
         btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memverifikasi...`;
-        errorEl.classList.add('hidden');
+        if (errorEl) errorEl.classList.add('hidden');
 
-        if (googleSheetsUrl) {
-            fetch(googleSheetsUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({ action: 'LOGIN', username: username, password: password }),
-    redirect: 'follow'
-})
-            .then(res => res.json())
-            .then(data => {
-                btn.disabled = false;
-                btn.innerHTML = `<i class="fa-solid fa-arrow-right-to-bracket"></i> Masuk Ujian Try Out`;
-
-                if (data.status === 'success' && data.student) {
-                    currentStudent = data.student;
-                    
-                    // TAMBAHKAN BARIS INI: Narik data hasil dari Google Sheets saat login sukses
-                    if (typeof fetchCloudResults === 'function') fetchCloudResults();
-                    
-                    showStudentPrepCard();
-                    checkActiveExamSession();
-                } else {
-                    document.getElementById('login-error-text').textContent = data.message || 'Username atau password 6-digit salah!';
-                    errorEl.classList.remove('hidden');
-                }
-            })
-            .catch(() => {
-                btn.disabled = false;
-                btn.innerHTML = `<i class="fa-solid fa-arrow-right-to-bracket"></i> Masuk Ujian Try Out`;
-                currentStudent = {
-                    username: username,
-                    name: username.toUpperCase(),
-                    studentClass: 'XII TKR 1',
-                    major: 'Teknik Kendaraan Ringan'
-                };
-                showStudentPrepCard();
-                checkActiveExamSession();
-            });
-        } else {
+        function proceedFallback() {
             btn.disabled = false;
             btn.innerHTML = `<i class="fa-solid fa-arrow-right-to-bracket"></i> Masuk Ujian Try Out`;
             currentStudent = {
                 username: username,
                 name: username.toUpperCase(),
-                studentClass: 'XII TKR 1',
-                major: 'Teknik Kendaraan Ringan'
+                studentClass: 'XII NKPI 1',
+                major: 'Nautika Kapal Penangkap Ikan'
             };
             showStudentPrepCard();
             checkActiveExamSession();
+        }
+
+        if (googleSheetsUrl) {
+            fetch(googleSheetsUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'LOGIN', username: username, password: password })
+            })
+            .then(res => res.json())
+            .then(data => {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-arrow-right-to-bracket"></i> Masuk Ujian Try Out`;
+
+                if (data && data.status === 'success' && data.student) {
+                    currentStudent = data.student;
+                    showStudentPrepCard();
+                    checkActiveExamSession();
+                } else if (data && data.status === 'error') {
+                    if (document.getElementById('login-error-text')) {
+                        document.getElementById('login-error-text').textContent = data.message || 'Username atau password salah!';
+                    }
+                    if (errorEl) errorEl.classList.remove('hidden');
+                } else {
+                    proceedFallback();
+                }
+            })
+            .catch(err => {
+                console.warn("Koneksi login cloud terkendala, masuk mode lokal:", err);
+                proceedFallback();
+            });
+        } else {
+            proceedFallback();
         }
     }
 
@@ -1533,7 +1510,8 @@ function switchTab(tabName) {
         }
     }
 
-  async function handleStartExam(e) {
+    // --- FUNGSI MULAI UJIAN + CEK RIWAYAT REAL-TIME KELUARAN GOOGLE SHEETS ---
+    async function handleStartExam(e) {
         e.preventDefault();
 
         const btnStart = e.target.querySelector('button[type="submit"]');
@@ -1562,17 +1540,20 @@ function switchTab(tabName) {
                 }
             }
 
-            // 2. GABUNGKAN RIWAYAT LOKAL & CLOUD TERBARU
+            // 2. GABUNGKAN RIWAYAT LOKAL & CLOUD TERBARU (FLEKSIBEL PENCOCOKAN NAMA)
             const localResults = JSON.parse(localStorage.getItem('tryout_results') || '[]');
             const combinedResults = [...localResults, ...(resultsDataList || [])];
 
             const alreadyTaken = combinedResults.some(r => {
                 const rUser = String(r.username || '').trim().toLowerCase();
-                const rName = String(r.studentName || '').trim().toLowerCase();
-                const rSubtest = String(r.subtest || '').trim().toLowerCase();
+                const rName = String(r.studentName || r.nama || '').trim().toLowerCase();
+                const rSubtest = String(r.subtest || r.mapel || '').trim().toLowerCase();
 
-                const isSameStudent = (rUser && rUser === studentUsername) || (rName && rName === studentName);
-                const isSameSubtest = rSubtest === selectedSubtest.toLowerCase();
+                const isSameUser = (rUser && rUser !== '-' && rUser === studentUsername);
+                const isSameName = (rName && studentName) && (rName.includes(studentName) || studentName.includes(rName));
+                
+                const isSameStudent = isSameUser || isSameName;
+                const isSameSubtest = rSubtest.includes(selectedSubtest.toLowerCase()) || selectedSubtest.toLowerCase().includes(rSubtest);
 
                 return isSameStudent && isSameSubtest;
             });
@@ -1590,7 +1571,6 @@ function switchTab(tabName) {
                 return;
             }
 
-            // RESTO KODE MULAI UJIAN (Lanjut jika belum pernah ujian)
             if (btnStart) {
                 btnStart.disabled = false;
                 btnStart.innerHTML = originalBtnHtml;
@@ -1677,79 +1657,6 @@ function switchTab(tabName) {
             console.error("Error pada handleStartExam:", error);
         }
     }
-        // 2. CEK TOKEN UJIAN
-        const subtestConfig = getSubtestConfig(selectedSubtest);
-        const inputToken = document.getElementById('exam-token-input').value.trim().toUpperCase();
-        if (inputToken !== subtestConfig.token) {
-            showAlert('Token Salah', `Token Ujian untuk mata pelajaran (${selectedSubtest}) yang Anda masukkan salah / tidak aktif. Silakan tanyakan ke pengawas.`, 'error');
-            return;
-        }
-        if (googleSheetsUrl) {
-            try {
-                await fetchCloudQuestions();
-            } catch(err) {
-                console.warn("Menggunakan data lokal:", err);
-            }
-        }
-
-        const classStr = (currentStudent.studentClass || '').toUpperCase();
-        const majorStr = (currentStudent.major || '').toUpperCase();
-
-        function matchMajorCategory(qCategory) {
-            const catUpper = (qCategory || '').toUpperCase();
-            if (classStr.includes('TAV') || majorStr.includes('AUDIO') || majorStr.includes('TAV')) return catUpper.includes('AUDIO') || catUpper.includes('TAV');
-            if (classStr.includes('TKR') || majorStr.includes('KENDARAAN') || majorStr.includes('TKR')) return catUpper.includes('KENDARAAN') || catUpper.includes('TKR');
-            if (classStr.includes('TSM') || classStr.includes('TBSM') || majorStr.includes('MOTOR') || majorStr.includes('TSM')) return catUpper.includes('MOTOR') || catUpper.includes('TSM');
-            if (classStr.includes('TITL') || majorStr.includes('LISTRIK') || majorStr.includes('TITL')) return catUpper.includes('LISTRIK') || catUpper.includes('TITL');
-            if (classStr.includes('ATPH') || majorStr.includes('AGRIBISNIS') || majorStr.includes('HORTI') || majorStr.includes('ATPH')) return catUpper.includes('AGRIBISNIS') || catUpper.includes('HORTI') || catUpper.includes('ATPH');
-            if (classStr.includes('NKPI') || majorStr.includes('NAUTIKA') || majorStr.includes('KAPAL') || majorStr.includes('NKPI')) return catUpper.includes('NAUTIKA') || catUpper.includes('KAPAL') || catUpper.includes('NKPI');
-            return catUpper.includes(majorStr) || majorStr.includes(catUpper.replace('SMK - ', ''));
-        }
-
-        if (selectedSubtest === 'Program Keahlian' || selectedSubtest.toLowerCase().includes('keahlian')) {
-            currentExamQuestions = questionsData.filter(q => matchMajorCategory(q.category));
-        } else {
-            currentExamQuestions = questionsData.filter(q => q.category === selectedSubtest || q.category.includes(selectedSubtest));
-        }
-
-        if (currentExamQuestions.length === 0) {
-            showAlert('Soal Belum Ada', `Belum ada soal tersedia di bank soal untuk subtes/jurusan (${selectedSubtest})!`, 'error');
-            return;
-        }
-
-        if (subtestConfig.shuffleQ) {
-            currentExamQuestions = shuffleArray(currentExamQuestions);
-        }
-
-        if (subtestConfig.shuffleOpt) {
-            currentExamQuestions = applyOptionShuffle(currentExamQuestions);
-        }
-
-        studentAnswers = {};
-        bookmarkedQuestions.clear();
-        currentQIndex = 0;
-        violationCount = 0;
-        isExamActive = true;
-
-        document.getElementById('student-prep-card').style.display = 'none';
-        document.getElementById('cbt-screen').style.display = 'flex';
-        const globalFooter = document.getElementById('global-footer');
-        if (globalFooter) globalFooter.style.display = 'none';
-
-        document.getElementById('cbt-student-display').textContent = currentStudent.name || currentStudent.username;
-        document.getElementById('cbt-class-display').textContent = currentStudent.studentClass || 'Peserta';
-        document.getElementById('cbt-subtest-display').textContent = `Subtes: ${selectedSubtest}`;
-        document.getElementById('violation-count-display').textContent = '0';
-
-        const durationMinutes = (selectedSubtest === 'Bahasa Indonesia' || selectedSubtest === 'Matematika' || selectedSubtest === 'Bahasa Inggris') ? 75 : 60;
-        remainingTimeSeconds = durationMinutes * 60;
-
-        startExamTimer();
-        setupAntiCheatListeners();
-        renderQuestion();
-        renderQuestionGridNav();
-        saveActiveExamSession();
-    }
 
     function startExamTimer() {
         clearInterval(examTimerInterval);
@@ -1815,14 +1722,13 @@ function switchTab(tabName) {
         localStorage.setItem('tryout_active_session', JSON.stringify(sessionData));
     }
 
- function checkActiveExamSession() {
+    function checkActiveExamSession() {
         const saved = localStorage.getItem('tryout_active_session');
         if (!saved) return;
 
         try {
             const data = JSON.parse(saved);
             if (data && data.student && data.questions && data.questions.length > 0) {
-                // LANGSUNG MASUK KE SOAL TANPA POPUP CONFIRM
                 resumeExamSession(data);
             }
         } catch(e) {
@@ -1994,7 +1900,6 @@ function switchTab(tabName) {
             } else if (q.type === 'pgk_matrix') {
                 const matrixType = q.matrixType || 'bs';
                 const { col1, col2 } = getMatrixLabels(matrixType);
-
                 const userAnswersObj = studentAnswers[q.id] ? JSON.parse(studentAnswers[q.id]) : {};
 
                 const table = document.createElement('table');
@@ -2044,7 +1949,6 @@ function switchTab(tabName) {
         const btnNext = document.getElementById('btn-next-q');
         const btnSubmit = document.getElementById('btn-submit-q');
 
-       // LOGIKA BARU: TOMBOL SELESAI MUNCUL JIKA SUDAH TERISI SEMUA ATAU DI NO TERAKHIR
         const totalQuestions = currentExamQuestions.length;
         let answeredCount = 0;
 
@@ -2059,12 +1963,10 @@ function switchTab(tabName) {
         const isLastQuestion = (currentQIndex === totalQuestions - 1);
 
         if (btnNext) {
-            // Sembunyikan 'Berikut' hanya kalau sudah di nomor paling akhir
             btnNext.style.display = isLastQuestion ? 'none' : 'inline-flex';
         }
 
         if (btnSubmit) {
-            // Tampilkan 'Selesai' jika SUDAH DIJAWAB SEMUA atau sedang di nomor terakhir
             if (isAllAnswered || isLastQuestion) {
                 btnSubmit.style.display = 'inline-flex';
             } else {
@@ -2072,7 +1974,6 @@ function switchTab(tabName) {
             }
         }
 
-        // KODE BARU (Menggunakan setTimeout agar matematika dirender sempurna):
         if (window.renderMathInElement) {
             setTimeout(() => {
                 const cbtScreen = document.getElementById('cbt-screen');
@@ -2088,6 +1989,7 @@ function switchTab(tabName) {
             }, 50);
         }
     }
+
     function setMatrixAnswer(qId, statementLetter, val) {
         let obj = studentAnswers[qId] ? JSON.parse(studentAnswers[qId]) : {};
         obj[statementLetter] = val;
@@ -2152,22 +2054,19 @@ function switchTab(tabName) {
     }
 
     function confirmSubmitExam() {
-        // Hitung total soal dan berapa soal yang sudah diisi
         const totalQuestions = currentExamQuestions.length;
         let answeredCount = 0;
         let unansweredIndices = [];
 
         currentExamQuestions.forEach((q, idx) => {
             const userAns = studentAnswers[q.id];
-            // Pengecekan apakah soal sudah dijawab (PG, Checkbox, atau Matrix)
             if (userAns && userAns !== '{}' && userAns !== '') {
                 answeredCount++;
             } else {
-                unansweredIndices.push(idx + 1); // Simpan nomor soal yang belum diisi
+                unansweredIndices.push(idx + 1);
             }
         });
 
-        // JIKA MASIH ADA SOAL YANG BELUM DIJAWAB
         if (answeredCount < totalQuestions) {
             const missingText = unansweredIndices.length <= 5 
                 ? `Nomor soal yang belum dijawab: ${unansweredIndices.join(', ')}.` 
@@ -2178,10 +2077,9 @@ function switchTab(tabName) {
                 `Anda baru menjawab ${answeredCount} dari ${totalQuestions} soal. Silakan lengkapi semua jawaban terlebih dahulu sebelum mengakhiri ujian.\n\n${missingText}`, 
                 'error'
             );
-            return; // Hentikan proses submit
+            return;
         }
 
-        // JIKA SEMUA SOAL SUDAH TERISI
         showConfirm(
             'Selesaikan Ujian', 
             'Semua soal telah dijawab dengan lengkap. Apakah Anda yakin ingin menyelesaikan dan mengumpulkan ujian sekarang?', 
@@ -2191,7 +2089,7 @@ function switchTab(tabName) {
         );
     }
 
-  function finishExam(forced = false) {
+    function finishExam(forced = false) {
         isExamActive = false;
         clearInterval(examTimerInterval);
         window.onblur = null;
@@ -2269,7 +2167,6 @@ function switchTab(tabName) {
 
         const finalScore100 = totalMaxPoints > 0 ? Math.round((totalEarnedPoints / totalMaxPoints) * 100) : 0;
 
-        // --- TAMPILAN AKHIR SISWA DENGAN INDIKATOR WARNA DINAMIS ---
         document.getElementById('cbt-screen').style.display = 'none';
         document.getElementById('cbt-result-card').style.display = 'block';
         const globalFooter = document.getElementById('global-footer');
@@ -2280,7 +2177,6 @@ function switchTab(tabName) {
         document.getElementById('res-subtest-info').textContent = `Mata Pelajaran: ${subtestVal}`;
         document.getElementById('res-date-info').innerHTML = `<i class="fa-regular fa-clock"></i> Selesai: ${new Date().toLocaleString('id-ID')}`;
         
-        // Elemen Nilai & Warna Dinamis
         const scoreEl = document.getElementById('res-final-score');
         const scoreCard = document.getElementById('res-score-card');
         const badgeIcon = document.getElementById('res-badge-icon');
@@ -2288,7 +2184,6 @@ function switchTab(tabName) {
 
         scoreEl.textContent = finalScore100;
 
-        // PENGONDISIAN WARNA (< 60 = Merah, >= 60 = Hijau)
         if (finalScore100 < 60) {
             scoreCard.className = "bg-gradient-to-br from-rose-600 to-rose-800 text-white rounded-2xl p-8 text-center shadow-lg mb-6 border border-rose-500";
             badgeIcon.className = "w-16 h-16 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-3xl shadow-md border border-rose-200";
@@ -2299,7 +2194,7 @@ function switchTab(tabName) {
             iconEl.className = "fa-solid fa-trophy";
         }
 
-     const resultObj = {
+        const resultObj = {
             date: new Date().toLocaleString('id-ID'),
             studentName: currentStudent.name || '-',
             studentClass: currentStudent.studentClass || '-',
@@ -2311,20 +2206,18 @@ function switchTab(tabName) {
             empty: emptyCount,
             violations: violationCount,
             username: (currentStudent.username || '-').toLowerCase(),
-            syncedWithCloud: false // Default false sebelum sukses terkirim ke Sheets
+            syncedWithCloud: false
         };
 
         const existingResults = JSON.parse(localStorage.getItem('tryout_results') || '[]');
         existingResults.unshift(resultObj);
         localStorage.setItem('tryout_results', JSON.stringify(existingResults));
 
-        // OTOMATIS RENDER KE TABEL REKAP WEB SEKETIKA
         resultsDataList = existingResults;
         if (typeof renderResultsTable === 'function') {
             renderResultsTable();
         }
 
-      // PENGIRIMAN KE GOOGLE SHEETS CLOUD (ACTION: SAVE_RESULT)
         if (googleSheetsUrl) {
             const payload = JSON.stringify({ 
                 action: 'SAVE_RESULT', 
@@ -2340,27 +2233,18 @@ function switchTab(tabName) {
             .then(res => res.json())
             .then(data => {
                 if (data.status === 'success') {
-                    console.log('✅ Hasil ujian berhasil masuk ke Google Sheets Hasil_Ujian!');
-                    
-                    // Tandai bahwa data sudah sukses terkirim ke Sheets
                     resultObj.syncedWithCloud = true;
                     localStorage.setItem('tryout_results', JSON.stringify(existingResults));
 
-                    // --- UPDATE KELAS & REKAP TABEL SECARA REAL-TIME TANPA REFRESH ---
                     if (typeof updateResultsClassDropdown === 'function') updateResultsClassDropdown();
                     if (typeof renderResultsTable === 'function') renderResultsTable();
 
                     if (typeof fetchCloudResults === 'function' && window.activeAdminPin) {
                         fetchCloudResults();
                     }
-                } else {
-                    console.warn('⚠️ Server merespon tapi gagal simpan:', data.message);
                 }
             })
             .catch(err => {
-                console.warn("Mencoba pengiriman cadangan (no-cors)...", err);
-                
-                // Jalur cadangan tanpa terhalang blokir CORS browser
                 fetch(googleSheetsUrl, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -2369,33 +2253,13 @@ function switchTab(tabName) {
                 }).then(() => {
                     resultObj.syncedWithCloud = true;
                     localStorage.setItem('tryout_results', JSON.stringify(existingResults));
-                    
-                    // --- UPDATE KELAS & REKAP TABEL SECARA REAL-TIME (JALUR CADANGAN) ---
                     if (typeof updateResultsClassDropdown === 'function') updateResultsClassDropdown();
                     if (typeof renderResultsTable === 'function') renderResultsTable();
-                    
-                    console.log('✅ Terkirim via jalur no-cors!');
-                }).catch(err2 => {
-                    console.error("Semua jalur gagal, menyiapkan tombol backup.", err2);
-                    const btnCard = document.getElementById('cbt-result-card');
-                    if (btnCard && !document.getElementById('btn-download-backup')) {
-                        const backupBtn = document.createElement('button');
-                        backupBtn.id = 'btn-download-backup';
-                        backupBtn.className = 'w-full mt-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-4 rounded-xl transition text-sm flex items-center justify-center gap-2 shadow';
-                        backupBtn.innerHTML = `<i class="fa-solid fa-download"></i> Unduh Backup Hasil Ujian (Server Sibuk)`;
-                        backupBtn.onclick = function() {
-                            const blob = new Blob([JSON.stringify(resultObj, null, 2)], { type: 'application/json' });
-                            const a = document.createElement('a');
-                            a.href = URL.createObjectURL(blob);
-                            a.download = `Hasil_${currentStudent.name.replace(/\s+/g, '_')}_${resultObj.subtest}.json`;
-                            a.click();
-                        };
-                        btnCard.appendChild(backupBtn);
-                    }
                 });
             });
         }
     }
+
     function changeBankPage(direction) {
         const filterVal = document.getElementById('bank-filter-subtest').value;
         const filtered = filterVal === 'ALL' ? questionsData : questionsData.filter(q => q.category === filterVal);
@@ -2722,42 +2586,42 @@ function switchTab(tabName) {
     }
 
     function handleImageFileUpload(event) {
-    const file = event.target && event.target.files ? event.target.files[0] : null;
-    if (!file) return;
+        const file = event.target && event.target.files ? event.target.files[0] : null;
+        if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const img = new Image();
-        img.onload = function() {
-            const canvas = document.createElement('canvas');
-            let width = img.width;
-            let height = img.height;
-            const maxDim = 800;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                const maxDim = 800;
 
-            if (width > maxDim || height > maxDim) {
-                if (width > height) {
-                    height = Math.round((height * maxDim) / width);
-                    width = maxDim;
-                } else {
-                    width = Math.round((width * maxDim) / height);
-                    height = maxDim;
+                if (width > maxDim || height > maxDim) {
+                    if (width > height) {
+                        height = Math.round((height * maxDim) / width);
+                        width = maxDim;
+                    } else {
+                        width = Math.round((width * maxDim) / height);
+                        height = maxDim;
+                    }
                 }
-            }
 
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, height);
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
 
-            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
-            const urlInput = document.getElementById('form-q-image-url');
-            if (urlInput) urlInput.value = compressedBase64;
-            showImagePreview(compressedBase64);
+                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                const urlInput = document.getElementById('form-q-image-url');
+                if (urlInput) urlInput.value = compressedBase64;
+                showImagePreview(compressedBase64);
+            };
+            img.src = e.target.result;
         };
-        img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-}
+        reader.readAsDataURL(file);
+    }
 
     function updateMatrixKeyLabels() {
         const typeSelect = document.getElementById('form-q-matrix-type');
@@ -2897,14 +2761,13 @@ function switchTab(tabName) {
         const discussion = document.getElementById('form-q-discussion').value.trim();
         const qObj = { id, category, type, matrixType, weight, stimulus, question, image, options, correct, discussion };
 
-        // Jika tersambung ke Google Sheets, tunggu proses simpan di Sheets selesai lebih dahulu
         if (googleSheetsUrl) {
             try {
                 const res = await fetch(googleSheetsUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({ 
-                        action: 'SAVE_QUESTION', // <-- SESUAIKAN DENGAN CODE.GS
+                        action: 'SAVE_QUESTION',
                         pin: window.activeAdminPin || ADMIN_PIN,
                         question: qObj 
                     })
@@ -2912,7 +2775,6 @@ function switchTab(tabName) {
                 const data = await res.json();
                 
                 if (data.status === 'success') {
-                    // Update data lokal setelah terkonfirmasi tersimpan di Sheets
                     const existingIdx = questionsData.findIndex(item => String(item.id) === String(id));
                     if (existingIdx >= 0) {
                         questionsData[existingIdx] = qObj;
@@ -2930,7 +2792,6 @@ function switchTab(tabName) {
                 showAlert('Koneksi Terputus', 'Gagal terhubung ke Google Sheets. Pastikan koneksi internet lancar.', 'error');
             }
         } else {
-            // Jika tanpa URL Cloud, simpan ke browser saja
             const existingIdx = questionsData.findIndex(item => String(item.id) === String(id));
             if (existingIdx >= 0) {
                 questionsData[existingIdx] = qObj;
@@ -2941,6 +2802,7 @@ function switchTab(tabName) {
             closeModal('modal-question');
         }
     }
+
     function editQuestion(id) {
         openQuestionModal(id);
     }
@@ -2959,64 +2821,6 @@ function switchTab(tabName) {
                 }).catch(() => {});
             }
         });
-    }
-
-    function openImportModal() {
-        document.getElementById('import-json-textarea').value = '';
-        openModal('modal-import-questions');
-    }
-
-    function processBulkImport() {
-        const rawJson = document.getElementById('import-json-textarea').value.trim();
-        const defaultCat = document.getElementById('import-default-category').value;
-
-        if (!rawJson) {
-            showAlert('Teks Kosong', 'Tempelkan format teks JSON soal terlebih dahulu!', 'error');
-            return;
-        }
-
-        try {
-            const parsedArr = JSON.parse(rawJson);
-            if (!Array.isArray(parsedArr)) {
-                showAlert('Format Salah', 'Format data harus berupa Array JSON [ {...}, {...} ]', 'error');
-                return;
-            }
-
-            let importedCount = 0;
-            parsedArr.forEach((qItem, idx) => {
-                if (qItem.question) {
-                    const newQ = {
-                        id: qItem.id || `q_imp_${Date.now()}_${idx}`,
-                        category: qItem.category || defaultCat,
-                        type: qItem.type || 'pg',
-                        weight: qItem.weight || 3,
-                        stimulus: qItem.stimulus || null,
-                        question: qItem.question,
-                        image: qItem.image || '',
-                        options: qItem.options || { A: 'Opsi A', B: 'Opsi B', C: 'Opsi C', D: 'Opsi D', E: 'Opsi E' },
-                        correct: qItem.correct || 'A',
-                        discussion: qItem.discussion || ''
-                    };
-                    questionsData.push(newQ);
-                    importedCount++;
-                }
-            });
-
-            saveBankQuestions();
-            closeModal('modal-import-questions');
-            showAlert('Import Berhasil', `Berhasil menambahkan ${importedCount} soal ke dalam bank soal!`, 'success');
-
-           if (googleSheetsUrl && importedCount > 0) {
-    fetch(googleSheetsUrl, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'SYNC_ALL', pin: ADMIN_PIN, questions: questionsData })
-    }).catch(() => {});
-}
-        } catch(err) {
-            showAlert('Gagal Import', `Teks JSON tidak valid: ${err.message}`, 'error');
-        }
     }
 
     function connectAndAutoSyncSheets() {
@@ -3042,68 +2846,65 @@ function switchTab(tabName) {
         fetchCloudResults();
     }
 
- // 1. FUNGSI AMBIL BANK SOAL (UNTUK KOORDINATOR & SISWA)
-function fetchCloudQuestions() {
-    if (!googleSheetsUrl) return;
+    function fetchCloudQuestions() {
+        if (!googleSheetsUrl) return;
 
-    // Otomatis cek PIN jika user berada di mode Koordinator
-    const adminPin = window.activeAdminPin || sessionStorage.getItem('cbt_admin_pin') || ADMIN_PIN;
-    let requestUrl = googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
-    
-    // Jika ada PIN Koordinator, kirim ke server agar Kunci Jawaban DIBUKA
-    if (adminPin) {
-        requestUrl += '&admin_pin=' + encodeURIComponent(adminPin) + '&pin=' + encodeURIComponent(adminPin);
-    }
+        const adminPin = window.activeAdminPin || sessionStorage.getItem('cbt_admin_pin') || ADMIN_PIN;
+        let requestUrl = googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
+        
+        if (adminPin) {
+            requestUrl += '&admin_pin=' + encodeURIComponent(adminPin) + '&pin=' + encodeURIComponent(adminPin);
+        }
 
-    const statusEl = document.getElementById('sheet-status-indicator');
+        const statusEl = document.getElementById('sheets-sync-status');
 
-    fetch(requestUrl)
-        .then(res => res.json())
-        .then(data => {
-            if (Array.isArray(data) && data.length > 0) {
-                questionsData = deduplicateQuestions(data);
-                localStorage.setItem('tryout_bank_questions', JSON.stringify(questionsData));
-                
-                bankCurrentPage = 1;
-                renderBankTable();
+        fetch(requestUrl)
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data) && data.length > 0) {
+                    questionsData = deduplicateQuestions(data);
+                    localStorage.setItem('tryout_bank_questions', JSON.stringify(questionsData));
+                    
+                    bankCurrentPage = 1;
+                    renderBankTable();
 
-                if (statusEl) {
-                    statusEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-300"></i> <span>Tersambung ke Google Sheets (${questionsData.length} Soal Dimuat)</span>`;
+                    if (statusEl) {
+                        statusEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-300"></i> <span>Tersambung ke Google Sheets (${questionsData.length} Soal Dimuat)</span>`;
+                    }
                 }
-            }
-        })
-        .catch(err => console.error('Gagal memuat soal cloud:', err));
-}
-
-// 2. FUNGSI AMBIL REKAP HASIL UJIAN
-function fetchCloudResults() {
-    if (!googleSheetsUrl) return;
-
-    const adminPin = window.activeAdminPin || sessionStorage.getItem('cbt_admin_pin') || ADMIN_PIN;
-    let cacheBusterUrl = googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 'action=GET_RESULTS&t=' + Date.now();
-    
-    if (adminPin) {
-        cacheBusterUrl += '&admin_pin=' + encodeURIComponent(adminPin) + '&pin=' + encodeURIComponent(adminPin);
+            })
+            .catch(err => console.error('Gagal memuat soal cloud:', err));
     }
 
-    fetch(cacheBusterUrl)
-        .then(res => res.json())
-        .then(data => {
-            if (Array.isArray(data)) {
-                resultsDataList = data;
-                localStorage.setItem('tryout_results', JSON.stringify(data));
+    function fetchCloudResults() {
+        if (!googleSheetsUrl) return;
+
+        const adminPin = window.activeAdminPin || sessionStorage.getItem('cbt_admin_pin') || ADMIN_PIN;
+        let cacheBusterUrl = googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 'action=GET_RESULTS&t=' + Date.now();
+        
+        if (adminPin) {
+            cacheBusterUrl += '&admin_pin=' + encodeURIComponent(adminPin) + '&pin=' + encodeURIComponent(adminPin);
+        }
+
+        fetch(cacheBusterUrl)
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    resultsDataList = data;
+                    localStorage.setItem('tryout_results', JSON.stringify(data));
+                    updateResultsClassDropdown();
+                    currentResultsPage = 1;
+                    renderResultsTable();
+                }
+            })
+            .catch(err => {
+                resultsDataList = JSON.parse(localStorage.getItem('tryout_results') || '[]');
                 updateResultsClassDropdown();
-                currentResultsPage = 1;
                 renderResultsTable();
-            }
-        })
-        .catch(err => {
-            resultsDataList = JSON.parse(localStorage.getItem('tryout_results') || '[]');
-            updateResultsClassDropdown();
-            renderResultsTable();
-        });
-}
-   function fetchCloudSettings() {
+            });
+    }
+
+    function fetchCloudSettings() {
         if (!googleSheetsUrl) return;
         
         fetch(googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 'action=GET_SETTINGS&t=' + Date.now())
@@ -3111,7 +2912,6 @@ function fetchCloudResults() {
             .then(data => {
                 if (data && typeof data === 'object' && Object.keys(data).length > 0) {
                     const localMap = getSubtestSettingsMap();
-                    // Gabungkan data cloud dengan data lokal yang ada
                     const mergedMap = { ...localMap, ...data };
                     localStorage.setItem('cbt_subtest_settings_map', JSON.stringify(mergedMap));
                     loadSubtestSettingsToForm();
@@ -3243,44 +3043,39 @@ function fetchCloudResults() {
         window.print();
     }
 
-   window.onload = function() {
-    // 1. Ambil Status Admin/Koordinator dari sessionStorage
-    if (sessionStorage.getItem('cbt_is_admin') === 'true') {
-        isAdminLoggedIn = true;
-        window.activeAdminPin = sessionStorage.getItem('cbt_admin_pin') || ADMIN_PIN;
-    }
+    window.onload = function() {
+        if (sessionStorage.getItem('cbt_is_admin') === 'true') {
+            isAdminLoggedIn = true;
+            window.activeAdminPin = sessionStorage.getItem('cbt_admin_pin') || ADMIN_PIN;
+        }
 
-    // 2. Pastikan URL Google Sheets terisi
-    const savedUrl = localStorage.getItem('google_sheets_url');
-    if (savedUrl) {
-        googleSheetsUrl = savedUrl;
-    }
+        const savedUrl = localStorage.getItem('google_sheets_url');
+        if (savedUrl) {
+            googleSheetsUrl = savedUrl;
+        }
 
-    const inputEl = document.getElementById('google-sheets-url');
-    if (inputEl) {
-        inputEl.value = googleSheetsUrl || '';
-    }
+        const inputEl = document.getElementById('google-sheets-url');
+        if (inputEl) {
+            inputEl.value = googleSheetsUrl || '';
+        }
 
-    // 3. Tampilkan UI Navigasi & Muat Data Lokal
-    loadBankQuestions();
-    updateExamDurationDisplay();
-    updateNavUI();
-    loadSubtestSettingsToForm();
+        loadBankQuestions();
+        updateExamDurationDisplay();
+        updateNavUI();
+        loadSubtestSettingsToForm();
 
-    // 4. BUKA TAB TERAKHIR YANG DISIMPAN (TIDAK PAKSA KE BANK SOAL)
-    if (isAdminLoggedIn) {
-        const lastTab = sessionStorage.getItem('cbt_active_tab') || 'bank';
-        switchTab(lastTab);
-    } else {
-        checkActiveExamSession();
-    }
+        if (isAdminLoggedIn) {
+            const lastTab = sessionStorage.getItem('cbt_active_tab') || 'bank';
+            switchTab(lastTab);
+        } else {
+            checkActiveExamSession();
+        }
 
-    // 5. Sinkronkan Otomatis dari Cloud
-    if (googleSheetsUrl) {
-        fetchCloudQuestions(); 
-        fetchCloudSettings();
-    }
-};
+        if (googleSheetsUrl) {
+            fetchCloudQuestions(); 
+            fetchCloudSettings();
+        }
+    };
 </script>
 </body>
 </html>
