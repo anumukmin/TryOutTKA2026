@@ -2915,22 +2915,6 @@
             });
     }
 
-    function fetchCloudSettings() {
-        if (!googleSheetsUrl) return;
-        
-        fetch(googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 'action=GET_SETTINGS&t=' + Date.now())
-            .then(res => res.json())
-            .then(data => {
-                if (data && typeof data === 'object' && Object.keys(data).length > 0) {
-                    const localMap = getSubtestSettingsMap();
-                    const mergedMap = { ...localMap, ...data };
-                    localStorage.setItem('cbt_subtest_settings_map', JSON.stringify(mergedMap));
-                    loadSubtestSettingsToForm();
-                }
-            })
-            .catch(err => console.warn("Gagal mengambil pengaturan dari cloud:", err));
-    }
-
     function updateResultsClassDropdown() {
         const selectEl = document.getElementById('results-filter-class');
         if (!selectEl) return;
