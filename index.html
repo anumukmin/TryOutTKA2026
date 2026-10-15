@@ -3089,13 +3089,13 @@ function fetchCloudResults() {
     }
 
    window.onload = function() {
-    // 1. Pemulihan Sesi Koordinator dari sessionStorage
+    // 1. Ambil & Kunci Status Admin/Koordinator dari sessionStorage
     if (sessionStorage.getItem('cbt_is_admin') === 'true') {
         isAdminLoggedIn = true;
         window.activeAdminPin = sessionStorage.getItem('cbt_admin_pin') || ADMIN_PIN;
     }
 
-    // 2. Ambil URL Google Sheets
+    // 2. Pastikan URL Google Sheets terisi
     const savedUrl = localStorage.getItem('google_sheets_url');
     if (savedUrl) {
         googleSheetsUrl = savedUrl;
@@ -3106,16 +3106,21 @@ function fetchCloudResults() {
         inputEl.value = googleSheetsUrl || '';
     }
 
-    // 3. Muat Data Dasar
+    // 3. Tampilkan UI Navigasi & Muat Data Lokal
     loadBankQuestions();
     updateExamDurationDisplay();
     updateNavUI();
     loadSubtestSettingsToForm();
 
-    // 4. AUTO-RESUME SISWA: Jika halaman di-refresh saat siswa sedang ujian
-    checkActiveExamSession();
+    // 4. JIKA KOORDINATOR AKTIF -> LANGSUNG BUKA TAB BANK SOAL (TIDAK TAMPILKAN LOGIN SISWA)
+    if (isAdminLoggedIn) {
+        switchTab('bank');
+    } else {
+        // Jika Siswa, cek apakah ada sesi ujian aktif yang terputus
+        checkActiveExamSession();
+    }
 
-    // 5. Sinkronkan dari Cloud
+    // 5. Sinkronkan Otomatis dari Cloud
     if (googleSheetsUrl) {
         fetchCloudQuestions(); 
         fetchCloudSettings();
