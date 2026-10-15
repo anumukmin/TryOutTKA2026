@@ -1029,7 +1029,6 @@
     btn.disabled = true;
     btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memeriksa...`;
 
-    // Kirim PIN ke Google Apps Script untuk diverifikasi
     fetch(googleSheetsUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -1042,7 +1041,12 @@
         
         if (data.status === 'success') {
             isAdminLoggedIn = true;
-            window.activeAdminPin = pinInput; // Simpan PIN sementara untuk penarikan data koordinator
+            window.activeAdminPin = pinInput; 
+            
+            // SIMPAN SESI KOORDINATOR DI TAB BROWSER
+            sessionStorage.setItem('cbt_is_admin', 'true');
+            sessionStorage.setItem('cbt_admin_pin', pinInput);
+
             closeModal('modal-admin-auth');
             document.getElementById('admin-pin-input').value = '';
             if (errEl) errEl.classList.add('hidden');
@@ -1061,7 +1065,6 @@
         showAlert('Error', 'Gagal terhubung ke server Google Apps Script.', 'error');
     });
 }
-
     function formatGoogleDriveUrl(url) {
         if (!url) return '';
         if (url.includes('drive.google.com') && url.includes('/d/')) {
@@ -3086,13 +3089,13 @@ function fetchCloudResults() {
     }
 
    window.onload = function() {
-    // 1. Ambil & Kunci Status Admin/Koordinator dari sessionStorage
+    // 1. Pemulihan Sesi Koordinator dari sessionStorage
     if (sessionStorage.getItem('cbt_is_admin') === 'true') {
         isAdminLoggedIn = true;
         window.activeAdminPin = sessionStorage.getItem('cbt_admin_pin') || ADMIN_PIN;
     }
 
-    // 2. Pastikan URL Google Sheets selalu mengambil data terbaru dari localStorage
+    // 2. Ambil URL Google Sheets
     const savedUrl = localStorage.getItem('google_sheets_url');
     if (savedUrl) {
         googleSheetsUrl = savedUrl;
@@ -3103,15 +3106,18 @@ function fetchCloudResults() {
         inputEl.value = googleSheetsUrl || '';
     }
 
-    // 3. Tampilkan UI & Muat Soal Lokal Terlebih Dahulu
+    // 3. Muat Data Dasar
     loadBankQuestions();
     updateExamDurationDisplay();
     updateNavUI();
     loadSubtestSettingsToForm();
 
-    // 4. Sinkronkan Otomatis dari Cloud (Tarik Kunci Jawaban Lengkap)
+    // 4. AUTO-RESUME SISWA: Jika halaman di-refresh saat siswa sedang ujian
+    checkActiveExamSession();
+
+    // 5. Sinkronkan dari Cloud
     if (googleSheetsUrl) {
-        fetchCloudQuestions(); // Memanggil data fresh dari Google Sheets menggunakan PIN Koordinator
+        fetchCloudQuestions(); 
         fetchCloudSettings();
     }
 };
