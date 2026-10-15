@@ -1382,8 +1382,7 @@
             return q;
         });
     }
-
-    function switchTab(tabName) {
+function switchTab(tabName) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
         document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-brand-700', 'font-bold'));
 
@@ -1392,15 +1391,10 @@
 
         const navBtn = document.getElementById('nav-' + tabName);
         if (navBtn) navBtn.classList.add('bg-brand-700', 'font-bold');
-// SIMPAN TAB TERAKHIR YANG DIBUKA
+
+        // SIMPAN TAB TERAKHIR YANG DIBUKA
         sessionStorage.setItem('cbt_active_tab', tabName);
 
-        if (tabName === 'bank') renderBankTable();
-        if (tabName === 'results') {
-            if (googleSheetsUrl) fetchCloudResults();
-            else renderResultsTable();
-        }
-    }
         if (tabName === 'bank') renderBankTable();
         if (tabName === 'results') {
             if (googleSheetsUrl) fetchCloudResults();
