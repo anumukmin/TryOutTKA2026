@@ -1535,18 +1535,23 @@ function switchTab(tabName) {
         const selectedSubtest = document.getElementById('exam-subtest-filter').value;
         const studentUsername = (currentStudent.username || '').toLowerCase();
 
-        // 1. CEK RIWAYAT LOKAL: JIKA SUDAH PERNAH SUBMIT MAPEL INI DAN SUDAH SYNC KE CLOUD, TOLAK
+      // 1. CEK RIWAYAT (LOKAL & CLOUD): JIKA SUDAH PERNAH KERJAKAN MAPEL INI, TOLAK
         const localResults = JSON.parse(localStorage.getItem('tryout_results') || '[]');
-        const alreadyTaken = localResults.some(r => 
-            String(r.username || r.studentName).toLowerCase() === studentUsername && 
-            String(r.subtest).toLowerCase() === selectedSubtest.toLowerCase() &&
-            r.syncedWithCloud === true // Hanya tolak jika data benar-benar sudah sukses terkirim
-        );
+        
+        // Gabungkan riwayat lokal dan riwayat dari Cloud (Google Sheets)
+        const combinedResults = [...localResults, ...resultsDataList];
+
+        const alreadyTaken = combinedResults.some(r => {
+            const rUser = String(r.username || r.studentName || '').trim().toLowerCase();
+            const rSubtest = String(r.subtest || '').trim().toLowerCase();
+            return (rUser === studentUsername || rUser === (currentStudent.name || '').toLowerCase()) && 
+                   rSubtest === selectedSubtest.toLowerCase();
+        });
 
         if (alreadyTaken) {
             showAlert(
                 'Ujian Sudah Dikerjakan!', 
-                `Anda sudah pernah menyelesaikan dan mengumpulkan ujian untuk mata pelajaran (${selectedSubtest}). Anda tidak dapat mengerjakannya kembali.`, 
+                `Siswa atas nama (${currentStudent.name}) sudah pernah menyelesaikan ujian untuk mata pelajaran (${selectedSubtest}). Ujian tidak dapat diulang.`, 
                 'error'
             );
             return;
