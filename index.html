@@ -1511,7 +1511,7 @@
     }
 
     // --- FUNGSI MULAI UJIAN + CEK RIWAYAT REAL-TIME KELUARAN GOOGLE SHEETS ---
-    async function handleStartExam(e) {
+   async function handleStartExam(e) {
         e.preventDefault();
 
         const btnStart = e.target.querySelector('button[type="submit"]');
@@ -1520,19 +1520,28 @@
         try {
             if (btnStart) {
                 btnStart.disabled = true;
-                btnStart.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memeriksa Riwayat Ujian...`;
+                btnStart.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memeriksa Riwayat Ujian Cloud...`;
             }
 
             const selectedSubtest = document.getElementById('exam-subtest-filter').value;
-            const studentUsername = String(currentStudent.username || '').trim().toLowerCase();
-            const studentName = String(currentStudent.name || '').trim().toLowerCase();
 
-            // 1. TARIK DATA TERBARU DARI GOOGLE SHEETS DULU SEBELUM IJINKAN MASUK
+            // Helper pembersih string (hapus spasi, simbol, ubah ke lowercase)
+            function cleanStr(str) {
+                return String(str || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+            }
+
+            const cleanStudentUser = cleanStr(currentStudent.username); // "nebula26088"
+            const cleanStudentName = cleanStr(currentStudent.name);     // "muhammaddimassetiadi"
+            const cleanSelectedSubtest = cleanStr(selectedSubtest);
+
+            // 1. TARIK REKAP HASIL UJIAN TERBARU DARI GOOGLE SHEETS
+            let fetchedCloudData = [];
             if (googleSheetsUrl) {
                 try {
                     const res = await fetch(googleSheetsUrl + (googleSheetsUrl.includes('?') ? '&' : '?') + 'action=GET_RESULTS&t=' + Date.now());
                     const cloudData = await res.json();
                     if (Array.isArray(cloudData)) {
+                        fetchedCloudData = cloudData;
                         resultsDataList = cloudData;
                     }
                 } catch (err) {
@@ -1540,22 +1549,35 @@
                 }
             }
 
-            // 2. GABUNGKAN RIWAYAT LOKAL & CLOUD TERBARU (FLEKSIBEL PENCOCOKAN NAMA)
+            // 2. GABUNGKAN DATA LOKAL & CLOUD
             const localResults = JSON.parse(localStorage.getItem('tryout_results') || '[]');
-            const combinedResults = [...localResults, ...(resultsDataList || [])];
+            const combinedResults = [...localResults, ...fetchedCloudData, ...(resultsDataList || [])];
 
+            // 3. PENGECEKAN TINGKAT KETAT
             const alreadyTaken = combinedResults.some(r => {
-                const rUser = String(r.username || '').trim().toLowerCase();
-                const rName = String(r.studentName || r.nama || '').trim().toLowerCase();
-                const rSubtest = String(r.subtest || r.mapel || '').trim().toLowerCase();
+                if (!r) return false;
 
-                const isSameUser = (rUser && rUser !== '-' && rUser === studentUsername);
-                const isSameName = (rName && studentName) && (rName.includes(studentName) || studentName.includes(rName));
+                // Ambil nilai dari berbagai kemungkinan nama kolom JSON yang dikirim Apps Script
+                const keys = Object.keys(r);
                 
-                const isSameStudent = isSameUser || isSameName;
-                const isSameSubtest = rSubtest.includes(selectedSubtest.toLowerCase()) || selectedSubtest.toLowerCase().includes(rSubtest);
+                // Cari nilai berdasarkan urutan / nama properti
+                let rUser = cleanStr(r.username || r.Username || r.NISN || r.nisn || r[keys[1]] || '');
+                let rName = cleanStr(r.studentName || r.nama || r.Nama || r['Nama Murid'] || r['Nama Siswa'] || r[keys[2]] || '');
+                let rSubtest = cleanStr(r.subtest || r.mapel || r.Mapel || r['Mata Pelajaran'] || r.Subtest || r[keys[5]] || '');
 
-                return isSameStudent && isSameSubtest;
+                // A. Cek Username ("nebula26088")
+                const isSameUser = (cleanStudentUser.length > 2 && rUser.length > 2) && (rUser === cleanStudentUser);
+                
+                // B. Cek Nama ("muhammaddimassetiadi")
+                const isSameName = (cleanStudentName.length > 2 && rName.length > 2) && (rName.includes(cleanStudentName) || cleanStudentName.includes(rName));
+
+                const isStudentMatch = isSameUser || isSameName;
+
+                // C. Cek Mapel ("bahasaindonesia")
+                const isSubtestMatch = (rSubtest.length > 2 && cleanSelectedSubtest.length > 2) && 
+                                       (rSubtest.includes(cleanSelectedSubtest) || cleanSelectedSubtest.includes(rSubtest));
+
+                return isStudentMatch && isSubtestMatch;
             });
 
             if (alreadyTaken) {
@@ -1565,20 +1587,20 @@
                 }
                 showAlert(
                     'Ujian Sudah Dikerjakan!', 
-                    `Siswa atas nama (${currentStudent.name}) sudah pernah menyelesaikan ujian untuk mata pelajaran (${selectedSubtest}). Ujian tidak dapat diulang.`, 
+                    `Siswa atas nama (${currentStudent.name}) sudah pernah menyelesaikan ujian untuk mata pelajaran (${selectedSubtest}). Ujian tidak dapat diulang kembali.`, 
                     'error'
                 );
                 return;
             }
 
-            if (btnStart) {
-                btnStart.disabled = false;
-                btnStart.innerHTML = originalBtnHtml;
-            }
-
+            // 4. JIKA BELUM UJIAN, CEK TOKEN & MULAI
             const subtestConfig = getSubtestConfig(selectedSubtest);
             const inputToken = document.getElementById('exam-token-input').value.trim().toUpperCase();
             if (inputToken !== subtestConfig.token) {
+                if (btnStart) {
+                    btnStart.disabled = false;
+                    btnStart.innerHTML = originalBtnHtml;
+                }
                 showAlert('Token Salah', `Token Ujian untuk mata pelajaran (${selectedSubtest}) yang Anda masukkan salah / tidak aktif. Silakan tanyakan ke pengawas.`, 'error');
                 return;
             }
@@ -1612,6 +1634,10 @@
             }
 
             if (currentExamQuestions.length === 0) {
+                if (btnStart) {
+                    btnStart.disabled = false;
+                    btnStart.innerHTML = originalBtnHtml;
+                }
                 showAlert('Soal Belum Ada', `Belum ada soal tersedia di bank soal untuk subtes/jurusan (${selectedSubtest})!`, 'error');
                 return;
             }
