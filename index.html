@@ -1177,7 +1177,7 @@
                 if (data && typeof data === 'object' && Object.keys(data).length > 0) {
                     const localMap = getSubtestSettingsMap();
                     // SOLUSI UTAMA: Dibalik ({ ...data, ...localMap }), agar localMap (yang baru diubah admin) MENIMPA data cloud lama!
-                    const mergedMap = { ...data, ...localMap };
+                    const mergedMap = { ...localMap, ...data };
                     localStorage.setItem('cbt_subtest_settings_map', JSON.stringify(mergedMap));
                     loadSubtestSettingsToForm();
                 }
