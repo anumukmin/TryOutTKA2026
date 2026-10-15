@@ -1687,16 +1687,15 @@
         localStorage.setItem('tryout_active_session', JSON.stringify(sessionData));
     }
 
-    function checkActiveExamSession() {
+ function checkActiveExamSession() {
         const saved = localStorage.getItem('tryout_active_session');
         if (!saved) return;
 
         try {
             const data = JSON.parse(saved);
             if (data && data.student && data.questions && data.questions.length > 0) {
-                showConfirm('Sesi Ujian Ditemukan!', `Sistem menemukan sesi pengerjaan ujian (${data.subtest}) atas nama ${data.student.name} yang belum selesai. Apakah Anda ingin melanjutkan ujian?`, () => {
-                    resumeExamSession(data);
-                });
+                // LANGSUNG MASUK KE SOAL TANPA POPUP CONFIRM
+                resumeExamSession(data);
             }
         } catch(e) {
             localStorage.removeItem('tryout_active_session');
@@ -1917,31 +1916,50 @@
         const btnNext = document.getElementById('btn-next-q');
         const btnSubmit = document.getElementById('btn-submit-q');
 
-        if (currentQIndex === currentExamQuestions.length - 1) {
-            if (btnNext) btnNext.style.display = 'none';
-            if (btnSubmit) btnSubmit.style.display = 'inline-flex';
-        } else {
-            if (btnNext) btnNext.style.display = 'inline-flex';
-            if (btnSubmit) btnSubmit.style.display = 'none';
+       // LOGIKA BARU: TOMBOL SELESAI MUNCUL JIKA SUDAH TERISI SEMUA ATAU DI NO TERAKHIR
+        const totalQuestions = currentExamQuestions.length;
+        let answeredCount = 0;
+
+        currentExamQuestions.forEach(q => {
+            const userAns = studentAnswers[q.id];
+            if (userAns && userAns !== '{}' && userAns !== '') {
+                answeredCount++;
+            }
+        });
+
+        const isAllAnswered = (answeredCount === totalQuestions);
+        const isLastQuestion = (currentQIndex === totalQuestions - 1);
+
+        if (btnNext) {
+            // Sembunyikan 'Berikut' hanya kalau sudah di nomor paling akhir
+            btnNext.style.display = isLastQuestion ? 'none' : 'inline-flex';
+        }
+
+        if (btnSubmit) {
+            // Tampilkan 'Selesai' jika SUDAH DIJAWAB SEMUA atau sedang di nomor terakhir
+            if (isAllAnswered || isLastQuestion) {
+                btnSubmit.style.display = 'inline-flex';
+            } else {
+                btnSubmit.style.display = 'none';
+            }
         }
 
         // KODE BARU (Menggunakan setTimeout agar matematika dirender sempurna):
-if (window.renderMathInElement) {
-    setTimeout(() => {
-        const cbtScreen = document.getElementById('cbt-screen');
-        if (cbtScreen) {
-            renderMathInElement(cbtScreen, {
-                delimiters: [
-                    {left: '$$', right: '$$', display: true},
-                    {left: '$', right: '$', display: false}
-                ],
-                throwOnError: false
-            });
+        if (window.renderMathInElement) {
+            setTimeout(() => {
+                const cbtScreen = document.getElementById('cbt-screen');
+                if (cbtScreen) {
+                    renderMathInElement(cbtScreen, {
+                        delimiters: [
+                            {left: '$$', right: '$$', display: true},
+                            {left: '$', right: '$', display: false}
+                        ],
+                        throwOnError: false
+                    });
+                }
+            }, 50);
         }
-    }, 50);
-}
     }
-
     function setMatrixAnswer(qId, statementLetter, val) {
         let obj = studentAnswers[qId] ? JSON.parse(studentAnswers[qId]) : {};
         obj[statementLetter] = val;
