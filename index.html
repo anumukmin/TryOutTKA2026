@@ -1511,7 +1511,7 @@
     }
 
     // --- FUNGSI MULAI UJIAN + CEK RIWAYAT REAL-TIME KELUARAN GOOGLE SHEETS ---
-   async function handleStartExam(e) {
+  async function handleStartExam(e) {
         e.preventDefault();
 
         const btnStart = e.target.querySelector('button[type="submit"]');
@@ -1525,14 +1525,14 @@
 
             const selectedSubtest = document.getElementById('exam-subtest-filter').value;
 
-            // Helper pembersih string (hapus spasi, simbol, ubah ke lowercase)
+            // Helper pembersih string: hapus semua spasi & simbol, ubah ke lowercase
             function cleanStr(str) {
                 return String(str || '').toLowerCase().replace(/[^a-z0-9]/g, '');
             }
 
             const cleanStudentUser = cleanStr(currentStudent.username); // "nebula26088"
             const cleanStudentName = cleanStr(currentStudent.name);     // "muhammaddimassetiadi"
-            const cleanSelectedSubtest = cleanStr(selectedSubtest);
+            const cleanSelectedSubtest = cleanStr(selectedSubtest);     // "bahasaindonesia"
 
             // 1. TARIK REKAP HASIL UJIAN TERBARU DARI GOOGLE SHEETS
             let fetchedCloudData = [];
@@ -1553,29 +1553,22 @@
             const localResults = JSON.parse(localStorage.getItem('tryout_results') || '[]');
             const combinedResults = [...localResults, ...fetchedCloudData, ...(resultsDataList || [])];
 
-            // 3. PENGECEKAN TINGKAT KETAT
+            // 3. PENGECEKAN SUPER KETAT & FLEKSIBEL
             const alreadyTaken = combinedResults.some(r => {
                 if (!r) return false;
 
-                // Ambil nilai dari berbagai kemungkinan nama kolom JSON yang dikirim Apps Script
-                const keys = Object.keys(r);
+                // Ambil seluruh nilai (values) yang ada pada objek row tersebut
+                const rowValues = Object.values(r).map(val => cleanStr(val));
+                const rowJsonStr = JSON.stringify(r).toLowerCase();
+
+                // A. Cek apakah Username ("nebula26088") atau Nama ("muhammaddimassetiadi") ada di dalam baris data tersebut
+                const hasUser = cleanStudentUser.length > 2 && rowValues.some(v => v === cleanStudentUser);
+                const hasName = cleanStudentName.length > 2 && rowValues.some(v => v.includes(cleanStudentName) || cleanStudentName.includes(v));
                 
-                // Cari nilai berdasarkan urutan / nama properti
-                let rUser = cleanStr(r.username || r.Username || r.NISN || r.nisn || r[keys[1]] || '');
-                let rName = cleanStr(r.studentName || r.nama || r.Nama || r['Nama Murid'] || r['Nama Siswa'] || r[keys[2]] || '');
-                let rSubtest = cleanStr(r.subtest || r.mapel || r.Mapel || r['Mata Pelajaran'] || r.Subtest || r[keys[5]] || '');
+                const isStudentMatch = hasUser || hasName;
 
-                // A. Cek Username ("nebula26088")
-                const isSameUser = (cleanStudentUser.length > 2 && rUser.length > 2) && (rUser === cleanStudentUser);
-                
-                // B. Cek Nama ("muhammaddimassetiadi")
-                const isSameName = (cleanStudentName.length > 2 && rName.length > 2) && (rName.includes(cleanStudentName) || cleanStudentName.includes(rName));
-
-                const isStudentMatch = isSameUser || isSameName;
-
-                // C. Cek Mapel ("bahasaindonesia")
-                const isSubtestMatch = (rSubtest.length > 2 && cleanSelectedSubtest.length > 2) && 
-                                       (rSubtest.includes(cleanSelectedSubtest) || cleanSelectedSubtest.includes(rSubtest));
+                // B. Cek apakah Mata Pelajaran ("bahasaindonesia") ada di dalam baris data tersebut
+                const isSubtestMatch = cleanSelectedSubtest.length > 2 && rowValues.some(v => v.includes(cleanSelectedSubtest) || cleanSelectedSubtest.includes(v));
 
                 return isStudentMatch && isSubtestMatch;
             });
@@ -1683,7 +1676,6 @@
             console.error("Error pada handleStartExam:", error);
         }
     }
-
     function startExamTimer() {
         clearInterval(examTimerInterval);
         examTimerInterval = setInterval(() => {
