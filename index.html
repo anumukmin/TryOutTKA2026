@@ -1,6 +1,30 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <script>
+  // Memblokir Klik Kanan (Context Menu)
+  document.addEventListener('contextmenu', event => event.preventDefault());
+
+  // Memblokir shortcut keyboard untuk Inspect Element dan View Source
+  document.onkeydown = function(e) {
+    // Blokir tombol F12
+    if (e.keyCode === 123) {
+      return false;
+    }
+    // Blokir Ctrl+Shift+I (Inspect Element)
+    if (e.ctrlKey && e.shiftKey && e.keyCode === 73) {
+      return false;
+    }
+    // Blokir Ctrl+Shift+J (Console)
+    if (e.ctrlKey && e.shiftKey && e.keyCode === 74) {
+      return false;
+    }
+    // Blokir Ctrl+U (View Source)
+    if (e.ctrlKey && e.keyCode === 85) {
+      return false;
+    }
+  };
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TRY OUT TKA 2026 - SMK NEGERI 1 BULAKAMBA</title>
