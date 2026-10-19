@@ -1445,7 +1445,7 @@
     // --- FUNGSI LOGIN SISWA DENGAN FALLBACK AMAN ---
     function handleStudentLogin(e) {
         e.preventDefault();
-        const username = document.getElementById('login-username').value.trim();
+       const username = document.getElementById('login-username').value.trim().toLowerCase();
         const password = document.getElementById('login-password').value.trim();
         const btn = document.getElementById('btn-login-student');
         const errorEl = document.getElementById('login-error-msg');
@@ -1456,18 +1456,18 @@
         btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memverifikasi...`;
         if (errorEl) errorEl.classList.add('hidden');
 
-        function proceedFallback() {
-            btn.disabled = false;
-            btn.innerHTML = `<i class="fa-solid fa-arrow-right-to-bracket"></i> Masuk Ujian Try Out`;
-            currentStudent = {
-                username: username,
-                name: username.toUpperCase(),
-                studentClass: 'XII NKPI 1',
-                major: 'Nautika Kapal Penangkap Ikan'
-            };
-            showStudentPrepCard();
-            checkActiveExamSession();
-        }
+    function proceedFallback() {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-arrow-right-to-bracket"></i> Masuk Ujian Try Out`;
+        currentStudent = {
+            username: username,
+            name: username.toUpperCase(),
+            studentClass: 'Peserta Ujian',
+            major: 'Offline Mode'
+        };
+        showStudentPrepCard();
+        checkActiveExamSession();
+    }
 
         if (googleSheetsUrl) {
             fetch(googleSheetsUrl, {
